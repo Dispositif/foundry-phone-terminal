@@ -135,7 +135,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 ### Un agent vers un PNJ
 
-- **Message** : il arrive dans la boîte « Messages des agents » du panneau MJ. « Répondre » pré-remplit la réponse.
+- **Message** : il arrive dans l'onglet **Messages** du panneau MJ, qui répond dans le fil.
 - **Appel** : le MJ entend la sonnerie et choisit l'issue : **Décrocher**, **Messagerie**, **Pas de réponse**, **Injoignable** ou **Numéro non attribué**.
 
 ### Entre agents
@@ -152,16 +152,15 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 ## Côté MJ
 
-### Le panneau MJ (Ctrl+Shift+P)
+### Le panneau MJ : Réseau (Ctrl+Shift+P)
 
-- Zone d'envoi : destinataire (avec l'icône du modèle), expéditeur, message ou appel, pièce jointe.
-- Boutons **Faire sonner**, **Raccrocher**, **Envoyer**, et 🔗 **Copier en lien** pour un journal.
-- Boîte **Messages des agents**.
-- Bascule **coupure générale du réseau mobile**.
-- Liste **Appareils**, défilante. Un clic sur un appareil le choisit comme destinataire. Pour chacun :
-  - icône du modèle, mode, porteur ou lieu (📍), nombre de messages non lus par le joueur ;
-  - signalements : numéro cloné, porté par personne ;
-  - actions : ouvrir et préparer l'historique, contacts, verrouiller, pas de réseau, donner à…, modifier, retirer.
+- Barre du haut : état du réseau, messages en attente, et bascule **Couper le réseau** mobile.
+- Onglet **Envoyer** : destinataire (avec l'icône du modèle), expéditeur affiché, puis **Message** ou **Appel**. Seul ce que le destinataire sait faire est proposé (pas de message vers une ligne fixe, pas d'appel vers un terminal). **Envoyer** ou **Faire sonner**, pièce jointe, et **Copier en lien** pour un journal.
+- Onglet **Messages** : un fil par agent et par PNJ, en bulles. Réponse directement sous le fil (Entrée envoie), ou rappel de l'agent.
+- Onglet **Appareils**, groupés par porteur (portrait du personnage) ou par lieu (vignette de la scène). Un clic sur un appareil le choisit comme destinataire. Pour chacun :
+  - icône du modèle, mode, nombre de messages non lus par le joueur ;
+  - signalements : numéro cloné, verrouillé, pas de réseau ;
+  - actions au survol : ouvrir et préparer l'historique, contacts, verrouiller, pas de réseau, donner à…, modifier, retirer.
 
 ### Préparer un appareil
 

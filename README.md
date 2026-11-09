@@ -167,7 +167,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 ### Agent to NPC
 
-- **Message:** it lands in the GM panel's **Agents' messages** inbox. **Reply** pre-fills the answer.
+- **Message:** it lands in the **Messages** tab of the GM panel, where the GM replies in the thread.
 - **Call:** the GM hears the ring and picks the outcome: **Answer**, **Voicemail**, **No answer**, **Unreachable** or **Not in service**.
 
 ### Agent to agent
@@ -187,16 +187,15 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 ![GM panel](docs/gm.png)
 
-### The GM panel (Ctrl+Shift+P)
+### The GM panel: Network (Ctrl+Shift+P)
 
-- Send area: recipient (with the model's icon), displayed sender, message or call, attachment.
-- **Ring**, **Hang up**, **Send**, and **Copy as a link** to paste into a journal.
-- **Agents' messages** inbox.
-- **Cut network** toggle for the whole mobile network.
-- **Devices** list. Click a device to make it the recipient. For each one:
-  - model icon, mode, holder or place, number of messages the player hasn't read;
-  - flags: cloned number, held by nobody;
-  - actions: open and prepare history, contacts, lock, no signal, give to…, edit, remove.
+- Top bar: network status, pending messages, and a **Cut network** toggle for the whole mobile network.
+- **Send** tab: recipient (with the model's icon), displayed sender, then **Message** or **Call**. Only what the recipient can do is offered (no message to a landline, no call to a terminal). **Send** or **Ring**, attachment, and **Copy as a link** to paste into a journal.
+- **Messages** tab: one thread per agent and NPC, as chat bubbles. Reply right under the thread (Enter sends), or call the agent back.
+- **Devices** tab, grouped by holder (character portrait) or place (scene thumbnail). Click a device to make it the recipient. For each one:
+  - model icon, mode, number of messages the player hasn't read;
+  - flags: cloned number, locked, no signal;
+  - actions on hover: open and prepare history, contacts, lock, no signal, give to…, edit, remove.
 
 ### Preparing a device
 
