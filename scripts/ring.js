@@ -1,0 +1,142 @@
+import { MASKED, MODULE_ID, RESULT_LABELS, SOCKET } from "./constants.js";
+import { addLog, displayName, getPhoneData, hasSignal, holders, isLandline, keyFor, modelOf, phoneLabel, phonesByNumber } from "./devices.js";
+import { esc, gmWhisper, maskedLabel, rerenderAll } from "./util.js";
+import { t } from "./i18n.js";
+/* -------------------------------------------- */
+/*  Appels sonnant chez des joueurs             */
+/* -------------------------------------------- */
+
+// callId -> { caller, label, open: Map<userId, itemUuid|null>, origin, lastResult }
+export const pendingCalls = new Map();
+
+/**
+ * Fait sonner un téléphone (target = "phone:<numéro>") ou un joueur ("user:<id>").
+ * origin = { userId, itemUuid, callId, key, name } quand l'appel vient d'un autre PJ.
+ */
+export function ring(target, { caller = MASKED, origin = null, callId = foundry.utils.randomID() } = {}) {
+  if (!game.user.isGM) return ui.notifications.warn(t("Warn.GmOnlyCall"));
+  const [kind, value] = String(target).split(/:(.*)/s);
+  const timeout = game.settings.get(MODULE_ID, "ringTimeout");
+  const call = { caller, label: value, open: new Map(), origin, lastResult: "nobody" };
+
+  const emitRing = (userId, extra) => {
+    call.open.set(userId, extra.itemUuid ?? null);
+    game.socket.emit(SOCKET, { type: "ring", targetUserId: userId, callId, timeout, ...extra });
+  };
+
+  if (kind === "user") {
+    const user = game.users.get(value);
+    if (!user) return ui.notifications.warn(t("Warn.PlayerNotFound"));
+    call.label = user.name;
+    if (!user.active) return ui.notifications.warn(`📱 ${t("Warn.UserOffline", { name: user.name })}`);
+    emitRing(user.id, { caller });
+  } else {
+    const phones = phonesByNumber(value).filter((p) => p.item.uuid !== origin?.itemUuid);
+    if (!phones.length) {
+      if (origin) return finishOrigin(origin, "unassigned");
+      return ui.notifications.warn(t("Warn.NoDevice", { value }));
+    }
+    for (const p of phones) {
+      const mode = p.phone.mode ?? "on";
+      const users = holders(p, { activeOnly: true });
+      if (modelOf(p.phone).noCalls) {
+        call.lastResult = "unassigned";
+        if (!origin) ui.notifications.warn(`💻 ${phoneLabel(p)} : ${t("Warn.ComputerNoCalls")}`);
+        continue;
+      }
+      const result = !hasSignal(p.phone) ? "nosignal" : mode === "off" ? "off" : !users.length ? "nobody" : null;
+      if (result) {
+        call.lastResult = result;
+        if (!origin) {
+          ui.notifications.warn(`📱 ${phoneLabel(p)} : ${RESULT_LABELS[result]}.`);
+          gmWhisper(`<p><strong>📞 ${esc(phoneLabel(p))}</strong> : ${RESULT_LABELS[result]}</p><p><em>${t("Caller")} : ${esc(maskedLabel(caller))}</em></p>`);
+        }
+        // Sans réseau, l'appel manqué n'apparaîtra qu'au retour du réseau.
+        addLog(p.item, { kind: "call", dir: "in", with: keyFor(p.phone, caller), result: "missed", pending: result === "nosignal" });
+        continue;
+      }
+      for (const u of users) {
+        const model = modelOf(p.phone);
+        emitRing(u.id, {
+          caller: model.callerId ? displayName(p.phone, caller) : null,
+          itemUuid: p.item.uuid,
+          phoneLabel: isLandline(p.phone) ? `${p.phone.label} (${game.scenes.get(p.phone.sceneId)?.name ?? ""})` : p.phone.label,
+          silent: mode === "silent",
+          ringSrc: model.ring
+        });
+      }
+    }
+  }
+
+  if (!call.open.size) {
+    if (origin) finishOrigin(origin, { nosignal: "unreachable", off: "voicemail", unassigned: "unassigned" }[call.lastResult] ?? "noanswer");
+    return;
+  }
+  pendingCalls.set(callId, call);
+  if (!origin) ui.notifications.info(`📱 ${t("Info.Calling", { label: call.label, caller: maskedLabel(caller) })}`);
+  rerenderAll();
+  return callId;
+}
+
+export function hangUp(callId, { notifyOrigin = true } = {}) {
+  const call = pendingCalls.get(callId);
+  if (!call) return;
+  pendingCalls.delete(callId);
+  const logged = new Set();
+  for (const [userId, itemUuid] of call.open) {
+    game.socket.emit(SOCKET, { type: "cancel", targetUserId: userId, callId });
+    if (itemUuid && !logged.has(itemUuid)) {
+      logged.add(itemUuid);
+      const item = fromUuidSync(itemUuid);
+      if (item) addLog(item, { kind: "call", dir: "in", with: keyFor(getPhoneData(item), call.caller), result: "missed" });
+    }
+  }
+  if (call.origin && notifyOrigin) finishOrigin(call.origin, "noanswer");
+  if (!call.origin) ui.notifications.info(`📱 ${t("Info.CallInterrupted")}`);
+  rerenderAll();
+}
+
+export function hangUpAll() {
+  for (const callId of [...pendingCalls.keys()]) hangUp(callId);
+}
+
+export function onResponse({ callId, result, userId }) {
+  const call = pendingCalls.get(callId);
+  if (!call) return; // appel passé par un autre MJ
+  const itemUuid = call.open.get(userId);
+  call.open.delete(userId);
+  call.lastResult = result;
+  const user = game.users.get(userId);
+  const item = itemUuid ? fromUuidSync(itemUuid) : null;
+  if (item) addLog(item, { kind: "call", dir: "in", with: keyFor(getPhoneData(item), call.caller), result });
+
+  if (!call.origin) {
+    const where = item ? ` (${getPhoneData(item)?.label ?? item.name})` : "";
+    const text = `${user?.name ?? "?"}${where} ${RESULT_LABELS[result] ?? result} — ${t("Caller").toLowerCase()} : ${maskedLabel(call.caller)}`;
+    if (result === "answer") ui.notifications.info(`📱 ${text}`);
+    else ui.notifications.warn(`📱 ${text}`);
+    gmWhisper(`<p><strong>📞 ${esc(user?.name)}${esc(where)}</strong> ${RESULT_LABELS[result] ?? esc(result)}</p><p><em>${t("Caller")} : ${esc(maskedLabel(call.caller))}</em></p>`);
+  }
+
+  if (result === "answer") {
+    // Quelqu'un a décroché : on coupe la sonnerie chez les autres (clones, co-propriétaires).
+    for (const otherId of call.open.keys()) game.socket.emit(SOCKET, { type: "cancel", targetUserId: otherId, callId });
+    call.open.clear();
+  }
+  if (!call.open.size) {
+    pendingCalls.delete(callId);
+    if (call.origin) finishOrigin(call.origin, result === "answer" ? "answer" : result === "off" ? "voicemail" : "noanswer");
+  }
+  rerenderAll();
+}
+
+/** Clôt un appel passé par un joueur : historique + résultat affiché chez lui. */
+export function finishOrigin(origin, result) {
+  const item = fromUuidSync(origin.itemUuid);
+  if (item) addLog(item, { kind: "call", dir: "out", with: origin.key, result });
+  game.socket.emit(SOCKET, { type: "callResult", targetUserId: origin.userId, callId: origin.callId, result, name: origin.name });
+  if (result === "answer") {
+    gmWhisper(`<p>📞 ${t("Gm.OnLine", { who: `<strong>${esc(item?.parent?.name ?? "?")}</strong>`, name: `<strong>${esc(origin.name)}</strong>` })}</p>`);
+  }
+}
+

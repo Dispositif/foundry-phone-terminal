@@ -1,0 +1,391 @@
+/* ============================================================
+   Phone & Terminal — feuille de style
+   Organisée par composant. Couleurs communes en variables ;
+   chaque habillage (spt-skin-*) redéfinit ses propres variables.
+   ============================================================ */
+
+:root {
+  --spt-accent: #2f6f3e;     /* vert « réseau », SMS */
+  --spt-warn: #c9761c;       /* signalements MJ */
+  --spt-danger: #c0392b;     /* non-lus, coupure */
+  --spt-mail: #3b5b8a;       /* mails */
+  --spt-line: rgba(128,128,128,0.35);
+  --spt-soft: rgba(128,128,128,0.12);
+}
+
+/* ---------- Commun ---------- */
+.spt-phone-form { display: flex; flex-direction: column; gap: 0.4rem; }
+.spt-phone-empty { opacity: 0.7; font-style: italic; text-align: center; }
+.spt-badge { display: inline-block; min-width: 1.3em; padding: 0 0.35em; border-radius: 1em; background: var(--spt-danger); color: #fff; font-size: 0.75em; text-align: center; line-height: 1.4em; }
+.spt-check { display: block; margin: 4px 0; }
+.spt-icon-select { display: flex; align-items: center; gap: 0.4rem; flex: 1; min-width: 0; }
+.spt-icon-select > i { flex: 0 0 1.1em; text-align: center; opacity: 0.85; }
+.spt-icon-select select { flex: 1; min-width: 0; }
+.spt-icon-select strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.spt-phone-row { display: flex; gap: 0.4rem; }
+.spt-phone-row button { flex: 1; }
+.spt-phone-row button.spt-icon-btn { flex: 0 0 2.5em; }
+
+/* ---------- Pièces jointes ---------- */
+.spt-drop { display: flex; flex-direction: column; gap: 0.35rem; border-radius: 6px; transition: box-shadow 0.15s; }
+.spt-drop.spt-drag { box-shadow: 0 0 0 2px var(--spt-warn); }
+.spt-att-chip { display: inline-flex; align-items: center; gap: 0.4rem; align-self: flex-start; padding: 2px 6px; border-radius: 6px; background: rgba(128,128,128,0.18); max-width: 100%; }
+.spt-att-chip img { max-height: 48px; max-width: 120px; border: none; border-radius: 4px; }
+.spt-att-img { display: block; max-width: 100%; max-height: 180px; border: none; border-radius: 8px; cursor: zoom-in; margin-bottom: 3px; }
+.spt-att-doc { display: inline-flex; gap: 0.3rem; align-items: center; padding: 2px 8px; border-radius: 8px; background: rgba(255,255,255,0.25); cursor: pointer; margin-bottom: 3px; }
+
+/* ---------- Messages dans le chat ---------- */
+.spt-sms { border-radius: 10px; overflow: hidden; border: 1px solid var(--spt-accent); }
+.spt-sms .spt-sms-header { background: var(--spt-accent); color: #fff; padding: 2px 8px; font-weight: bold; }
+.spt-sms .spt-sms-body { background: #e7f5ea; color: #111; padding: 6px 8px; font-family: monospace; }
+.spt-sms .spt-sms-to { float: right; font-weight: normal; opacity: 0.85; }
+.spt-sms .spt-att-img { max-height: 140px; }
+.spt-sms.spt-mail { border-color: var(--spt-mail); }
+.spt-sms.spt-mail .spt-sms-header { background: var(--spt-mail); }
+.spt-sms.spt-mail .spt-sms-body { background: #eef2f8; font-family: inherit; }
+.spt-sms.spt-mail .spt-sms-body::first-line { font-weight: bold; }
+.spt-gm-copy { margin: 0 0 4px; font-size: 0.9em; }
+
+/* Liens @SMS / @Call dans les journaux (MJ) */
+a.spt-link { display: inline-flex; align-items: baseline; gap: 0.3em; padding: 1px 8px; border-radius: 10px; background: rgba(47,111,62,0.18); border: 1px solid rgba(47,111,62,0.5); cursor: pointer; text-decoration: none; }
+a.spt-link.call { background: rgba(201,118,28,0.15); border-color: rgba(201,118,28,0.55); }
+a.spt-link:hover { filter: brightness(1.15); }
+
+/* ---------- Appel entrant / sortant ---------- */
+.spt-phone-ring { text-align: center; padding: 0.75rem 0; }
+.spt-phone-ring > i { font-size: 2.5rem; animation: spt-phone-shake 0.6s infinite; }
+.spt-phone-ring .spt-caller { font-size: 1.3rem; font-weight: bold; margin: 0.5rem 0 0; }
+.spt-phone-ring .spt-which { margin: 0 0 0.5rem; opacity: 0.85; }
+.spt-phone-ring.silent > i { animation: none; opacity: 0.6; }
+.spt-phone-ring.outgoing > i { animation: spt-phone-pulse 1.2s infinite; }
+@keyframes spt-phone-shake { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
+@keyframes spt-phone-pulse { 50% { opacity: 0.35; } }
+
+/* ---------- Panneau MJ ---------- */
+.spt-phone-panel { max-height: 92vh; }
+.spt-phone-panel .window-content { overflow-y: auto; }
+.spt-phone-panel .spt-phone-body { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem; }
+.spt-phone-panel fieldset { display: flex; flex-direction: column; gap: 0.4rem; }
+.spt-phone-panel textarea { width: 100%; resize: vertical; }
+.spt-phone-panel .spt-phone-status { margin: 0; font-style: italic; opacity: 0.8; }
+.spt-phone-panel .spt-dim { opacity: 0.55; }
+.spt-phone-panel .spt-warn, .spt-phone-panel .spt-locked { color: var(--spt-warn); }
+.spt-phone-panel .spt-phone-row button[data-action="hangup"] { flex: 0 0 2.5em; }
+/* Réseau */
+.spt-phone-panel .spt-network { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 4px 8px; border-radius: 6px; background: rgba(47,111,62,0.15); }
+.spt-phone-panel .spt-network.down { background: rgba(192,57,43,0.2); font-weight: bold; }
+.spt-phone-panel .spt-network button { flex: 0 0 auto; width: auto; }
+.spt-phone-panel .spt-nosignal { color: var(--spt-danger); }
+.spt-phone-panel .spt-nosignal i { text-decoration: line-through; }
+/* Messages des agents */
+.spt-phone-panel .spt-inbox-list { list-style: none; margin: 0; padding: 0; max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.spt-phone-panel .spt-inbox-item { padding: 4px 6px; border-radius: 6px; background: rgba(128,128,128,0.1); }
+.spt-phone-panel .spt-inbox-item.unread { background: rgba(192,57,43,0.15); border-left: 3px solid var(--spt-danger); }
+.spt-phone-panel .spt-inbox-head { display: flex; gap: 0.3rem; }
+.spt-phone-panel .spt-inbox-text { font-family: monospace; margin: 2px 0; }
+.spt-phone-panel .spt-inbox-item a, .spt-phone-panel .spt-mark-all { font-size: 0.85em; }
+.spt-phone-panel .spt-mark-all { align-self: flex-end; opacity: 0.8; }
+/* Liste des appareils (le !important protège la liste des styles génériques de Foundry) */
+.spt-phone-panel .spt-phone-list { list-style: none; margin: 0; padding: 0; display: block !important; max-height: 220px !important; overflow-y: auto !important; }
+.spt-phone-panel .spt-phone-row-item { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 2px 0; border-bottom: 1px dashed rgba(128,128,128,0.3); }
+.spt-phone-panel .spt-row-controls { display: flex; gap: 0.5rem; white-space: nowrap; }
+.spt-row-unread { font-size: 0.8em; color: var(--spt-warn); white-space: nowrap; }
+
+/* ---------- Fenêtre joueur : structure ---------- */
+.spt-player-phone .window-content { display: flex; flex-direction: column; gap: 0; padding: 0; overflow: hidden; }
+.spt-phone-top { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--spt-line); }
+.spt-phone-top.conv strong { flex: 1; text-align: center; }
+.spt-phone-top a { padding: 0 0.3rem; font-size: 1.1em; }
+.spt-phone-top .spt-phone-select { flex: 1; }
+.spt-top-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.spt-top-actions a { cursor: pointer; }
+.spt-modes { display: flex; gap: 2px; }
+.spt-modes .spt-mode { width: 2em; height: 1.9em; line-height: 1; padding: 0; opacity: 0.45; }
+.spt-modes .spt-mode.active { opacity: 1; box-shadow: 0 0 0 1px currentColor inset; }
+.spt-player-phone .spt-signal { opacity: 0.7; }
+.spt-player-phone .spt-signal.off { opacity: 1; }
+.spt-player-phone .spt-signal.off small { font-size: 0.75em; opacity: 0.8; }
+.spt-phone-foot { padding: 0.5rem; border-top: 1px solid var(--spt-line); }
+.spt-phone-foot button { width: 100%; }
+
+/* Liste des conversations */
+.spt-conv-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; }
+.spt-conv { position: relative; padding: 0.5rem 0.7rem; border-bottom: 1px solid rgba(128,128,128,0.2); cursor: pointer; }
+.spt-conv:hover { background: var(--spt-soft); }
+.spt-conv-head { display: flex; justify-content: space-between; gap: 0.5rem; }
+.spt-conv-preview { font-size: 0.9em; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 2em; }
+.spt-conv.unread .spt-conv-preview { opacity: 1; font-weight: bold; }
+.spt-conv .spt-badge { position: absolute; right: 0.7rem; bottom: 0.55rem; }
+
+/* Conversation */
+.spt-thread { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 0.6rem; }
+.spt-bubble { position: relative; max-width: 80%; padding: 6px 9px; border-radius: 14px; line-height: 1.3; }
+.spt-bubble span { display: block; font-size: 0.7em; opacity: 0.6; margin-top: 2px; text-align: right; }
+.spt-bubble.in { align-self: flex-start; background: rgba(128,128,128,0.2); border-bottom-left-radius: 4px; }
+.spt-bubble.out { align-self: flex-end; background: var(--spt-accent); color: #fff; border-bottom-right-radius: 4px; }
+.spt-call-line { align-self: center; font-size: 0.8em; opacity: 0.7; }
+.spt-read { display: block; font-size: 0.7em; opacity: 0.6; text-align: right; margin-top: 2px; }
+.spt-read.unread { opacity: 1; color: var(--spt-warn); font-weight: bold; }
+.spt-fwd { display: block; font-size: 0.7em; opacity: 0.6; font-style: italic; margin-bottom: 2px; }
+/* Mails */
+.spt-thread.mail { gap: 10px; }
+.spt-thread.mail .spt-bubble { max-width: 100%; width: 100%; border-radius: 6px; padding: 8px 10px; border-left: 3px solid rgba(128,128,128,0.6); }
+.spt-thread.mail .spt-bubble.out { background: rgba(47,111,62,0.2); color: inherit; border-left-color: var(--spt-accent); }
+.spt-thread.mail .spt-bubble > div:first-line { font-weight: bold; }
+
+/* Saisie */
+.spt-composer { display: flex; gap: 0.4rem; padding: 0.5rem; border-top: 1px solid var(--spt-line); }
+.spt-composer textarea { flex: 1; resize: none; }
+.spt-composer button { flex: 0 0 2.6em; }
+.spt-new { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.6rem; flex: 1; }
+.spt-new textarea { flex: 1; resize: none; }
+
+/* Écran verrouillé */
+.spt-lockscreen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem; opacity: 0.85; }
+.spt-lockscreen > i { font-size: 3rem; opacity: 0.6; }
+.spt-lockscreen p { margin: 0; font-size: 1.1em; }
+.spt-lockscreen .spt-lock-notif { font-size: 0.9em; padding: 2px 10px; border-radius: 1em; background: rgba(128,128,128,0.2); }
+
+/* Préparation MJ dans la fenêtre d'un appareil */
+.spt-del { opacity: 0; font-size: 0.8em; transition: opacity 0.15s; }
+.spt-bubble .spt-del { position: absolute; top: -6px; right: -6px; background: var(--spt-danger); color: #fff; border-radius: 50%; width: 1.3em; height: 1.3em; display: flex; align-items: center; justify-content: center; }
+.spt-bubble:hover .spt-del, .spt-call-line:hover .spt-del { opacity: 1; }
+.spt-gm-composer { display: flex; flex-direction: column; gap: 0.35rem; padding: 0.5rem; border-top: 1px dashed rgba(201,118,28,0.7); background: rgba(201,118,28,0.08); }
+.spt-gm-composer textarea { resize: none; }
+.spt-new .spt-gm-composer { border-top: none; padding: 0; background: none; flex: 1; }
+.spt-new .spt-gm-composer textarea { flex: 1; }
+
+/* Partager : montrer l'écran, transférer */
+.spt-bubble .spt-share { float: right; margin-left: 6px; opacity: 0; transition: opacity 0.15s; font-size: 0.8em; }
+.spt-bubble:hover .spt-share { opacity: 0.7; }
+.spt-bubble .spt-share a { margin-left: 6px; cursor: pointer; }
+.spt-bubble .spt-share a:hover { opacity: 1; }
+.spt-show { max-height: 70vh; overflow-y: auto; padding: 4px; }
+.spt-show-title { font-weight: bold; opacity: 0.75; margin: 0 0 8px; }
+.spt-show-img { display: block; max-width: 100%; margin: 6px auto; border-radius: 6px; }
+.spt-show-doc { font-size: 1.05em; margin: 4px 0 8px; }
+.spt-show .spt-att-img { max-width: 100%; }
+
+/* ---------- Habillages par modèle ---------- */
+/* Règles communes : chaque habillage ne fixe que ses variables. */
+.spt-player-phone[class*="spt-skin-"] .window-content { background: var(--skin-bg); color: var(--skin-fg); font-family: var(--skin-font, inherit); }
+.spt-player-phone[class*="spt-skin-"] .spt-phone-top,
+.spt-player-phone[class*="spt-skin-"] .spt-composer,
+.spt-player-phone[class*="spt-skin-"] .spt-phone-foot { border-color: var(--skin-line); }
+.spt-player-phone[class*="spt-skin-"] .spt-conv { border-color: var(--skin-line-soft); background: var(--skin-row, transparent); }
+.spt-player-phone[class*="spt-skin-"] .spt-conv:hover { background: var(--skin-hover); }
+.spt-player-phone[class*="spt-skin-"] textarea,
+.spt-player-phone[class*="spt-skin-"] input,
+.spt-player-phone[class*="spt-skin-"] select { background: var(--skin-input-bg); color: var(--skin-fg); border: 1px solid var(--skin-input-border); border-radius: var(--skin-radius); font-family: inherit; }
+.spt-player-phone[class*="spt-skin-"] button { background: var(--skin-btn-bg); color: var(--skin-btn-fg); border: 1px solid var(--skin-btn-border); border-radius: var(--skin-radius); font-family: inherit; }
+.spt-player-phone[class*="spt-skin-"] a { color: var(--skin-link); }
+
+/* Smartphone : sombre, arrondi, moderne */
+.spt-player-phone.spt-skin-smartphone {
+  --skin-bg: #121316; --skin-fg: #ececec; --skin-line: rgba(255,255,255,0.12); --skin-line-soft: rgba(255,255,255,0.08);
+  --skin-hover: rgba(255,255,255,0.06); --skin-input-bg: #1f2125; --skin-input-border: rgba(255,255,255,0.18);
+  --skin-btn-bg: #24262b; --skin-btn-fg: #ececec; --skin-btn-border: rgba(255,255,255,0.15); --skin-radius: 14px; --skin-link: #ececec;
+}
+.spt-player-phone.spt-skin-smartphone .spt-bubble { border-radius: 18px; }
+.spt-player-phone.spt-skin-smartphone .spt-bubble.in { background: #2a2c31; color: #ececec; }
+.spt-player-phone.spt-skin-smartphone .spt-bubble.out { background: #2e7d5b; color: #fff; }
+
+/* Téléphone mobile : écran LCD monochrome */
+.spt-player-phone.spt-skin-mobile {
+  --skin-bg: #b7c79c; --skin-fg: #1e2a17; --skin-font: "Courier New", Courier, monospace; --skin-line: rgba(30,42,23,0.4); --skin-line-soft: rgba(30,42,23,0.25);
+  --skin-hover: rgba(30,42,23,0.1); --skin-input-bg: rgba(255,255,255,0.15); --skin-input-border: #1e2a17;
+  --skin-btn-bg: rgba(255,255,255,0.15); --skin-btn-fg: #1e2a17; --skin-btn-border: #1e2a17; --skin-radius: 0; --skin-link: #1e2a17;
+}
+.spt-player-phone.spt-skin-mobile .window-content { letter-spacing: 0.02em; box-shadow: inset 0 0 18px rgba(30,42,23,0.35); }
+.spt-player-phone.spt-skin-mobile .spt-bubble,
+.spt-player-phone.spt-skin-mobile .spt-bubble.in,
+.spt-player-phone.spt-skin-mobile .spt-bubble.out { border-radius: 0; background: transparent; color: #1e2a17; border: 1px dashed rgba(30,42,23,0.55); max-width: 95%; }
+.spt-player-phone.spt-skin-mobile .spt-bubble.out { border-style: solid; }
+.spt-player-phone.spt-skin-mobile .spt-badge { background: #1e2a17; color: #b7c79c; border-radius: 0; }
+.spt-player-phone.spt-skin-mobile .spt-modes .spt-mode { color: #1e2a17; }
+
+/* Ordinateur portable : client de messagerie sobre */
+.spt-player-phone.spt-skin-computer {
+  --skin-bg: #f3f4f6; --skin-fg: #1f2933; --skin-font: "Segoe UI", Helvetica, Arial, sans-serif; --skin-line: #dde1e6; --skin-line-soft: #dde1e6;
+  --skin-row: #fff; --skin-hover: #e8eef7; --skin-input-bg: #fff; --skin-input-border: #c5ccd5;
+  --skin-btn-bg: var(--spt-mail); --skin-btn-fg: #fff; --skin-btn-border: transparent; --skin-radius: 3px; --skin-link: var(--spt-mail);
+}
+.spt-player-phone.spt-skin-computer .spt-phone-top { background: var(--spt-mail); color: #fff; border: none; }
+.spt-player-phone.spt-skin-computer .spt-phone-top a, .spt-player-phone.spt-skin-computer .spt-phone-top .spt-mode { color: #fff; }
+.spt-player-phone.spt-skin-computer .spt-phone-top select { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.4); }
+.spt-player-phone.spt-skin-computer .spt-phone-top select option { color: #1f2933; }
+.spt-player-phone.spt-skin-computer .spt-thread.mail .spt-bubble { background: #fff; color: #1f2933; border: 1px solid #dde1e6; border-left: 3px solid var(--spt-mail); }
+.spt-player-phone.spt-skin-computer .spt-thread.mail .spt-bubble.out { background: #eef3fa; }
+
+/* Terminal : poste de bureau institutionnel, gris froid, un peu daté */
+.spt-player-phone.spt-skin-desktop {
+  --skin-bg: #e4e6e3; --skin-fg: #23282c; --skin-font: Tahoma, Verdana, "DejaVu Sans", sans-serif; --skin-line: #b9bdb8; --skin-line-soft: #cfd2ce;
+  --skin-row: #f2f3f1; --skin-hover: #d9e1e6; --skin-input-bg: #fff; --skin-input-border: #8e948f;
+  --skin-btn-bg: #d3d6d2; --skin-btn-fg: #23282c; --skin-btn-border: #8e948f; --skin-radius: 0; --skin-link: #2f4f67;
+}
+.spt-player-phone.spt-skin-desktop .window-content { font-size: 0.95em; }
+.spt-player-phone.spt-skin-desktop .spt-phone-top { background: #4b5761; color: #eef1f2; border: none; }
+.spt-player-phone.spt-skin-desktop .spt-phone-top a, .spt-player-phone.spt-skin-desktop .spt-phone-top .spt-mode { color: #eef1f2; }
+.spt-player-phone.spt-skin-desktop .spt-phone-top select { background: #5d6a75; color: #eef1f2; border-color: #7d8a94; }
+.spt-player-phone.spt-skin-desktop .spt-phone-top select option { color: #23282c; }
+.spt-player-phone.spt-skin-desktop button { box-shadow: inset -1px -1px 0 #8e948f, inset 1px 1px 0 #fff; }
+.spt-player-phone.spt-skin-desktop .spt-thread.mail .spt-bubble { background: #fff; color: #23282c; border: 1px solid #b9bdb8; border-radius: 0; }
+.spt-player-phone.spt-skin-desktop .spt-thread.mail .spt-bubble.out { background: #eef0ec; }
+.spt-player-phone.spt-skin-desktop .spt-badge { border-radius: 0; background: #2f4f67; }
+
+/* Téléphone fixe : bakélite noire et cadran rotatif (1920-1980) */
+.spt-player-phone.spt-skin-landline {
+  --skin-bg: #241e1a; --skin-fg: #ece3cc; --skin-font: Georgia, "Times New Roman", serif; --skin-line: rgba(236,227,204,0.2); --skin-line-soft: rgba(236,227,204,0.12);
+  --skin-hover: rgba(236,227,204,0.06); --skin-input-bg: #3a302a; --skin-input-border: #8b7b5c;
+  --skin-btn-bg: #3a302a; --skin-btn-fg: #ece3cc; --skin-btn-border: #8b7b5c; --skin-radius: 3px; --skin-link: #ece3cc;
+}
+.spt-player-phone.spt-skin-landline .window-content { background: radial-gradient(ellipse at 50% 35%, #3a2f28 0%, #241e1a 70%); }
+.spt-player-phone.spt-skin-landline .spt-bubble.in { background: #3a302a; color: #ece3cc; }
+.spt-player-phone.spt-skin-landline .spt-bubble.out { background: #5a4632; color: #f1e9d2; }
+.spt-player-phone.spt-skin-landline .spt-dialer { align-items: center; justify-content: center; gap: 0.8rem; }
+.spt-rotary { width: min(240px, 80%); height: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6)); }
+.spt-rotary .spt-dial-plate { fill: #e9e0c7; stroke: #6d6048; stroke-width: 1.5; }
+.spt-rotary .spt-dial-digit { fill: #1b1917; font: bold 17px Georgia, serif; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.spt-rotary .spt-rotor { transform-origin: 0 0; }
+.spt-rotary .spt-dial-card { fill: #f4eedb; stroke: #8b7b5c; stroke-width: 1.5; }
+.spt-rotary .spt-dial-number { fill: #3a302a; font: 11px "Courier New", monospace; text-anchor: middle; pointer-events: none; }
+.spt-rotary .spt-dial-stop { stroke: #b8b3a6; stroke-width: 5; stroke-linecap: round; }
+.spt-rotary .spt-dial-hole { fill: transparent; cursor: pointer; }
+.spt-rotary .spt-dial-hole:hover { fill: rgba(255,255,255,0.12); }
+.spt-dial-strip { display: flex; gap: 4px; width: min(240px, 80%); }
+.spt-player-phone .spt-dial-strip input { min-width: 0; }
+.spt-player-phone[class*="spt-skin-"] .spt-dial-strip input { flex: 1; text-align: center; letter-spacing: 0.2em; font-family: "Courier New", monospace; color: #241e1a; background: #f1e9d2; }
+.spt-dial-strip button { flex: 0 0 auto; width: 2.2em; }
+.spt-player-phone.spt-skin-landline .spt-dialer .spt-phone-row { width: min(240px, 80%); }
+.spt-player-phone.spt-skin-landline .spt-dialer .spt-phone-row button { padding: 4px 0; font-size: 1.05em; }
+
+/* Fixe moderne (1980-2020) : plastique gris clair, petit afficheur, clavier à touches */
+.spt-player-phone.spt-skin-modern {
+  --skin-bg: #d9d7d2; --skin-fg: #2b2d30; --skin-font: "Helvetica Neue", Arial, sans-serif; --skin-line: #b7b4ad; --skin-line-soft: #c8c5bf;
+  --skin-hover: rgba(0,0,0,0.05); --skin-input-bg: #ecebe7; --skin-input-border: #a19d95;
+  --skin-btn-bg: #f1f0ec; --skin-btn-fg: #2b2d30; --skin-btn-border: #a19d95; --skin-radius: 6px; --skin-link: #2b2d30;
+}
+.spt-player-phone.spt-skin-modern .window-content { background: linear-gradient(180deg, #e4e2dd 0%, #cfccc6 100%); }
+.spt-player-phone.spt-skin-modern .spt-bubble.in { background: #ecebe7; color: #2b2d30; }
+.spt-player-phone.spt-skin-modern .spt-bubble.out { background: #5d6b78; color: #fff; }
+.spt-player-phone.spt-skin-modern .spt-dialer { align-items: center; justify-content: center; gap: 0.7rem; }
+.spt-player-phone.spt-skin-modern .spt-dial-strip { width: min(220px, 80%); }
+.spt-player-phone.spt-skin-modern .spt-dial-strip input {
+  background: #9fae8f; color: #1d2418; border: 2px solid #6f6c66; border-radius: 4px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.35);
+  font-size: 1.3em; height: 2em; letter-spacing: 0.15em;
+}
+.spt-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: min(220px, 80%); }
+.spt-player-phone .spt-keypad button {
+  height: 44px; font-size: 1.35em; font-weight: 600; border-radius: 10px;
+  background: linear-gradient(180deg, #fbfaf7, #e3e1dc); border: 1px solid #a19d95; box-shadow: 0 2px 0 #9b978f;
+}
+.spt-player-phone .spt-keypad button:active { transform: translateY(2px); box-shadow: none; }
+.spt-player-phone.spt-skin-modern .spt-dialer .spt-phone-row { width: min(220px, 80%); }
+.spt-player-phone.spt-skin-modern .spt-dialer .spt-phone-row button { height: 40px; font-size: 1.05em; background: #4f8a5b; color: #fff; border-color: #3e6f48; }
+
+/* Thème fédéral (FBI) : poste gouvernemental, mails en fiches de dossier */
+.spt-player-phone.spt-skin-federal {
+  --skin-bg: #e9ebee; --skin-fg: #1c2533; --skin-font: Arial, Helvetica, sans-serif; --skin-line: #c3c9d2; --skin-line-soft: #d5dae1;
+  --skin-row: #fff; --skin-hover: #e3e9f2; --skin-input-bg: #fff; --skin-input-border: #9aa5b5;
+  --skin-btn-bg: #1f3358; --skin-btn-fg: #fff; --skin-btn-border: #b8964a; --skin-radius: 2px; --skin-link: #1f3358;
+}
+.spt-player-phone.spt-skin-federal .spt-banner { background: #f0e6c8; color: #5a4614; letter-spacing: 0.05em; text-transform: uppercase; font-size: 0.66em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid #b8964a; }
+.spt-player-phone.spt-skin-federal .spt-phone-top { background: #1f3358; color: #fff; border: none; border-bottom: 3px solid #b8964a; }
+.spt-player-phone.spt-skin-federal .spt-phone-top a, .spt-player-phone.spt-skin-federal .spt-phone-top .spt-mode { color: #fff; }
+.spt-player-phone.spt-skin-federal .spt-phone-top select { background: #2c4470; color: #fff; border-color: #4a6290; }
+.spt-player-phone.spt-skin-federal .spt-phone-top select option { color: #1c2533; }
+.spt-player-phone.spt-skin-federal .spt-thread.mail .spt-bubble,
+.spt-player-phone.spt-skin-federal .spt-bubble {
+  position: relative; background: #fffef8; color: #1c2533; border: 1px solid #c3c9d2; border-top: 4px solid #1f3358; border-radius: 0;
+  font-family: "Courier New", Courier, monospace; padding-top: 1.6em; box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+}
+.spt-player-phone.spt-skin-federal .spt-bubble.out { background: #f3f5f8; border-top-color: #8a96a8; }
+.spt-player-phone.spt-skin-federal .spt-ref { position: absolute; top: 3px; left: 8px; font: bold 0.72em Arial, sans-serif; letter-spacing: 0.08em; color: #5b6676; }
+.spt-player-phone.spt-skin-federal .spt-stamp {
+  position: absolute; top: 4px; right: 8px; padding: 0 5px; font: bold 0.68em Arial, sans-serif; letter-spacing: 0.12em; text-transform: uppercase;
+  color: #a8322a; border: 2px solid #a8322a; border-radius: 2px; transform: rotate(-4deg); opacity: 0.75;
+}
+.spt-player-phone.spt-skin-federal .spt-badge { background: #a8322a; border-radius: 2px; }
+.spt-player-phone.spt-skin-federal .spt-lockscreen { gap: 0.5rem; }
+.spt-player-phone.spt-skin-federal .spt-lockscreen > i { color: #1f3358; opacity: 0.8; }
+.spt-player-phone .spt-fake-login { width: 70%; text-align: center; pointer-events: none; }
+
+/* Thème console texte : vert phosphore sur noir, texte seul */
+.spt-player-phone.spt-skin-console {
+  --skin-bg: #050805; --skin-fg: #39ff6a; --skin-font: "Courier New", Courier, monospace; --skin-line: rgba(57,255,106,0.35); --skin-line-soft: rgba(57,255,106,0.15);
+  --skin-hover: rgba(57,255,106,0.08); --skin-input-bg: #050805; --skin-input-border: rgba(57,255,106,0.5);
+  --skin-btn-bg: transparent; --skin-btn-fg: #39ff6a; --skin-btn-border: rgba(57,255,106,0.6); --skin-radius: 0; --skin-link: #39ff6a;
+}
+.spt-player-phone.spt-skin-console .window-content {
+  text-shadow: 0 0 4px rgba(57,255,106,0.55);
+  background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0 1px, transparent 1px 3px);
+}
+.spt-player-phone.spt-skin-console .spt-bubble,
+.spt-player-phone.spt-skin-console .spt-thread.mail .spt-bubble { background: none; color: inherit; border: none; border-radius: 0; max-width: 100%; padding: 1px 0; align-self: stretch; }
+.spt-player-phone.spt-skin-console .spt-bubble::before { float: left; margin-right: 0.6em; }
+.spt-player-phone.spt-skin-console .spt-bubble.in::before { content: "<"; opacity: 0.7; }
+.spt-player-phone.spt-skin-console .spt-bubble.out::before { content: ">"; }
+.spt-player-phone.spt-skin-console .spt-bubble.out { opacity: 0.8; }
+.spt-player-phone.spt-skin-console .spt-badge { background: #39ff6a; color: #050805; border-radius: 0; text-shadow: none; }
+.spt-player-phone.spt-skin-console .spt-phone-top strong::after,
+.spt-player-phone.spt-skin-console .spt-phone-empty::after { content: "█"; margin-left: 4px; animation: spt-blink 1s steps(1) infinite; }
+.spt-player-phone.spt-skin-console button:hover { background: rgba(57,255,106,0.15); }
+.spt-player-phone.spt-skin-console img { filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(3); }
+@keyframes spt-blink { 50% { opacity: 0; } }
+
+/* Thème sécurisé (militaire) : kaki et noir, majuscules, bandeau */
+.spt-player-phone.spt-skin-military {
+  --skin-bg: #1d2016; --skin-fg: #d8d4b6; --skin-font: "Courier New", Courier, monospace; --skin-line: #4f5338; --skin-line-soft: #383b28;
+  --skin-hover: rgba(216,212,182,0.06); --skin-input-bg: #12140d; --skin-input-border: #6b6f4a;
+  --skin-btn-bg: #3c4029; --skin-btn-fg: #e3dfc0; --skin-btn-border: #6b6f4a; --skin-radius: 0; --skin-link: #c9c48f;
+}
+.spt-player-phone.spt-skin-military .window-content { text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.92em; }
+.spt-player-phone.spt-skin-military textarea, .spt-player-phone.spt-skin-military input { text-transform: none; }
+.spt-player-phone.spt-skin-military .spt-bubble { border-radius: 0; border: 1px solid #4f5338; }
+.spt-player-phone.spt-skin-military .spt-bubble.in { background: #2a2e1e; color: #d8d4b6; }
+.spt-player-phone.spt-skin-military .spt-bubble.out { background: #3c4029; color: #ece8c8; }
+.spt-player-phone.spt-skin-military .spt-badge { background: #a8322a; border-radius: 0; }
+.spt-banner { flex: 0 0 auto; text-align: center; font-weight: bold; letter-spacing: 0.3em; font-size: 0.75em; padding: 2px 0; background: #a8322a; color: #f4eadc; }
+
+/* Vue MJ (préparation) : même habillage que le joueur, avec un liseré */
+.spt-player-phone.spt-gm-view .window-content { box-shadow: inset 0 0 0 2px var(--spt-warn); }
+.spt-gm-ribbon { flex: 0 0 auto; text-align: center; font: 0.75em var(--font-primary, sans-serif); text-transform: none; letter-spacing: 0; padding: 2px 0; background: var(--spt-warn); color: #1b1b1b; text-shadow: none; }
+
+/* Appel entrant : prend l'habillage de l'appareil qui sonne */
+.spt-phone-ring-dialog.spt-player-phone .window-content { padding: 0.5rem; }
+.spt-phone-ring-dialog.spt-player-phone .form-footer { gap: 6px; }
+
+/* ---------- Bouton flottant (joueurs) ---------- */
+#spt-phone-fab { position: fixed; left: 16px; bottom: 140px; z-index: 100; display: flex; flex-direction: column; align-items: center; gap: 8px; user-select: none; touch-action: none; }
+#spt-phone-fab .spt-fab {
+  position: relative; width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #1b1d22; color: #e8e8e8; font-size: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.15); cursor: pointer;
+}
+#spt-phone-fab .spt-fab[hidden] { display: none; }
+#spt-phone-fab .spt-fab:hover { background: #2a2d34; }
+/* Appareil de la pièce : plus petit, teinte « bureau ». */
+#spt-phone-fab .spt-fab-room { width: 34px; height: 34px; font-size: 15px; background: #23272e; color: #c9d3e0; border-color: rgba(160,185,220,0.35); }
+#spt-phone-fab .spt-fab-badge {
+  position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 4px;
+  border-radius: 9px; background: var(--spt-danger); color: #fff; font-size: 11px; font-weight: bold;
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px #1b1d22;
+}
+#spt-phone-fab .spt-fab-room .spt-fab-badge { min-width: 15px; height: 15px; font-size: 10px; top: -5px; right: -5px; }
+#spt-phone-fab .spt-fab-badge[hidden] { display: none; }
+#spt-phone-fab .spt-fab.ringing { animation: spt-fab-ring 0.5s infinite; background: var(--spt-accent); }
+@keyframes spt-fab-ring { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-14deg); } 75% { transform: rotate(14deg); } }
+
+/* ---------- Anciens messages du chat (classes dg- des versions Burner Phone) ---------- */
+.dg-sms { border-radius: 10px; overflow: hidden; border: 1px solid #2f6f3e; }
+.dg-sms .dg-sms-header { background: #2f6f3e; color: #fff; padding: 2px 8px; font-weight: bold; }
+.dg-sms .dg-sms-body { background: #e7f5ea; color: #111; padding: 6px 8px; font-family: monospace; }
+.dg-sms .dg-sms-to { float: right; font-weight: normal; opacity: 0.85; }
+.dg-gm-copy { margin: 0 0 4px; font-size: 0.9em; }
+.dg-sms .dg-att-img { max-height: 140px; }
+.dg-sms.dg-mail { border-color: #3b5b8a; }
+.dg-sms.dg-mail .dg-sms-header { background: #3b5b8a; }
+.dg-sms.dg-mail .dg-sms-body { background: #eef2f8; font-family: inherit; }
+.dg-sms.dg-mail .dg-sms-body::first-line { font-weight: bold; }
+.dg-att-img { display: block; max-width: 100%; max-height: 140px; border-radius: 8px; }

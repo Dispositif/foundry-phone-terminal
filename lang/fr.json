@@ -1,0 +1,340 @@
+{
+  "SPT": {
+    "Mode": {
+      "on": "Normal",
+      "silent": "Silencieux",
+      "off": "Éteint"
+    },
+    "Result": {
+      "answer": "a décroché",
+      "decline": "a refusé l'appel",
+      "missed": "n'a pas répondu",
+      "cancelled": "appel interrompu",
+      "off": "téléphone éteint",
+      "nobody": "personne ne décroche",
+      "nosignal": "injoignable (pas de réseau)"
+    },
+    "Masked": "Numéro masqué",
+    "PhoneAlias": "Téléphone",
+    "Unread": {
+      "one": "{n} message non lu",
+      "other": "{n} messages non lus"
+    },
+    "MyPhone": "Mon téléphone",
+    "Model": {
+      "landline": "Téléphone fixe",
+      "mobile": "Téléphone mobile",
+      "smartphone": "Smartphone",
+      "computer": "Ordinateur",
+      "desktop": "Terminal"
+    },
+    "NoPlace": "Sans lieu",
+    "NoHolder": "Sans possesseur",
+    "Warn": {
+      "GmOnlyCall": "Seul le MJ peut passer un appel.",
+      "PlayerNotFound": "Joueur introuvable.",
+      "UserOffline": "{name} n'est pas connecté : personne ne décroche.",
+      "NoDevice": "Aucun appareil avec ce numéro ou email : {value}.",
+      "ComputerNoCalls": "un ordinateur ne reçoit pas d'appels.",
+      "NoSms": "ce téléphone ne reçoit pas les SMS.",
+      "NoAttachments": "ce modèle n'affiche pas les pièces jointes, seul le texte est envoyé.",
+      "GmOnlySms": "Seul le MJ peut envoyer un message.",
+      "Empty": "Le message est vide.",
+      "SmsDisabled": "Les SMS sont désactivés dans les réglages du module.",
+      "NobodyHolds": "message reçu, mais personne n'a cet appareil en main.",
+      "DocGone": "Ce document n'existe plus.",
+      "NoAccess": "Vous n'avez pas accès à ce document.",
+      "CantReplyMasked": "Impossible de répondre à un numéro masqué.",
+      "Locked": "Téléphone verrouillé.",
+      "PhoneOff": "Votre téléphone est éteint.",
+      "CantCallMasked": "Impossible de rappeler un numéro masqué.",
+      "AlreadyCalling": "Un appel est déjà en cours.",
+      "SceneNotFound": "Scène « {name} » introuvable.",
+      "ActorNotFound": "Personnage « {name} » introuvable.",
+      "NoItems": "Aucun objet disponible.",
+      "ChooseRecipient": "Choisissez d'abord un destinataire.",
+      "RecipientNotFound": "Destinataire « {to} » introuvable (numéro, personnage ou joueur).",
+      "DropHint": "Déposez une image ou une page de journal.",
+      "NoRecipient": "Aucun destinataire.",
+      "NoCorrespondent": "Indiquez un correspondant.",
+      "NameOrNumber": "Indiquez un nom ou un numéro.",
+      "GmOnlyPanel": "Panneau réservé au MJ."
+    },
+    "Caller": "Appelant",
+    "Info": {
+      "Calling": "Appel en cours vers {label} ({caller})…",
+      "CallInterrupted": "Appel interrompu.",
+      "SmsPending": "pas de réseau, message en attente.",
+      "SentTo": "Message envoyé à {name}.",
+      "Installed": "{model} « {label} » installé.",
+      "Created": "Appareil « {label} » ({number}) créé."
+    },
+    "Gm": {
+      "OnLine": "{who} est en ligne avec {name}.",
+      "WritesTo": "{who} écrit à {name}.",
+      "AgentCalling": "Un agent appelle",
+      "CalledBy": "appelé par {who}",
+      "AgentHungUp": "L'agent a raccroché.",
+      "PanelTitle": "Téléphone (MJ)",
+      "Cloned": "cloné",
+      "Offline": "hors ligne",
+      "Reply": "Répondre",
+      "ClonedHint": "Numéro cloné : plusieurs objets ont ce numéro",
+      "Orphan": "Porté par personne",
+      "UnreadByPlayer": {
+        "one": "{n} message pas encore lu par le joueur",
+        "other": "{n} messages pas encore lus par le joueur"
+      },
+      "PickRecipient": "Choisir comme destinataire",
+      "Locked": "Verrouillé (cliquer pour déverrouiller)",
+      "Unlocked": "Déverrouillé (cliquer pour verrouiller)",
+      "NoSignal": "Pas de réseau (cliquer pour rétablir)",
+      "SignalOk": "Réseau OK (cliquer pour couper)",
+      "OpenPrepare": "Ouvrir / préparer l'historique",
+      "GiveTo": "Donner à…",
+      "Edit": "Modifier",
+      "Remove": "Retirer",
+      "Inbox": "Messages des agents",
+      "MarkAllSeen": "Tout marquer comme lu",
+      "Recipient": "Destinataire",
+      "PlayersDirect": "Joueurs (direct)",
+      "Sender": "Expéditeur affiché",
+      "SmsMail": "SMS / mail",
+      "Mail": "Mail",
+      "MessagePlaceholder": "Votre message… (déposez une image ou un journal pour le joindre)",
+      "Call": "Appel",
+      "Ring": "Faire sonner",
+      "CopyLink": "Copier en lien, à coller dans un journal",
+      "RingingAt": "Sonne chez : {who}",
+      "NoDevices": "Aucun appareil pour l'instant.",
+      "MarkItem": "Marquer un objet",
+      "CorrespondentPlaceholder": "Correspondant : nom ou numéro"
+    },
+    "LockedMessage": "Déverrouillez le téléphone pour lire ce message.",
+    "Document": "Document",
+    "RemoveAttachment": "Retirer la pièce jointe",
+    "Enlarge": "Agrandir",
+    "Attachment": "Pièce jointe",
+    "DocNotFound": "Document introuvable.",
+    "Share": {
+      "NobodyNear": "Personne à côté de vous à qui montrer l'écran.",
+      "ShowScreen": "Montrer l'écran",
+      "ShowTo": "Montrer à :",
+      "Show": "Montrer",
+      "GmCopy": "{from} montre son écran ({title}) à {names}.",
+      "YouShow": "Vous montrez votre écran à {names}.",
+      "ShowsYou": "{from} vous montre son écran",
+      "GiveBack": "Rendre le téléphone",
+      "ReceivedFrom": "Reçu de {who}",
+      "SentTo": "Envoyé à {who}",
+      "ConversationWith": "Conversation avec {who}",
+      "ShowConversation": "Montrer la conversation"
+    },
+    "Cancel": "Annuler",
+    "Fwd": {
+      "NoAttachments": "Cet appareil ne peut pas transférer de pièce jointe.",
+      "TextOnly": "Seul le texte sera transféré.",
+      "AnImage": "une image",
+      "ThisMessage": "ce message",
+      "Forward": "Transférer",
+      "ForwardTo": "Transférer {what} à :",
+      "Done": "Transféré à {to}.",
+      "Verb": "transfère",
+      "Forwarded": "Transféré"
+    },
+    "NameOrNumber": "nom ou numéro",
+    "Outcome": {
+      "answer": "Décrocher",
+      "voicemail": "Messagerie",
+      "noanswer": "Pas de réponse",
+      "unreachable": "Injoignable",
+      "unassigned": "Non attribué"
+    },
+    "Call": {
+      "Incoming": "Appel entrant",
+      "IsCalling": "vous appelle…",
+      "Ringing": "Le téléphone sonne…",
+      "Answer": "Répondre",
+      "Decline": "Refuser",
+      "Missed": "Appel manqué : {caller}",
+      "Outgoing": "Appel en cours",
+      "Calling": "Appel en cours…",
+      "HangUp": "Raccrocher",
+      "Call": "Appeler"
+    },
+    "Net": {
+      "GmAbsent": "Pas de réseau téléphonique [MJ absent]",
+      "NoSignal": "Pas de réseau.",
+      "NewMessages": {
+        "one": "{n} nouveau message",
+        "other": "{n} nouveaux messages"
+      },
+      "MissedCalls": {
+        "one": "{n} appel manqué",
+        "other": "{n} appels manqués"
+      },
+      "Back": "réseau retrouvé",
+      "DownAll": "Réseau coupé pour tous",
+      "Ok": "Réseau OK",
+      "Pending": "{n} en attente",
+      "Restore": "Rétablir le réseau",
+      "Cut": "Couper le réseau",
+      "GmAway": "MJ absent",
+      "Signal": "Réseau",
+      "NoSignalShort": "Pas de réseau"
+    },
+    "CallerResult": {
+      "answer": "{name} a décroché.",
+      "voicemail": "Vous êtes sur la messagerie de {name}.",
+      "unassigned": "Le numéro que vous avez demandé n'est pas attribué.",
+      "unreachable": "Votre correspondant n'est pas joignable pour le moment.",
+      "noanswer": "{name} ne répond pas."
+    },
+    "Form": {
+      "Model": "Modèle",
+      "Place": "Lieu (scène)",
+      "SceneName": "Nom de la scène",
+      "DeviceName": "Nom de l'appareil",
+      "DeviceNameHint": "perso, jetable, cabine, bureau…",
+      "Number": "Numéro / email",
+      "HeldBy": "Porté par",
+      "Nobody": "Personne (à préparer)",
+      "HeldByHint": "Tapez quelques lettres pour trouver un agent ou un PNJ. Laissez vide pour préparer l'appareil sans porteur.",
+      "Theme": "Habillage"
+    },
+    "Ok": "Valider",
+    "NewDevice": "Nouvel appareil",
+    "Give": {
+      "Title": "Donner « {label} » ({number})",
+      "Hint": "L'appareil est déplacé avec son numéro, ses contacts et son historique.",
+      "Give": "Donner",
+      "NowHeld": "« {label} » est maintenant porté par {name}.",
+      "NowWorld": "« {label} » est maintenant dans les objets du monde."
+    },
+    "WorldItems": "Objets du monde",
+    "Mark": {
+      "Title": "Marquer un objet comme appareil",
+      "Item": "Objet",
+      "Done": "« {name} » est maintenant un appareil ({number})."
+    },
+    "EditDevice": "Modifier l'appareil",
+    "Contacts": {
+      "Title": "Contacts",
+      "Hint": "Un contact par ligne : <code>Nom | numéro</code>. Le numéro est facultatif pour un PNJ.",
+      "Placeholder": "Marlin Hunt | 555-0142&#10;Le Programme"
+    },
+    "Save": "Enregistrer",
+    "Link": {
+      "Copied": "Lien copié : {link}",
+      "CopyFailed": "Copie impossible, voici le lien : {link}",
+      "ClickToSend": "Cliquer pour envoyer",
+      "Calls": "{who} appelle {to}"
+    },
+    "Unmark": {
+      "Title": "Retirer l'appareil",
+      "Confirm": "« {name} » ne sera plus un appareil (l'objet est conservé, l'historique est perdu)."
+    },
+    "Image": "Image",
+    "Devices": "Appareils",
+    "DropHere": "Déposez ici une image ou une page de journal",
+    "AttachImage": "Joindre une image",
+    "Send": "Envoyer",
+    "MyDevices": "Mes appareils",
+    "Device": "Appareil",
+    "NoDevice": "Aucun appareil.",
+    "NoPhone": "Vous n'avez pas de téléphone.",
+    "OutOfReach": "{label} n'est plus à portée.",
+    "Lock": {
+      "Session": "Session verrouillée"
+    },
+    "NoMessage": "Aucun message",
+    "You": "Vous",
+    "NoConversation": "Aucune conversation.",
+    "NewConversation": "Nouvelle conversation",
+    "NewMail": "Nouveau mail",
+    "NewMessage": "Nouveau message",
+    "Dial": "Composer un numéro",
+    "Delete": "Effacer",
+    "Read": {
+      "Pending": "En attente",
+      "Unread": "Non lu",
+      "Seen": "Vu"
+    },
+    "MessagePlaceholder": "Message…",
+    "Back": "Retour",
+    "Number": "Numéro",
+    "ToPlaceholder": "À : nom ou numéro",
+    "MailPlaceholder": "Objet (première ligne)&#10;&#10;Votre message…",
+    "Prep": {
+      "TextPlaceholder": "Texte du message (vide pour un appel)",
+      "Add": "Ajouter à l'historique",
+      "smsIn": "Message reçu",
+      "smsOut": "Message envoyé",
+      "callMissed": "Appel manqué",
+      "callIn": "Appel reçu",
+      "callOut": "Appel émis"
+    },
+    "CallLog": {
+      "out": {
+        "answer": "Appel sortant",
+        "voicemail": "Messagerie",
+        "unassigned": "Numéro non attribué",
+        "unreachable": "Injoignable",
+        "cancelled": "Appel annulé",
+        "noanswer": "Sans réponse"
+      },
+      "in": {
+        "answer": "Appel reçu",
+        "decline": "Appel refusé",
+        "missed": "Appel manqué"
+      }
+    },
+    "Settings": {
+      "language": {
+        "name": "Langue du module",
+        "hint": "Langue de l'interface du téléphone pour tout le monde. « Automatique » suit la langue de Foundry de chaque joueur. Recharge la page.",
+        "auto": "Automatique (langue de Foundry)"
+      },
+      "volume": {
+        "name": "Volume du téléphone",
+        "hint": "Volume de la sonnerie et du bip de message sur ce poste."
+      },
+      "ringTimeout": {
+        "name": "Durée de sonnerie (secondes)",
+        "hint": "Au-delà, l'appel est considéré comme manqué. 0 = sonne jusqu'à réponse."
+      },
+      "floatingButton": {
+        "name": "Bouton flottant pour les joueurs",
+        "hint": "Une icône de téléphone toujours visible, avec le nombre de messages non lus. Un clic ouvre le téléphone ; elle se déplace par glisser."
+      },
+      "smsEnabled": {
+        "name": "SMS",
+        "hint": "Décochez pour une époque sans SMS : seuls les appels (et les mails des ordinateurs) restent possibles."
+      },
+      "keybinding": "Téléphone : panneau MJ / Mon téléphone (joueur)"
+    },
+    "Migrated": "{n} appareil(s) repris de l'ancienne version.",
+    "Demo": {
+      "Landline": "Fixe de démo",
+      "Terminal": "Terminal de démo",
+      "NpcPhone": "Mobile de PNJ (démo)",
+      "SampleText": "Rendez-vous ce soir, 22 h, au parking.",
+      "Created": "{n} appareil(s) de démo créé(s).",
+      "Removed": "{n} appareil(s) de démo retiré(s)."
+    },
+    "Theme": {
+      "default": "Celui du modèle",
+      "console": "Console texte",
+      "military": "Sécurisé (militaire)",
+      "Classified": "Confidentiel défense",
+      "GmView": "Vue MJ · préparation",
+      "modern": "Moderne, à touches (1980-2020)",
+      "federal": "Fédéral (FBI)",
+      "GovSystem": "Système gouvernemental · usage autorisé uniquement",
+      "IdRequired": "Identification requise",
+      "AgentId": "Identifiant agent",
+      "Ref": "Réf.",
+      "Confidential": "Confidentiel"
+    }
+  }
+}

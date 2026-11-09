@@ -1,0 +1,340 @@
+{
+  "SPT": {
+    "Mode": {
+      "on": "Normal",
+      "silent": "Silent",
+      "off": "Off"
+    },
+    "Result": {
+      "answer": "answered",
+      "decline": "declined the call",
+      "missed": "did not answer",
+      "cancelled": "call interrupted",
+      "off": "phone switched off",
+      "nobody": "nobody picks up",
+      "nosignal": "unreachable (no signal)"
+    },
+    "Masked": "Hidden number",
+    "PhoneAlias": "Phone",
+    "Unread": {
+      "one": "{n} unread message",
+      "other": "{n} unread messages"
+    },
+    "MyPhone": "My phone",
+    "Model": {
+      "landline": "Landline",
+      "mobile": "Mobile phone",
+      "smartphone": "Smartphone",
+      "computer": "Laptop",
+      "desktop": "Terminal"
+    },
+    "NoPlace": "No location",
+    "NoHolder": "No holder",
+    "Warn": {
+      "GmOnlyCall": "Only the GM can place a call.",
+      "PlayerNotFound": "Player not found.",
+      "UserOffline": "{name} is not connected: nobody picks up.",
+      "NoDevice": "No device with this number or email: {value}.",
+      "ComputerNoCalls": "a computer cannot receive calls.",
+      "NoSms": "this phone cannot receive text messages.",
+      "NoAttachments": "this model cannot display attachments, only the text is sent.",
+      "GmOnlySms": "Only the GM can send a message.",
+      "Empty": "The message is empty.",
+      "SmsDisabled": "Text messages are disabled in the module settings.",
+      "NobodyHolds": "message received, but nobody holds this device.",
+      "DocGone": "This document no longer exists.",
+      "NoAccess": "You do not have access to this document.",
+      "CantReplyMasked": "You cannot reply to a hidden number.",
+      "Locked": "Phone locked.",
+      "PhoneOff": "Your phone is switched off.",
+      "CantCallMasked": "You cannot call back a hidden number.",
+      "AlreadyCalling": "A call is already in progress.",
+      "SceneNotFound": "Scene \"{name}\" not found.",
+      "ActorNotFound": "Character \"{name}\" not found.",
+      "NoItems": "No item available.",
+      "ChooseRecipient": "Choose a recipient first.",
+      "RecipientNotFound": "Recipient \"{to}\" not found (number, character or player).",
+      "DropHint": "Drop an image or a journal page.",
+      "NoRecipient": "No recipient.",
+      "NoCorrespondent": "Enter a contact.",
+      "NameOrNumber": "Enter a name or a number.",
+      "GmOnlyPanel": "GM only panel."
+    },
+    "Caller": "Caller",
+    "Info": {
+      "Calling": "Calling {label} ({caller})…",
+      "CallInterrupted": "Call interrupted.",
+      "SmsPending": "no signal, message pending.",
+      "SentTo": "Message sent to {name}.",
+      "Installed": "{model} \"{label}\" installed.",
+      "Created": "Device \"{label}\" ({number}) created."
+    },
+    "Gm": {
+      "OnLine": "{who} is on the line with {name}.",
+      "WritesTo": "{who} writes to {name}.",
+      "AgentCalling": "An agent is calling",
+      "CalledBy": "called by {who}",
+      "AgentHungUp": "The agent hung up.",
+      "PanelTitle": "Phone (GM)",
+      "Cloned": "cloned",
+      "Offline": "offline",
+      "Reply": "Reply",
+      "ClonedHint": "Cloned number: several items share this number",
+      "Orphan": "Held by nobody",
+      "UnreadByPlayer": {
+        "one": "{n} message not yet read by the player",
+        "other": "{n} messages not yet read by the player"
+      },
+      "PickRecipient": "Use as recipient",
+      "Locked": "Locked (click to unlock)",
+      "Unlocked": "Unlocked (click to lock)",
+      "NoSignal": "No signal (click to restore)",
+      "SignalOk": "Signal OK (click to cut)",
+      "OpenPrepare": "Open / prepare history",
+      "GiveTo": "Give to…",
+      "Edit": "Edit",
+      "Remove": "Remove",
+      "Inbox": "Agents' messages",
+      "MarkAllSeen": "Mark all as read",
+      "Recipient": "Recipient",
+      "PlayersDirect": "Players (direct)",
+      "Sender": "Displayed sender",
+      "SmsMail": "Text / email",
+      "Mail": "Email",
+      "MessagePlaceholder": "Your message… (drop an image or a journal to attach it)",
+      "Call": "Call",
+      "Ring": "Ring",
+      "CopyLink": "Copy as a link, to paste into a journal",
+      "RingingAt": "Ringing at: {who}",
+      "NoDevices": "No device yet.",
+      "MarkItem": "Mark an item",
+      "CorrespondentPlaceholder": "Contact: name or number"
+    },
+    "LockedMessage": "Unlock the phone to read this message.",
+    "Document": "Document",
+    "RemoveAttachment": "Remove attachment",
+    "Enlarge": "Enlarge",
+    "Attachment": "Attachment",
+    "DocNotFound": "Document not found.",
+    "Share": {
+      "NobodyNear": "Nobody next to you to show the screen to.",
+      "ShowScreen": "Show the screen",
+      "ShowTo": "Show to:",
+      "Show": "Show",
+      "GmCopy": "{from} shows their screen ({title}) to {names}.",
+      "YouShow": "You show your screen to {names}.",
+      "ShowsYou": "{from} shows you their screen",
+      "GiveBack": "Hand it back",
+      "ReceivedFrom": "Received from {who}",
+      "SentTo": "Sent to {who}",
+      "ConversationWith": "Conversation with {who}",
+      "ShowConversation": "Show the conversation"
+    },
+    "Cancel": "Cancel",
+    "Fwd": {
+      "NoAttachments": "This device cannot forward attachments.",
+      "TextOnly": "Only the text will be forwarded.",
+      "AnImage": "an image",
+      "ThisMessage": "this message",
+      "Forward": "Forward",
+      "ForwardTo": "Forward {what} to:",
+      "Done": "Forwarded to {to}.",
+      "Verb": "forwards",
+      "Forwarded": "Forwarded"
+    },
+    "NameOrNumber": "name or number",
+    "Outcome": {
+      "answer": "Answer",
+      "voicemail": "Voicemail",
+      "noanswer": "No answer",
+      "unreachable": "Unreachable",
+      "unassigned": "Not in service"
+    },
+    "Call": {
+      "Incoming": "Incoming call",
+      "IsCalling": "is calling you…",
+      "Ringing": "The phone is ringing…",
+      "Answer": "Answer",
+      "Decline": "Decline",
+      "Missed": "Missed call: {caller}",
+      "Outgoing": "Calling",
+      "Calling": "Calling…",
+      "HangUp": "Hang up",
+      "Call": "Call"
+    },
+    "Net": {
+      "GmAbsent": "No phone network [GM away]",
+      "NoSignal": "No signal.",
+      "NewMessages": {
+        "one": "{n} new message",
+        "other": "{n} new messages"
+      },
+      "MissedCalls": {
+        "one": "{n} missed call",
+        "other": "{n} missed calls"
+      },
+      "Back": "signal back",
+      "DownAll": "Network down for everyone",
+      "Ok": "Network OK",
+      "Pending": "{n} pending",
+      "Restore": "Restore network",
+      "Cut": "Cut network",
+      "GmAway": "GM away",
+      "Signal": "Signal",
+      "NoSignalShort": "No signal"
+    },
+    "CallerResult": {
+      "answer": "{name} picked up.",
+      "voicemail": "You've reached {name}'s voicemail.",
+      "unassigned": "The number you have dialed is not in service.",
+      "unreachable": "The person you are calling cannot be reached at the moment.",
+      "noanswer": "{name} does not answer."
+    },
+    "Form": {
+      "Model": "Model",
+      "Place": "Location (scene)",
+      "SceneName": "Scene name",
+      "DeviceName": "Device name",
+      "DeviceNameHint": "personal, burner, booth, office…",
+      "Number": "Number / email",
+      "HeldBy": "Held by",
+      "Nobody": "Nobody (to prepare)",
+      "HeldByHint": "Type a few letters to find an agent or an NPC. Leave empty to prepare the device without a holder.",
+      "Theme": "Look"
+    },
+    "Ok": "OK",
+    "NewDevice": "New device",
+    "Give": {
+      "Title": "Give \"{label}\" ({number})",
+      "Hint": "The device moves with its number, contacts and history.",
+      "Give": "Give",
+      "NowHeld": "\"{label}\" is now held by {name}.",
+      "NowWorld": "\"{label}\" is now among the world items."
+    },
+    "WorldItems": "World items",
+    "Mark": {
+      "Title": "Turn an item into a device",
+      "Item": "Item",
+      "Done": "\"{name}\" is now a device ({number})."
+    },
+    "EditDevice": "Edit device",
+    "Contacts": {
+      "Title": "Contacts",
+      "Hint": "One contact per line: <code>Name | number</code>. The number is optional for an NPC.",
+      "Placeholder": "Marlin Hunt | 555-0142&#10;The Program"
+    },
+    "Save": "Save",
+    "Link": {
+      "Copied": "Link copied: {link}",
+      "CopyFailed": "Could not copy, here is the link: {link}",
+      "ClickToSend": "Click to send",
+      "Calls": "{who} calls {to}"
+    },
+    "Unmark": {
+      "Title": "Remove device",
+      "Confirm": "\"{name}\" will no longer be a device (the item is kept, the history is lost)."
+    },
+    "Image": "Image",
+    "Devices": "Devices",
+    "DropHere": "Drop an image or a journal page here",
+    "AttachImage": "Attach an image",
+    "Send": "Send",
+    "MyDevices": "My devices",
+    "Device": "Device",
+    "NoDevice": "No device.",
+    "NoPhone": "You don't have a phone.",
+    "OutOfReach": "{label} is out of reach.",
+    "Lock": {
+      "Session": "Session locked"
+    },
+    "NoMessage": "No message",
+    "You": "You",
+    "NoConversation": "No conversation.",
+    "NewConversation": "New conversation",
+    "NewMail": "New email",
+    "NewMessage": "New message",
+    "Dial": "Dial a number",
+    "Delete": "Delete",
+    "Read": {
+      "Pending": "Pending",
+      "Unread": "Unread",
+      "Seen": "Seen"
+    },
+    "MessagePlaceholder": "Message…",
+    "Back": "Back",
+    "Number": "Number",
+    "ToPlaceholder": "To: name or number",
+    "MailPlaceholder": "Subject (first line)&#10;&#10;Your message…",
+    "Prep": {
+      "TextPlaceholder": "Message text (empty for a call)",
+      "Add": "Add to history",
+      "smsIn": "Message received",
+      "smsOut": "Message sent",
+      "callMissed": "Missed call",
+      "callIn": "Incoming call",
+      "callOut": "Outgoing call"
+    },
+    "CallLog": {
+      "out": {
+        "answer": "Outgoing call",
+        "voicemail": "Voicemail",
+        "unassigned": "Number not in service",
+        "unreachable": "Unreachable",
+        "cancelled": "Call cancelled",
+        "noanswer": "No answer"
+      },
+      "in": {
+        "answer": "Incoming call",
+        "decline": "Call declined",
+        "missed": "Missed call"
+      }
+    },
+    "Settings": {
+      "language": {
+        "name": "Module language",
+        "hint": "Language of the phone interface for everyone. \"Automatic\" follows each player's Foundry language. Reloads the page.",
+        "auto": "Automatic (Foundry's language)"
+      },
+      "volume": {
+        "name": "Phone volume",
+        "hint": "Volume of the ringtone and message beep on this computer."
+      },
+      "ringTimeout": {
+        "name": "Ring duration (seconds)",
+        "hint": "After this, the call counts as missed. 0 = rings until answered."
+      },
+      "floatingButton": {
+        "name": "Floating button for players",
+        "hint": "An always visible phone icon showing the number of unread messages. Click to open the phone; drag to move it."
+      },
+      "smsEnabled": {
+        "name": "Text messages",
+        "hint": "Uncheck for an era without text messages: only calls (and computer emails) remain."
+      },
+      "keybinding": "Phone: GM panel / My phone (player)"
+    },
+    "Migrated": "{n} device(s) recovered from the previous version.",
+    "Demo": {
+      "Landline": "Demo landline",
+      "Terminal": "Demo terminal",
+      "NpcPhone": "NPC mobile (demo)",
+      "SampleText": "Meet tonight, 10 pm, at the parking lot.",
+      "Created": "{n} demo device(s) created.",
+      "Removed": "{n} demo device(s) removed."
+    },
+    "Theme": {
+      "default": "Model default",
+      "console": "Text console",
+      "military": "Secure (military)",
+      "Classified": "Classified",
+      "GmView": "GM view · preparation",
+      "modern": "Modern, keypad (1980-2020)",
+      "federal": "Federal (FBI)",
+      "GovSystem": "Government system · authorized use only",
+      "IdRequired": "Identification required",
+      "AgentId": "Agent ID",
+      "Ref": "Ref.",
+      "Confidential": "Confidential"
+    }
+  }
+}
