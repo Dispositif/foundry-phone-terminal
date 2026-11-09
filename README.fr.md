@@ -1,28 +1,24 @@
 # Phone & Terminal
 
+*Le téléphone et l'ordinateur comme outils narratifs. Le réseau, c'est vous.*
+
 *Pour les jeux d'enquête de toutes les époques : L'Appel de Cthulhu, Delta Green, Vampire, Blade Runner, Alien.*
 
-Un téléphone pour les personnages, pensé comme un **outil narratif** plutôt que comme une imitation de smartphone. Le MJ est le réseau : il incarne tous les correspondants, décide de l'issue des appels et contrôle la couverture.
+Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateurs portables et des terminaux installés dans les lieux. Chaque appel ou message vers un PNJ arrive chez le MJ, qui répond, laisse sonner ou décide que le numéro n'existe pas. Pensé pour l'enquête et le jeu narratif, pas comme un simulateur de smartphone.
 
 - **Un raccourci : Ctrl+Shift+P** ouvre le panneau MJ, ou le téléphone du joueur. Les joueurs ont aussi un bouton flottant.
-- **Sans rien configurer**, le MJ peut appeler un joueur ou lui envoyer un message depuis le panneau MJ.
+- **Rien à configurer :** le MJ peut tout de suite appeler un joueur ou lui envoyer un message, depuis le panneau MJ.
 - **Les appareils sont un plus.** Un appareil est un objet dans l'inventaire d'un personnage (téléphone, portable), ou il est installé dans un lieu : fixe ou terminal rattaché à une scène Foundry, utilisé par ceux qui s'y trouvent. Les appareils apportent l'historique, les contacts, les réponses, le partage et les habillages.
-- **Un scénario prêt à jouer.** Les liens `@SMS` et `@Call` dans un journal envoient un message ou font sonner un téléphone d'un clic.
 - **Les agents communiquent aussi entre eux.** Avec des appareils, les personnages s'appellent et s'envoient des messages directement, sans intervention du MJ, qui reçoit une copie discrète des messages.
+- Foundry VTT v13 et v14. N'importe quel système de jeu.
+- Interface en français et en anglais.
+- **URL du manifeste :** `https://github.com/Dispositif/foundry-phone-terminal/releases/latest/download/module.json`
 
-Compatible Foundry VTT v13 et v14. Fonctionne avec n'importe quel système de jeu. Interface en français et en anglais.
+![Vue joueur](docs/player.png)
 
-**Installation** : dans Foundry, **Modules → Installer un module**, puis collez l'URL du manifeste :
-
-```
-https://github.com/Dispositif/foundry-phone-terminal/releases/latest/download/module.json
-```
-
-Pour essayer sur un monde vierge, lancez dans une macro MJ : `game.modules.get("soren-phone-terminal").api.demo()`.
+> **Le MJ doit être connecté.** Son navigateur fait office de réseau : sans MJ en ligne, les joueurs voient « Pas de réseau téléphonique [MJ absent] ». Ils peuvent relire leurs messages, mais ni écrire ni appeler.
 
 [English version](README.md)
-
-> **Le MJ doit être connecté.** Son navigateur fait office de réseau : sans MJ en ligne, les joueurs voient « 📱 Pas de réseau téléphonique [MJ absent] ». Ils peuvent relire leurs messages, mais ni écrire ni appeler.
 
 ---
 
@@ -32,6 +28,37 @@ Pour essayer sur un monde vierge, lancez dans une macro MJ : `game.modules.get("
 - **Pas d'horloge.** Aucune date ni heure n'est jamais affichée, pour ne pas contredire la chronologie de la fiction. L'ordre des messages suffit.
 - **Peu de réglages.** Des défauts sensés plutôt que des options.
 - **Discrétion.** Seuls les joueurs concernés entendent la sonnerie ou le bip et voient le message.
+
+## Idées pour votre table
+
+- **Un contact qui rappelle**, ou ne rappelle jamais.
+- **Un terminal dans une pièce.** Quiconque s'y trouve lit son courrier. Joignez des pages de journal pour simuler des fichiers : archives, journaux système, rapports d'enquête.
+- **Un piratage, un téléphone volé.** Verrouillez un appareil, déverrouillez-le quand le jet réussit. Remettez-le à un autre personnage avec tout son historique.
+- **Un scénario prêt à jouer.** Les liens `@SMS` et `@Call` dans un journal envoient un message ou font sonner un téléphone d'un clic.
+- **Un indice préparé.** Écrivez à l'avance l'historique d'un appareil : messages, photos, appels manqués.
+- **Montrer plutôt que raconter.** Un joueur montre son écran aux agents dans la même pièce, ou transfère la photo.
+
+---
+
+## Installation
+
+Dans Foundry : **Modules → Installer un module**, puis collez l'URL du manifeste :
+
+```
+https://github.com/Dispositif/foundry-phone-terminal/releases/latest/download/module.json
+```
+
+Activez **Phone & Terminal** dans votre monde. Pour essayer sur un monde vierge, lancez dans une macro MJ :
+
+```js
+game.modules.get("soren-phone-terminal").api.demo()
+```
+
+Cela crée un smartphone pour chaque personnage assigné sans appareil, un téléphone fixe et un terminal sur la scène affichée, et un mobile de PNJ avec un message préparé. Pour tout retirer :
+
+```js
+game.modules.get("soren-phone-terminal").api.removeDemo()
+```
 
 ---
 
@@ -59,12 +86,17 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 | **Téléphone fixe** | installé dans une scène | oui | non | non | non |
 
 - **Mails** : la première ligne fait office d'objet. Les mails fonctionnent même si les SMS sont désactivés dans les réglages.
-- **Appareils installés** (fixe, terminal) : rattachés à une scène, ils ne dépendent pas du réseau mobile. Seule leur propre bascule « pas de réseau » les coupe (ligne coupée).
-- Chaque modèle a son **habillage** : smartphone sombre et arrondi, écran LCD vert pour le mobile, client de messagerie clair pour l'ordinateur, poste de bureau gris pour le terminal, bakélite et cadran rotatif pour le fixe (compatible années 1920 à 1980).
-- Le MJ peut choisir un autre **habillage** par appareil (« Modifier l'appareil »), parmi ceux qui conviennent au modèle :
+- **Appareils installés** (fixe, terminal) : rattachés à une scène, ils ne dépendent pas du réseau mobile. Seule leur propre bascule « pas de réseau » les coupe.
+
+### Habillages
+
+![Habillages](docs/skins.png)
+
+- Chaque modèle a son habillage : smartphone sombre et arrondi, écran LCD vert pour le mobile, client de messagerie clair pour l'ordinateur, poste de bureau gris pour le terminal, bakélite noire et cadran rotatif pour le fixe (années 1920 à 1980).
+- Le MJ peut choisir un autre habillage par appareil (**Modifier l'appareil**), parmi ceux qui conviennent au modèle :
   - fixe : **Moderne, à touches** (1980-2020 : petit afficheur, clavier) ;
-  - autres appareils : **Console texte** (vert phosphore sur noir, texte seul) ou **Sécurisé** (kaki, majuscules, bandeau « Confidentiel défense »).
-  - ordinateur et terminal : **Fédéral (FBI)**, poste gouvernemental bleu marine et or, mails présentés en fiches de dossier (référence, tampon « Confidentiel » à la réception), écran de verrouillage « Identification requise ».
+  - téléphones et ordinateurs : **Console texte** (vert phosphore sur noir, texte seul) ou **Sécurisé (militaire)** (kaki, majuscules, bandeau « Confidentiel défense ») ;
+  - ordinateur et terminal : **Fédéral (FBI)**, poste gouvernemental bleu marine et or, mails présentés en fiches de dossier (référence, tampon « Confidentiel »), écran de verrouillage « Identification requise ».
 - Chaque appareil enregistre son habillage (« default » = celui du modèle). Un habillage retiré ou renommé dans une version future retombe sur celui du modèle.
 - La fenêtre d'appel entrant prend l'habillage de l'appareil qui sonne. La vue MJ d'un appareil aussi, avec un liseré orange « Vue MJ · préparation ».
 
@@ -92,7 +124,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
   - vibre quand le téléphone sonne ;
   - ouvre le dernier appareil personnel choisi.
 - Dans une pièce équipée d'un fixe ou d'un terminal, un **petit bouton de lieu** apparaît sous le téléphone, avec ses propres non-lus. Il vibre quand le fixe sonne, ouvre directement l'appareil de la pièce et disparaît quand l'agent s'en va.
-- Avec plusieurs appareils, la fenêtre rouvre sur le **dernier appareil choisi**. S'il n'est plus à portée (pièce quittée, appareil donné), elle revient à un appareil personnel et le signale (« 📍 Terminal n'est plus à portée »).
+- Avec plusieurs appareils, la fenêtre rouvre sur le **dernier appareil choisi**. S'il n'est plus à portée (pièce quittée, appareil donné), elle revient à un appareil personnel et le signale.
 
 ### Messages
 
@@ -120,7 +152,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 ### Ce que le joueur voit selon l'état de l'appareil
 
-- **Pas de réseau** (📵) : ni écrire ni appeler. Les messages et appels manqués attendent et arrivent tous au retour du réseau, avec un récapitulatif.
+- **Pas de réseau** : ni écrire ni appeler. Les messages et appels manqués attendent et arrivent tous au retour du réseau, avec un récapitulatif.
 - **Verrouillé** : écran de verrouillage avec le nombre de non-lus. Les messages arrivent avec leur expéditeur, mais leur texte reste masqué. Les appels sonnent normalement.
 
 ---
@@ -131,7 +163,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 - Le MJ fait sonner un appareil ou lui envoie un message, sous l'identité de son choix : un nom de PNJ, un numéro, ou « Numéro masqué ».
 - Destinataire : un appareil précis (liste « Appareils »), un numéro, ou un joueur.
-- **Pièces jointes** (smartphone, ordinateur, terminal) : une image (📎 ou glisser une tuile) ou une page de journal glissée depuis la barre latérale. Le destinataire reçoit automatiquement le droit de lire le journal joint.
+- **Pièces jointes** (smartphone, ordinateur, terminal) : une image (trombone, ou glisser une tuile) ou une page de journal glissée depuis la barre latérale. Le destinataire reçoit automatiquement le droit de lire le journal joint.
 
 ### Un agent vers un PNJ
 
@@ -146,11 +178,14 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 ### Contacts
 
 - Le carnet se construit en jouant : tout correspondant qui a écrit ou appelé apparaît.
-- Le MJ peut donner des contacts à un appareil, une ligne par contact : « Nom | numéro » (numéro facultatif).
+- Le MJ peut donner des contacts à un appareil, une ligne par contact : `Nom | numéro` (numéro facultatif).
+- Les numéros sont comparés sans tirets, espaces, points ni parenthèses : `555-0133` est `5550133`.
 
 ---
 
 ## Côté MJ
+
+![Panneau MJ](docs/gm.png)
 
 ### Le panneau MJ : Réseau (Ctrl+Shift+P)
 
@@ -177,42 +212,5 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 - Dans les notes de scénario, `@SMS[destinataire|expéditeur]{texte}` et `@Call[destinataire|expéditeur]` deviennent des boutons : un clic envoie le message ou fait sonner l'appareil.
 - Le destinataire peut être un numéro, un nom de personnage ou de joueur ; l'expéditeur est facultatif. Pièces jointes possibles (`img:` ou `doc:`).
-- Pas besoin de retenir la syntaxe : le bouton 🔗 du panneau MJ copie le lien correspondant à ce qui est saisi.
+- Pas besoin de retenir la syntaxe : le bouton lien du panneau MJ copie le lien correspondant à ce qui est saisi.
 - Les joueurs ne voient jamais ces boutons, seulement le texte.
-
----
-
-## Réglages
-
-| Réglage | Portée | Effet |
-|---|---|---|
-| Volume de la sonnerie et du bip | chaque joueur | |
-| Durée de sonnerie avant appel manqué | monde | |
-| SMS activés | monde | désactivés pour une époque sans SMS : restent les appels et les mails |
-| Bouton flottant | monde | affiche ou masque le bouton des joueurs |
-| Raccourci d'ouverture | chaque joueur | Ctrl+Shift+P par défaut |
-| Langue du module | monde | Automatique (langue de Foundry de chaque joueur), Français ou English. Recharge la page. Les libellés de l'écran des réglages suivent toujours la langue de Foundry. |
-
----
-
-## Démo
-
-Pour essayer le module sur un monde vierge, lancer dans une macro (MJ) :
-
-```js
-game.modules.get("soren-phone-terminal").api.demo()
-```
-
-Cela crée un smartphone pour chaque agent assigné qui n'a pas d'appareil, un téléphone fixe et un terminal sur la scène affichée, et un mobile de PNJ avec un message préparé. Pour tout retirer :
-
-```js
-game.modules.get("soren-phone-terminal").api.removeDemo()
-```
-
----
-
-## Mise à jour du module
-
-- Après une mise à jour des fichiers : **Cmd+Shift+R** (Ctrl+Shift+R sous Windows) chez le MJ et chez chaque joueur.
-- Relancer le monde seulement si le fichier `module.json` a changé.
-- Les données des anciennes versions (Burner Phone `soren-burner-phone`, DG Téléphone `dg-telephone`) sont reprises automatiquement au chargement : appareils, historiques et réglages du monde. Désactivez l'ancien module avant d'activer celui-ci.
