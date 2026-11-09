@@ -4,6 +4,9 @@
 
 A Foundry VTT module that gives your characters phones, laptops and room terminals. Every call or message to an NPC lands with the GM, who answers, lets it ring, or decides the number doesn't exist. Built for investigation and narrative play, not as a smartphone simulator.
 
+- **No setup needed:** the GM can ring a player or send them a message right away, from the GM panel.
+- **Devices are optional extras.** A device is an item in a character's inventory (phone, laptop), or is installed in a place: a landline or a terminal tied to a Foundry scene, used by whoever stands there. Devices bring history, contacts, replies, sharing and looks.
+- **Agents talk to each other too.** With devices, characters call and text one another directly, without the GM stepping in; the GM gets a discreet copy of the messages.
 - Foundry VTT v13 and v14. Any game system.
 - Interface in English and French.
 
@@ -56,8 +59,13 @@ game.modules.get("soren-phone-terminal").api.removeDemo()
 
 ## Devices
 
+### Without any device
+
+The GM can ring a player or send them a message (choose the player in **Recipient**). The call window or the message reaches only that player, in the chat. No history, no reply: to let players write back and keep a history, give them a device.
+
 ### A device is an item
 
+- A **carried device** is an item in a character's inventory. An **installed device** (landline, terminal) is tied to a Foundry scene.
 - Any item can become a device: create one from the GM panel (**New device**) or turn an existing item into one (**Mark an item**).
 - Each device has a **model**, a **name** ("personal", "burner", "office"…; defaults to the model name) and a **number** (or an email address for computers).
 - A character can carry several devices.

@@ -2,6 +2,10 @@
 
 Un téléphone pour les personnages, pensé comme un **outil narratif** plutôt que comme une imitation de smartphone. Le MJ est le réseau : il incarne tous les correspondants, décide de l'issue des appels et contrôle la couverture.
 
+- **Sans rien configurer**, le MJ peut appeler un joueur ou lui envoyer un message depuis le panneau MJ.
+- **Les appareils sont un plus.** Un appareil est un objet dans l'inventaire d'un personnage (téléphone, portable), ou il est installé dans un lieu : fixe ou terminal rattaché à une scène Foundry, utilisé par ceux qui s'y trouvent. Les appareils apportent l'historique, les contacts, les réponses, le partage et les habillages.
+- **Les agents communiquent aussi entre eux.** Avec des appareils, les personnages s'appellent et s'envoient des messages directement, sans intervention du MJ, qui reçoit une copie discrète des messages.
+
 Compatible Foundry VTT v13 et v14. Fonctionne avec n'importe quel système de jeu. Interface en français et en anglais.
 
 [English version](README.md)
@@ -21,8 +25,13 @@ Compatible Foundry VTT v13 et v14. Fonctionne avec n'importe quel système de je
 
 ## Appareils
 
+### Sans appareil
+
+Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans **Destinataire**). L'appel ou le message n'arrive qu'à ce joueur, dans le chat. Ni historique ni réponse : pour que les joueurs puissent répondre et garder une trace, donnez-leur un appareil.
+
 ### Un appareil, c'est un objet
 
+- Un **appareil porté** est un objet de l'inventaire d'un personnage. Un **appareil installé** (fixe, terminal) est rattaché à une scène Foundry.
 - N'importe quel objet peut devenir un appareil : on le crée depuis le panneau MJ (« Nouvel appareil ») ou on transforme un objet existant.
 - Chaque appareil a un **modèle**, un **nom** (« perso », « jetable », « bureau »… ; par défaut le nom du modèle) et un **numéro** (ou une adresse mail pour les ordinateurs).
 - Un personnage peut avoir plusieurs appareils.
