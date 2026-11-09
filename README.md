@@ -2,6 +2,8 @@
 
 *Phones and computers as a storytelling tool. You are the network.*
 
+*For investigation games of any era: Call of Cthulhu, Delta Green, Vampire, Blade Runner, Alien.*
+
 A Foundry VTT module that gives your characters phones, laptops and room terminals. Every call or message to an NPC lands with the GM, who answers, lets it ring, or decides the number doesn't exist. Built for investigation and narrative play, not as a smartphone simulator.
 
 - **No setup needed:** the GM can ring a player or send them a message right away, from the GM panel.
@@ -9,6 +11,7 @@ A Foundry VTT module that gives your characters phones, laptops and room termina
 - **Agents talk to each other too.** With devices, characters call and text one another directly, without the GM stepping in; the GM gets a discreet copy of the messages.
 - Foundry VTT v13 and v14. Any game system.
 - Interface in English and French.
+- **Manifest URL:** `https://github.com/Dispositif/foundry-phone-terminal/releases/latest/download/module.json`
 
 ![Player view](docs/player.png)
 
@@ -30,6 +33,7 @@ A Foundry VTT module that gives your characters phones, laptops and room termina
 - **A contact who calls back**, or never does.
 - **A terminal in a room.** Anyone standing there reads its mail. Attach journal pages to simulate files: archives, logs, case reports.
 - **A hack, a stolen phone.** Lock a device, unlock it when the roll succeeds. Hand it to another character with its whole history.
+- **A ready-to-play scenario.** `@SMS` and `@Call` links in a journal send a message or ring a phone in one click.
 - **A prepared clue.** Write a device's history in advance: messages, photos, missed calls.
 - **Show, don't tell.** A player shows their screen to the agents in the same room, or forwards the photo.
 

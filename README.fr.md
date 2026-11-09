@@ -1,12 +1,23 @@
 # Phone & Terminal
 
+*Pour les jeux d'enquête de toutes les époques : L'Appel de Cthulhu, Delta Green, Vampire, Blade Runner, Alien.*
+
 Un téléphone pour les personnages, pensé comme un **outil narratif** plutôt que comme une imitation de smartphone. Le MJ est le réseau : il incarne tous les correspondants, décide de l'issue des appels et contrôle la couverture.
 
 - **Sans rien configurer**, le MJ peut appeler un joueur ou lui envoyer un message depuis le panneau MJ.
 - **Les appareils sont un plus.** Un appareil est un objet dans l'inventaire d'un personnage (téléphone, portable), ou il est installé dans un lieu : fixe ou terminal rattaché à une scène Foundry, utilisé par ceux qui s'y trouvent. Les appareils apportent l'historique, les contacts, les réponses, le partage et les habillages.
+- **Un scénario prêt à jouer.** Les liens `@SMS` et `@Call` dans un journal envoient un message ou font sonner un téléphone d'un clic.
 - **Les agents communiquent aussi entre eux.** Avec des appareils, les personnages s'appellent et s'envoient des messages directement, sans intervention du MJ, qui reçoit une copie discrète des messages.
 
 Compatible Foundry VTT v13 et v14. Fonctionne avec n'importe quel système de jeu. Interface en français et en anglais.
+
+**Installation** : dans Foundry, **Modules → Installer un module**, puis collez l'URL du manifeste :
+
+```
+https://github.com/Dispositif/foundry-phone-terminal/releases/latest/download/module.json
+```
+
+Pour essayer sur un monde vierge, lancez dans une macro MJ : `game.modules.get("soren-phone-terminal").api.demo()`.
 
 [English version](README.md)
 
