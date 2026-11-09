@@ -6,6 +6,7 @@
 
 A Foundry VTT module that gives your characters phones, laptops and room terminals. Every call or message to an NPC lands with the GM, who answers, lets it ring, or decides the number doesn't exist. Built for investigation and narrative play, not as a smartphone simulator.
 
+- **One shortcut: Ctrl+Shift+P** opens the GM panel, or the player's phone. Players also get a floating phone button.
 - **No setup needed:** the GM can ring a player or send them a message right away, from the GM panel.
 - **Devices are optional extras.** A device is an item in a character's inventory (phone, laptop), or is installed in a place: a landline or a terminal tied to a Foundry scene, used by whoever stands there. Devices bring history, contacts, replies, sharing and looks.
 - **Agents talk to each other too.** With devices, characters call and text one another directly, without the GM stepping in; the GM gets a discreet copy of the messages.

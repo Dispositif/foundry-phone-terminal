@@ -1,0 +1,137 @@
+<div class="spt-gm">
+  {{!-- Bandeau d'état : réseau, messages en attente, appel en cours --}}
+  <header class="spt-gm-status {{#if down}}down{{/if}}" aria-label="{{spt "Gm.Status"}}">
+    <span class="spt-pill"><i class="fas {{#if down}}fa-ban{{else}}fa-tower-cell{{/if}}"></i> {{#if down}}{{spt "Net.DownAll"}}{{else}}{{spt "Net.Ok"}}{{/if}}</span>
+    {{#if pending}}<span class="spt-gm-pending">{{spt "Net.Pending" n=pending}}</span>{{/if}}
+    <button type="button" class="spt-gm-net" data-action="toggleNetwork">{{#if down}}{{spt "Net.Restore"}}{{else}}{{spt "Net.Cut"}}{{/if}}</button>
+  </header>
+  {{#if ringing}}
+  <div class="spt-gm-ringing">
+    <i class="fas fa-phone-volume"></i> {{spt "Gm.RingingAt" who=ringing}}
+    <button type="button" data-action="hangup" title="{{spt "Call.HangUp"}}" aria-label="{{spt "Call.HangUp"}}"><i class="fas fa-phone-slash"></i></button>
+  </div>
+  {{/if}}
+
+  {{!-- Onglets --}}
+  <nav class="spt-tabs" role="tablist">
+    <a class="spt-tab {{#if (eq tab "send")}}active{{/if}}" data-action="switchTab" data-tab="send" role="tab"><i class="fas fa-paper-plane"></i> {{spt "Gm.TabSend"}}</a>
+    <a class="spt-tab {{#if (eq tab "inbox")}}active{{/if}}" data-action="switchTab" data-tab="inbox" role="tab"><i class="fas fa-inbox"></i> {{spt "Gm.TabInbox"}}{{#if inboxUnread}} <span class="spt-badge">{{inboxUnread}}</span>{{/if}}</a>
+    <a class="spt-tab {{#if (eq tab "devices")}}active{{/if}}" data-action="switchTab" data-tab="devices" role="tab"><i class="fas fa-mobile-screen"></i> {{spt "Gm.TabDevices"}} <span class="spt-count">{{deviceCount}}</span></a>
+  </nav>
+
+  <div class="spt-tab-body">
+  {{#if (eq tab "send")}}
+    <section class="spt-gm-send">
+      <div class="form-group">
+        <label>{{spt "Gm.Recipient"}}</label>
+        <div class="spt-icon-select"><i class="fas fa-mobile-screen"></i>
+          <select name="target" data-icon-select>
+            {{#if targetDevices.length}}<optgroup label="{{spt "Devices"}}">{{#each targetDevices}}<option value="{{value}}" data-icon="{{icon}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</optgroup>{{/if}}
+            <optgroup label="{{spt "Gm.PlayersDirect"}}">{{#each targetPlayers}}<option value="{{value}}" data-icon="fa-user" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</optgroup>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>{{spt "Gm.Sender"}}</label>
+        <input type="text" name="sender" value="{{sender}}" placeholder="{{spt "Masked"}}">
+      </div>
+
+      {{#if messaging}}
+      <div class="spt-segmented" role="radiogroup">
+        <a class="{{#if (eq mode "message")}}active{{/if}}" data-action="mode" data-mode="message" role="radio"><i class="fas fa-comment-sms"></i> {{spt "Gm.ModeMessage"}}</a>
+        <a class="{{#if (eq mode "call")}}active{{/if}}" data-action="mode" data-mode="call" role="radio"><i class="fas fa-phone"></i> {{spt "Gm.ModeCall"}}</a>
+      </div>
+      {{/if}}
+
+      {{#if (eq mode "message")}}
+      <div class="spt-drop" title="{{spt "DropHere"}}">
+        {{{attChip}}}
+        <textarea name="text" rows="5" placeholder="{{spt "Gm.MessagePlaceholder"}}">{{text}}</textarea>
+      </div>
+      <div class="spt-phone-row">
+        <button type="button" class="spt-icon-btn" data-action="attach" title="{{spt "AttachImage"}}" aria-label="{{spt "AttachImage"}}"><i class="fas fa-paperclip"></i></button>
+        <button type="button" class="spt-icon-btn" data-action="copyLink" title="{{spt "Gm.CopyLink"}}" aria-label="{{spt "Gm.CopyLink"}}"><i class="fas fa-link"></i></button>
+        <button type="button" class="spt-primary" data-action="sms"><i class="fas fa-paper-plane"></i> {{spt "Send"}}</button>
+      </div>
+      {{else}}
+      <div class="spt-phone-row">
+        <button type="button" class="spt-icon-btn" data-action="copyLink" title="{{spt "Gm.CopyLink"}}" aria-label="{{spt "Gm.CopyLink"}}"><i class="fas fa-link"></i></button>
+        <button type="button" class="spt-primary" data-action="ring"><i class="fas fa-phone-volume"></i> {{spt "Gm.Ring"}}</button>
+      </div>
+      {{/if}}
+    </section>
+  {{/if}}
+
+  {{#if (eq tab "inbox")}}
+    <section class="spt-gm-inbox">
+      {{#if inbox.length}}
+      <div class="spt-threads">
+        {{#each inbox}}
+        <div class="spt-thread {{#if unread}}unread{{/if}}" data-thread="{{id}}" data-uuid="{{uuid}}" data-key="{{key}}">
+          <div class="spt-thread-head"><strong>{{who}}</strong> <i class="fas fa-arrow-right" aria-hidden="true"></i> {{to}}{{#if unread}} <span class="spt-badge">{{unread}}</span>{{/if}}</div>
+          {{#if more}}<div class="spt-thread-more">…</div>{{/if}}
+          {{#each bubbles}}
+          <div class="spt-bb {{dir}} {{#if pending}}pending{{/if}}">{{#if fwd}}<span class="spt-bb-fwd"><i class="fas fa-share"></i> {{spt "Fwd.Forwarded"}}</span>{{/if}}{{{att}}}{{#if text}}<div>{{{text}}}</div>{{/if}}</div>
+          {{/each}}
+          <div class="spt-thread-reply">
+            <input type="text" data-draft="{{id}}" value="{{draft}}" placeholder="{{spt "Gm.ReplyAs" name=to}}" aria-label="{{spt "Gm.ReplyAs" name=to}}">
+            <button type="button" data-action="sendReply" aria-label="{{spt "Send"}}" data-tooltip="{{spt "Send"}}"><i class="fas fa-paper-plane"></i></button>
+            {{#if canCall}}<button type="button" data-action="callBack" aria-label="{{spt "Gm.CallBack"}}" data-tooltip="{{spt "Gm.CallBack"}}"><i class="fas fa-phone"></i></button>{{/if}}
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      {{#if inboxUnread}}<a class="spt-mark-all" data-action="markAllSeen">{{spt "Gm.MarkAllSeen"}}</a>{{/if}}
+      {{else}}
+      <p class="spt-phone-status">{{spt "Gm.NoInbox"}}</p>
+      {{/if}}
+    </section>
+  {{/if}}
+
+  {{#if (eq tab "devices")}}
+    <section class="spt-gm-devices">
+      {{#each groups}}
+      <div class="spt-dev-group">
+        <header class="spt-dev-group-head">
+          {{#if img}}<img src="{{img}}" alt="">{{else}}<span class="spt-dev-avatar"><i class="fas {{icon}}"></i></span>{{/if}}
+          <strong>{{name}}</strong>
+        </header>
+        <ul class="spt-dev-list">
+          {{#each devices}}
+          <li class="spt-dev">
+            <a class="spt-dev-main" data-action="selectPhone" data-number="{{number}}" title="{{spt "Gm.PickRecipient"}}">
+              <i class="fas {{icon}}" title="{{modelLabel}}"></i>
+              <span class="spt-dev-label">{{label}} <small>{{number}}</small></span>
+              {{#if modeIcon}}<i class="fas {{modeIcon}} spt-dim" title="{{modeLabel}}"></i>{{/if}}
+              {{#if locked}}<i class="fas fa-lock spt-warn" title="{{spt "Gm.Locked"}}"></i>{{/if}}
+              {{#if noSignal}}<i class="fas fa-signal spt-nosignal" title="{{spt "Gm.NoSignal"}}"></i>{{/if}}
+              {{#if cloned}}<i class="fas fa-clone spt-warn" title="{{spt "Gm.ClonedHint"}}"></i>{{/if}}
+              {{#if unread}}<span class="spt-row-unread" title="{{unreadTitle}}"><i class="fas fa-envelope"></i> {{unread}}</span>{{/if}}
+            </a>
+            <span class="spt-dev-actions" aria-label="{{spt "Gm.Actions"}}">
+              <a data-action="openPhone" data-uuid="{{uuid}}" title="{{spt "Gm.OpenPrepare"}}" aria-label="{{spt "Gm.OpenPrepare"}}"><i class="fas fa-pen-to-square"></i></a>
+              <a data-action="toggleLock" data-uuid="{{uuid}}" class="{{#if locked}}spt-locked{{/if}}" title="{{#if locked}}{{spt "Gm.Locked"}}{{else}}{{spt "Gm.Unlocked"}}{{/if}}" aria-label="{{#if locked}}{{spt "Gm.Locked"}}{{else}}{{spt "Gm.Unlocked"}}{{/if}}"><i class="fas {{#if locked}}fa-lock{{else}}fa-lock-open{{/if}}"></i></a>
+              <a data-action="toggleSignal" data-uuid="{{uuid}}" class="{{#if noSignal}}spt-nosignal{{/if}}" title="{{#if noSignal}}{{spt "Gm.NoSignal"}}{{else}}{{spt "Gm.SignalOk"}}{{/if}}" aria-label="{{#if noSignal}}{{spt "Gm.NoSignal"}}{{else}}{{spt "Gm.SignalOk"}}{{/if}}"><i class="fas fa-signal"></i></a>
+              <a data-action="contacts" data-uuid="{{uuid}}" title="{{spt "Contacts.Title"}}" aria-label="{{spt "Contacts.Title"}}"><i class="fas fa-address-book"></i></a>
+              {{#unless fixed}}<a data-action="give" data-uuid="{{uuid}}" title="{{spt "Gm.GiveTo"}}" aria-label="{{spt "Gm.GiveTo"}}"><i class="fas fa-hand-holding"></i></a>{{/unless}}
+              <a data-action="editPhone" data-uuid="{{uuid}}" title="{{spt "Gm.Edit"}}" aria-label="{{spt "Gm.Edit"}}"><i class="fas fa-gear"></i></a>
+              <a data-action="unmarkPhone" data-uuid="{{uuid}}" title="{{spt "Gm.Remove"}}" aria-label="{{spt "Gm.Remove"}}"><i class="fas fa-trash"></i></a>
+            </span>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+      {{else}}
+      <p class="spt-phone-status">{{spt "Gm.NoDevices"}}</p>
+      {{/each}}
+    </section>
+  {{/if}}
+  </div>
+
+  {{#if (eq tab "devices")}}
+  <footer class="spt-phone-row spt-gm-foot">
+    <button type="button" data-action="newPhone"><i class="fas fa-plus"></i> {{spt "NewDevice"}}</button>
+    <button type="button" data-action="markItem"><i class="fas fa-tag"></i> {{spt "Gm.MarkItem"}}</button>
+  </footer>
+  {{/if}}
+</div>

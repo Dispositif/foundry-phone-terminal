@@ -20,7 +20,7 @@ import { hangUp, ring } from "./ring.js";
 import { onSocket } from "./socket.js";
 import { createDemo, removeDemo } from "./demo.js";
 import { isActiveGM, rerenderAll } from "./util.js";
-import { loadLanguages, t } from "./i18n.js";
+import { loadLanguages, t, tn } from "./i18n.js";
 
 // Les deux langues sont chargées dès le démarrage (réglage « Langue du module »).
 loadLanguages();
@@ -54,6 +54,9 @@ export function openPhone(phoneUuid = null) {
 
 Hooks.once("init", () => {
   registerEnrichers();
+  // Templates : {{spt "Clé" var=valeur}} et {{sptn "Clé" n}} utilisent les textes du module (langue du module).
+  Handlebars.registerHelper("spt", (key, options) => t(key, options?.hash ?? {}));
+  Handlebars.registerHelper("sptn", (key, n) => tn(key, n));
   // Les libellés des réglages suivent la langue de Foundry (traduits par Foundry depuis lang/*.json).
   game.settings.register(MODULE_ID, "language", {
     name: "SPT.Settings.language.name",
@@ -129,7 +132,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
   tokens.tools.sptPhone = {
     name: "sptPhone",
     title: game.user.isGM ? t("Gm.PanelTitle") : t("MyPhone"),
-    icon: "fas fa-mobile-screen",
+    icon: game.user.isGM ? "fas fa-tower-cell" : "fas fa-phone",
     order: Object.keys(tokens.tools).length,
     button: true,
     visible: true,

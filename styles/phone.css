@@ -61,34 +61,75 @@ a.spt-link:hover { filter: brightness(1.15); }
 @keyframes spt-phone-shake { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
 @keyframes spt-phone-pulse { 50% { opacity: 0.35; } }
 
-/* ---------- Panneau MJ ---------- */
-.spt-phone-panel { max-height: 92vh; }
-.spt-phone-panel .window-content { overflow-y: auto; }
-.spt-phone-panel .spt-phone-body { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem; }
-.spt-phone-panel fieldset { display: flex; flex-direction: column; gap: 0.4rem; }
-.spt-phone-panel textarea { width: 100%; resize: vertical; }
-.spt-phone-panel .spt-phone-status { margin: 0; font-style: italic; opacity: 0.8; }
-.spt-phone-panel .spt-dim { opacity: 0.55; }
-.spt-phone-panel .spt-warn, .spt-phone-panel .spt-locked { color: var(--spt-warn); }
-.spt-phone-panel .spt-phone-row button[data-action="hangup"] { flex: 0 0 2.5em; }
-/* Réseau */
-.spt-phone-panel .spt-network { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 4px 8px; border-radius: 6px; background: rgba(47,111,62,0.15); }
-.spt-phone-panel .spt-network.down { background: rgba(192,57,43,0.2); font-weight: bold; }
-.spt-phone-panel .spt-network button { flex: 0 0 auto; width: auto; }
-.spt-phone-panel .spt-nosignal { color: var(--spt-danger); }
-.spt-phone-panel .spt-nosignal i { text-decoration: line-through; }
+/* ---------- Panneau MJ « Réseau » ---------- */
+.spt-phone-panel .window-content { padding: 0; overflow: hidden; }
+.spt-gm { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.spt-gm .spt-phone-status { margin: 0.5rem 0; font-style: italic; opacity: 0.75; text-align: center; }
+.spt-gm .spt-dim { opacity: 0.55; }
+.spt-gm .spt-warn, .spt-gm .spt-locked { color: var(--spt-warn); }
+.spt-gm .spt-nosignal { color: var(--spt-danger); }
+.spt-gm textarea { width: 100%; resize: none; }
+/* Bandeau d'état */
+.spt-gm-status { display: flex; align-items: center; gap: 0.5rem; padding: 6px 10px; border-bottom: 1px solid var(--spt-line); }
+.spt-gm-status .spt-pill { display: inline-flex; align-items: center; gap: 0.35rem; padding: 2px 10px; border-radius: 1em; font-weight: 600; font-size: 0.9em; background: rgba(47,111,62,0.22); color: #7fd18f; }
+.spt-gm-status.down .spt-pill { background: rgba(192,57,43,0.25); color: #ff8a7a; }
+.spt-gm-status .spt-gm-pending { font-size: 0.85em; opacity: 0.8; }
+.spt-gm-status .spt-gm-net { margin-left: auto; flex: 0 0 auto; width: auto; font-size: 0.85em; padding: 1px 10px; }
+.spt-gm-ringing { display: flex; align-items: center; gap: 0.5rem; padding: 5px 10px; background: rgba(201,118,28,0.18); border-bottom: 1px solid rgba(201,118,28,0.4); }
+.spt-gm-ringing > i { animation: spt-phone-shake 0.6s infinite; color: var(--spt-warn); }
+.spt-gm-ringing button { margin-left: auto; flex: 0 0 2.4em; width: 2.4em; color: var(--spt-danger); }
+/* Onglets */
+.spt-tabs { display: flex; border-bottom: 1px solid var(--spt-line); }
+.spt-tab { flex: 1; text-align: center; padding: 7px 4px; cursor: pointer; opacity: 0.65; border-bottom: 2px solid transparent; white-space: nowrap; }
+.spt-tab:hover { opacity: 0.9; }
+.spt-tab.active { opacity: 1; border-bottom-color: var(--spt-warn); font-weight: 600; }
+.spt-tab .spt-count { font-size: 0.8em; opacity: 0.7; }
+.spt-tab-body { flex: 1; min-height: 0; overflow-y: auto; padding: 10px; }
+.spt-tab-body > section { display: flex; flex-direction: column; gap: 0.6rem; }
+.spt-gm-foot { padding: 8px 10px; border-top: 1px solid var(--spt-line); }
+/* Envoyer */
+.spt-gm-send .form-group { display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+.spt-gm-send .form-group > label { flex: 0 0 7.5em; }
+.spt-gm-send .spt-icon-select { flex: 1; }
+.spt-segmented { display: flex; border: 1px solid var(--spt-line); border-radius: 6px; overflow: hidden; }
+.spt-segmented a { flex: 1; text-align: center; padding: 5px; cursor: pointer; opacity: 0.7; }
+.spt-segmented a + a { border-left: 1px solid var(--spt-line); }
+.spt-segmented a.active { opacity: 1; background: rgba(201,118,28,0.2); font-weight: 600; }
+.spt-gm-send .spt-drop { display: flex; flex-direction: column; gap: 0.4rem; }
+.spt-gm .spt-primary { flex: 1; font-weight: 600; }
+.spt-gm .spt-icon-btn { flex: 0 0 2.6em; }
 /* Messages des agents */
-.spt-phone-panel .spt-inbox-list { list-style: none; margin: 0; padding: 0; max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
-.spt-phone-panel .spt-inbox-item { padding: 4px 6px; border-radius: 6px; background: rgba(128,128,128,0.1); }
-.spt-phone-panel .spt-inbox-item.unread { background: rgba(192,57,43,0.15); border-left: 3px solid var(--spt-danger); }
-.spt-phone-panel .spt-inbox-head { display: flex; gap: 0.3rem; }
-.spt-phone-panel .spt-inbox-text { font-family: monospace; margin: 2px 0; }
-.spt-phone-panel .spt-inbox-item a, .spt-phone-panel .spt-mark-all { font-size: 0.85em; }
-.spt-phone-panel .spt-mark-all { align-self: flex-end; opacity: 0.8; }
-/* Liste des appareils (le !important protège la liste des styles génériques de Foundry) */
-.spt-phone-panel .spt-phone-list { list-style: none; margin: 0; padding: 0; display: block !important; max-height: 220px !important; overflow-y: auto !important; }
-.spt-phone-panel .spt-phone-row-item { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 2px 0; border-bottom: 1px dashed rgba(128,128,128,0.3); }
-.spt-phone-panel .spt-row-controls { display: flex; gap: 0.5rem; white-space: nowrap; }
+.spt-threads { display: flex; flex-direction: column; gap: 8px; }
+.spt-thread { border: 1px solid var(--spt-line); border-radius: 8px; padding: 6px 8px; background: rgba(128,128,128,0.06); display: flex; flex-direction: column; }
+.spt-thread.unread { border-left: 3px solid var(--spt-danger); }
+.spt-thread-head { display: flex; align-items: center; gap: 0.35rem; font-size: 0.9em; margin-bottom: 4px; }
+.spt-thread-head .fa-arrow-right { font-size: 0.7em; opacity: 0.6; }
+.spt-thread-more { text-align: center; opacity: 0.5; font-size: 0.8em; }
+.spt-bb { max-width: 80%; padding: 5px 9px; border-radius: 12px; margin: 2px 0; font-size: 0.92em; line-height: 1.3; overflow-wrap: anywhere; }
+.spt-bb.out { align-self: flex-start; background: rgba(255,255,255,0.1); border-bottom-left-radius: 3px; }
+.spt-bb.in { align-self: flex-end; background: #2f6fd0; color: #fff; border-bottom-right-radius: 3px; }
+.spt-bb.pending { opacity: 0.55; }
+.spt-bb-img { display: block; max-width: 140px; max-height: 90px; border-radius: 6px; border: none; margin-bottom: 3px; object-fit: cover; }
+.spt-bb-doc, .spt-bb-fwd { display: block; font-size: 0.85em; opacity: 0.8; }
+.spt-thread-reply { display: flex; gap: 4px; margin-top: 6px; }
+.spt-thread-reply input { flex: 1; height: 26px; }
+.spt-thread-reply button { flex: 0 0 28px; width: 28px; height: 26px; padding: 0; line-height: 1; }
+.spt-gm .spt-mark-all { align-self: flex-end; opacity: 0.8; font-size: 0.85em; cursor: pointer; margin-top: 4px; }
+/* Appareils, groupés par porteur ou par lieu */
+.spt-dev-group { border: 1px solid var(--spt-line); border-radius: 6px; overflow: hidden; }
+.spt-dev-group-head { display: flex; align-items: center; gap: 0.5rem; padding: 4px 8px; background: rgba(128,128,128,0.12); }
+.spt-dev-group-head img, .spt-dev-avatar { width: 28px; height: 28px; border-radius: 4px; object-fit: cover; border: none; flex: 0 0 auto; }
+.spt-dev-avatar { display: inline-flex; align-items: center; justify-content: center; background: rgba(128,128,128,0.2); }
+.spt-gm .spt-dev-list { list-style: none; margin: 0; padding: 0; display: block !important; }
+.spt-dev { display: flex; align-items: center; gap: 0.4rem; padding: 4px 8px; border-top: 1px solid rgba(128,128,128,0.15); }
+.spt-dev:hover { background: rgba(128,128,128,0.08); }
+.spt-dev-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.4rem; cursor: pointer; }
+.spt-dev-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.spt-dev-label small { opacity: 0.6; margin-left: 0.3em; }
+.spt-dev-actions { display: flex; gap: 0.55rem; white-space: nowrap; opacity: 0; transition: opacity 0.15s; }
+.spt-dev:hover .spt-dev-actions, .spt-dev:focus-within .spt-dev-actions { opacity: 1; }
+.spt-dev-actions a { cursor: pointer; opacity: 0.8; }
+.spt-dev-actions a:hover { opacity: 1; }
 .spt-row-unread { font-size: 0.8em; color: var(--spt-warn); white-space: nowrap; }
 
 /* ---------- Fenêtre joueur : structure ---------- */

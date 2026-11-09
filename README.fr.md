@@ -4,6 +4,7 @@
 
 Un téléphone pour les personnages, pensé comme un **outil narratif** plutôt que comme une imitation de smartphone. Le MJ est le réseau : il incarne tous les correspondants, décide de l'issue des appels et contrôle la couverture.
 
+- **Un raccourci : Ctrl+Shift+P** ouvre le panneau MJ, ou le téléphone du joueur. Les joueurs ont aussi un bouton flottant.
 - **Sans rien configurer**, le MJ peut appeler un joueur ou lui envoyer un message depuis le panneau MJ.
 - **Les appareils sont un plus.** Un appareil est un objet dans l'inventaire d'un personnage (téléphone, portable), ou il est installé dans un lieu : fixe ou terminal rattaché à une scène Foundry, utilisé par ceux qui s'y trouvent. Les appareils apportent l'historique, les contacts, les réponses, le partage et les habillages.
 - **Un scénario prêt à jouer.** Les liens `@SMS` et `@Call` dans un journal envoient un message ou font sonner un téléphone d'un clic.

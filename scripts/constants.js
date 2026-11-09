@@ -11,7 +11,7 @@ export const HANGUP_SRC = `modules/${MODULE_ID}/sounds/hangup.wav`;
 export const MASKED = "Numéro masqué";
 export const LOG_MAX = 200; // entrées non préparées gardées par appareil (les entrées préparées par le MJ sont toujours gardées)
 
-export const { ApplicationV2, DialogV2 } = foundry.applications.api;
+export const { ApplicationV2, DialogV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export const AudioHelper = foundry.audio.AudioHelper;
 
 const MODE_LABELS = labels("Mode", ["on", "silent", "off"]);

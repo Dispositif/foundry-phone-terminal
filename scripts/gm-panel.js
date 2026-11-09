@@ -1,6 +1,6 @@
 import { attChipHtml, attFromDrop, pickImage } from "./attachments.js";
-import { ApplicationV2, DialogV2, MASKED, MODES, MODULE_ID } from "./constants.js";
-import { allPhones, anyMessaging, displayName, getLog, getPhoneData, holderName, isFixed, modelOf, patchLog, phoneLabel, sameConv, smsOn, unmarkPhone, unreadCount } from "./devices.js";
+import { ApplicationV2, DialogV2, HandlebarsApplicationMixin, MASKED, MODES, MODULE_ID } from "./constants.js";
+import { allPhones, anyMessaging, displayName, getLog, getPhoneData, holderName, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount } from "./devices.js";
 import { contactsDialog, editPhoneDialog, giveDialog, markItemDialog, newPhoneDialog } from "./dialogs.js";
 import { copyJournalLink } from "./journal-links.js";
 import { openPhone } from "./main.js";
@@ -32,6 +32,16 @@ export function bindDrop(zone, onAtt) {
 }
 
 /** Messages envoyés par les joueurs à des PNJ (la « boîte de réception » du MJ). */
+/** Bulles visibles par fil dans la boîte du MJ. */
+const INBOX_BUBBLES = 6;
+
+/** Pièce jointe dans une bulle de la boîte MJ : vignette ou nom du journal. */
+function bubbleAtt(att) {
+  if (!att) return "";
+  if (att.type === "image") return `<img class="spt-bb-img" src="${esc(att.src)}" alt="">`;
+  return `<span class="spt-bb-doc"><i class="fas fa-file-lines"></i> ${esc(att.name ?? "")}</span>`;
+}
+
 export function gmInbox() {
   const out = [];
   for (const p of allPhones()) {
@@ -66,17 +76,19 @@ export function bindIconSelects(root) {
   }
 }
 
-export class PhonePanel extends ApplicationV2 {
+export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
   static instance = null;
 
   static DEFAULT_OPTIONS = {
     id: "spt-phone-panel",
     tag: "form",
     classes: ["spt-phone-panel"],
-    window: { title: "Phone & Terminal", icon: "fas fa-mobile-screen", resizable: true },
-    position: { width: 480, height: "auto" },
+    window: { title: "Phone & Terminal", icon: "fas fa-tower-cell", resizable: true },
+    position: { width: 460, height: 620 },
     form: { handler: () => {}, submitOnChange: false, closeOnSubmit: false },
     actions: {
+      switchTab: function (event, target) { this._focusSend = true; this._setState({ tab: target.dataset.tab }); },
+      mode: function (event, target) { this._focusSend = true; this._setState({ mode: target.dataset.mode }); },
       ring: function () { this._doRing(); },
       hangup: function () { hangUpAll(); },
       sms: function () { this._doSms(); },
@@ -95,22 +107,16 @@ export class PhonePanel extends ApplicationV2 {
         if (ok) unmarkPhone(item);
       },
       selectPhone: function (event, target) {
-        const select = this.element.querySelector("[name=target]");
-        if (!select) return;
-        select.value = `phone:${target.dataset.number}`;
-        select.dispatchEvent(new Event("change")); // met à jour l'icône du destinataire
+        // Un clic sur un appareil le choisit comme destinataire et ouvre l'onglet Envoyer.
+        this._focusSend = true;
+        this._setState({ target: `phone:${target.dataset.number}`, tab: "send" });
       },
-      reply: async function (event, target) {
-        const item = await fromUuid(target.dataset.uuid);
+      sendReply: function (event, target) { this._sendReply(target.closest("[data-thread]")); },
+      callBack: async function (event, target) {
+        const th = target.closest("[data-thread]");
+        const item = await fromUuid(th.dataset.uuid);
         const phone = getPhoneData(item);
-        const key = target.dataset.key;
-        this._readForm();
-        this._state.target = `phone:${phone.number}`;
-        this._state.sender = displayName(phone, key);
-        this._skipRead = true;
-        await this.render();
-        this.element.querySelector("[name=text]")?.focus();
-        await patchLog(item, (e) => e.dir === "out" && sameConv(phone, e.with, key), { seen: true });
+        ring(`phone:${phone.number}`, { caller: displayName(phone, th.dataset.key) });
       },
       toggleNetwork: async function () {
         await game.settings.set(MODULE_ID, "networkDown", !game.settings.get(MODULE_ID, "networkDown"));
@@ -147,7 +153,19 @@ export class PhonePanel extends ApplicationV2 {
     }
   };
 
-  _state = { target: null, sender: t("Masked"), text: "", att: null };
+  static PARTS = {
+    body: { template: `modules/${MODULE_ID}/templates/gm-panel.hbs`, scrollable: [".spt-tab-body"] }
+  };
+
+  _state = { target: null, sender: t("Masked"), text: "", att: null, tab: "send", mode: "message", drafts: {} };
+
+  /** Change l'état (onglet, mode, destinataire…) en gardant la saisie en cours. */
+  _setState(patch) {
+    this._readForm();
+    Object.assign(this._state, patch);
+    this._skipRead = true;
+    return this.render();
+  }
 
   get title() {
     return t("Gm.PanelTitle");
@@ -159,6 +177,7 @@ export class PhonePanel extends ApplicationV2 {
     this._state.target = el.querySelector("[name=target]")?.value ?? this._state.target;
     this._state.sender = el.querySelector("[name=sender]")?.value ?? this._state.sender;
     this._state.text = el.querySelector("[name=text]")?.value ?? this._state.text;
+    for (const input of el.querySelectorAll("[data-draft]")) this._state.drafts[input.dataset.draft] = input.value;
   }
 
   async render(...args) {
@@ -168,133 +187,158 @@ export class PhonePanel extends ApplicationV2 {
     return super.render(...args);
   }
 
-  async _renderHTML() {
+  /** Données du template : tout est calculé ici, le template ne fait qu'afficher. */
+  async _prepareContext() {
     const phones = allPhones().sort((a, b) => phoneLabel(a).localeCompare(phoneLabel(b)));
-    const numbers = [...new Set(phones.map((p) => p.phone.number))];
-    const countByNumber = phones.reduce((m, p) => m.set(norm(p.phone.number), (m.get(norm(p.phone.number)) ?? 0) + 1), new Map());
     const players = game.users.filter((u) => !u.isGM);
+    const countByNumber = phones.reduce((m, p) => m.set(norm(p.phone.number), (m.get(norm(p.phone.number)) ?? 0) + 1), new Map());
 
+    // Destinataires : un numéro par ligne, quelle que soit son écriture (555-133 = 555133).
+    const numbers = [...new Map(phones.map((p) => [norm(p.phone.number), p.phone.number])).values()];
     const targets = [...numbers.map((n) => `phone:${n}`), ...players.map((u) => `user:${u.id}`)];
     if (!targets.includes(this._state.target)) this._state.target = targets[0] ?? "";
+    const targetDevices = numbers.map((n) => {
+      const ps = phones.filter((p) => norm(p.phone.number) === norm(n));
+      const label = ps.length > 1 ? `${n} — ${ps.map((p) => p.actor?.name ?? "?").join(" + ")} (${t("Gm.Cloned")})` : phoneLabel(ps[0]);
+      return { value: `phone:${n}`, label, icon: modelOf(ps[0].phone).icon, selected: this._state.target === `phone:${n}` };
+    });
+    const targetPlayers = players.map((u) => ({
+      value: `user:${u.id}`,
+      label: `${u.name}${u.character ? ` — ${u.character.name}` : ""}${u.active ? "" : ` (${t("Gm.Offline")})`}`,
+      selected: this._state.target === `user:${u.id}`
+    }));
 
-    const sel = (v) => (v === this._state.target ? "selected" : "");
-    const phoneOpts = numbers
-      .map((n) => {
-        const ps = phones.filter((p) => p.phone.number === n);
-        const label = ps.length > 1 ? `${n} — ${ps.map((p) => p.actor?.name ?? "?").join(" + ")} (${t("Gm.Cloned")})` : phoneLabel(ps[0]);
-        return `<option value="phone:${esc(n)}" data-icon="${modelOf(ps[0].phone).icon}" ${sel(`phone:${n}`)}>${esc(label)}</option>`;
-      })
-      .join("");
-    const userOpts = players
-      .map((u) => `<option value="user:${u.id}" data-icon="fa-user" ${sel(`user:${u.id}`)}>${esc(`${u.name}${u.character ? ` — ${u.character.name}` : ""}${u.active ? "" : ` (${t("Gm.Offline")})`}`)}</option>`)
-      .join("");
+    // Messages des agents : un fil par appareil et par correspondant PNJ, le plus récent en haut.
+    const inboxAll = gmInbox();
+    const threads = new Map();
+    for (const { item, phone, e } of inboxAll) {
+      const id = `${item.uuid}|${norm(keyFor(phone, e.with))}`;
+      if (!threads.has(id)) threads.set(id, { id, item, phone, key: e.with, unread: 0 });
+      if (e.seen === false) threads.get(id).unread++;
+    }
+    const inbox = [...threads.values()].slice(0, 12).map((th) => {
+      const conv = getLog(th.phone, { includePending: true }).filter((e) => e.kind === "sms" && sameConv(th.phone, e.with, th.key));
+      return {
+        id: th.id,
+        uuid: th.item.uuid,
+        key: th.key,
+        who: holderName(th.item, th.phone),
+        to: displayName(th.phone, th.key),
+        unread: th.unread,
+        canCall: !modelOf(th.phone).noCalls,
+        draft: this._state.drafts[th.id] ?? "",
+        bubbles: conv.slice(-INBOX_BUBBLES).map((e) => ({
+          dir: e.dir,
+          fwd: !!e.fwd,
+          pending: !!e.pending,
+          att: bubbleAtt(e.att),
+          text: e.text ? nl2br(e.text) : ""
+        })),
+        more: Math.max(0, conv.length - INBOX_BUBBLES)
+      };
+    });
 
-    const ringing = [...pendingCalls.values()].map((c) => esc(c.label)).join(", ");
+    // Appareils groupés : par porteur, puis par lieu, puis « sans porteur ».
+    const groups = new Map();
+    const groupOf = (p) => {
+      if (isFixed(p.phone)) {
+        const scene = game.scenes.get(p.phone.sceneId);
+        return { key: `s:${p.phone.sceneId}`, order: 1, name: scene?.name ?? t("NoPlace"), img: scene?.thumb ?? null, icon: "fa-location-dot" };
+      }
+      if (p.actor) return { key: `a:${p.actor.id}`, order: 0, name: p.actor.name, img: p.actor.img, icon: "fa-user" };
+      return { key: "none", order: 2, name: t("Gm.Nobody"), img: null, icon: "fa-ghost" };
+    };
+    for (const p of phones) {
+      const g = groupOf(p);
+      if (!groups.has(g.key)) groups.set(g.key, { ...g, devices: [] });
+      const model = modelOf(p.phone);
+      const mode = MODES[p.phone.mode ?? "on"] ?? MODES.on;
+      const fixed = isFixed(p.phone);
+      const unread = unreadCount(p.phone);
+      groups.get(g.key).devices.push({
+        uuid: p.item.uuid,
+        number: p.phone.number,
+        label: p.phone.label,
+        icon: model.icon,
+        modelLabel: model.label,
+        modeIcon: fixed || (p.phone.mode ?? "on") === "on" ? null : mode.icon,
+        modeLabel: mode.label,
+        fixed,
+        locked: !!p.phone.locked,
+        noSignal: !!p.phone.noSignal,
+        cloned: countByNumber.get(norm(p.phone.number)) > 1,
+        unread,
+        unreadTitle: unread ? tn("Gm.UnreadByPlayer", unread) : ""
+      });
+    }
+    const sortedGroups = [...groups.values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
 
-    // Boîte de réception
-    const inbox = gmInbox();
-    const unread = inbox.filter((x) => x.e.seen === false).length;
-    const inboxRows = inbox
-      .slice(0, 8)
-      .map(({ item, phone, actor, e }) => `<li class="spt-inbox-item ${e.seen === false ? "unread" : ""}">
-          <div class="spt-inbox-head"><strong>${esc(holderName(item, phone))}</strong>${e.fwd ? ` ${t("Fwd.Verb")}` : ""} → ${esc(displayName(phone, e.with))}</div>
-          <div class="spt-inbox-text">${e.att ? `<i class="fas fa-paperclip"></i> ${esc(e.att.type === "image" ? t("Image") : e.att.name)}<br>` : ""}${nl2br(e.text)}</div>
-          <a data-action="reply" data-uuid="${item.uuid}" data-key="${esc(e.with)}"><i class="fas fa-reply"></i> ${t("Gm.Reply")}</a>
-        </li>`)
-      .join("");
-
-    const rows = phones
-      .map((p) => {
-        const mode = MODES[p.phone.mode ?? "on"] ?? MODES.on;
-        const clone = countByNumber.get(norm(p.phone.number)) > 1 ? `<i class="fas fa-clone spt-warn" title="${t("Gm.ClonedHint")}"></i>` : "";
-        const fixed = isFixed(p.phone);
-        const orphan = !p.actor && !fixed ? `<i class="fas fa-ghost spt-warn" title="${t("Gm.Orphan")}"></i>` : "";
-        const model = modelOf(p.phone);
-        const unread = unreadCount(p.phone);
-        const unreadBadge = unread ? `<span class="spt-row-unread" title="${tn("Gm.UnreadByPlayer", unread)}"><i class="fas fa-envelope"></i> ${unread}</span>` : "";
-        return `<li class="spt-phone-row-item">
-            <a data-action="selectPhone" data-number="${esc(p.phone.number)}" title="${t("Gm.PickRecipient")}">
-              <i class="fas ${model.icon}" title="${model.label}"></i>${fixed ? "" : ` <i class="fas ${mode.icon} spt-dim" title="${mode.label}"></i>`} ${esc(phoneLabel(p))} ${clone}${orphan} ${unreadBadge}
-            </a>
-            <span class="spt-row-controls">
-              <a data-action="toggleLock" data-uuid="${p.item.uuid}" class="${p.phone.locked ? "spt-locked" : ""}" title="${p.phone.locked ? t("Gm.Locked") : t("Gm.Unlocked")}"><i class="fas ${p.phone.locked ? "fa-lock" : "fa-lock-open"}"></i></a>
-              <a data-action="toggleSignal" data-uuid="${p.item.uuid}" class="${p.phone.noSignal ? "spt-nosignal" : ""}" title="${p.phone.noSignal ? t("Gm.NoSignal") : t("Gm.SignalOk")}"><i class="fas fa-signal"></i></a>
-              <a data-action="openPhone" data-uuid="${p.item.uuid}" title="${t("Gm.OpenPrepare")}"><i class="fas fa-mobile-screen"></i></a>
-              <a data-action="contacts" data-uuid="${p.item.uuid}" title="${t("Contacts.Title")}"><i class="fas fa-address-book"></i></a>
-              ${fixed ? "" : `<a data-action="give" data-uuid="${p.item.uuid}" title="${t("Gm.GiveTo")}"><i class="fas fa-hand-holding"></i></a>`}
-              <a data-action="editPhone" data-uuid="${p.item.uuid}" title="${t("Gm.Edit")}"><i class="fas fa-pen"></i></a>
-              <a data-action="unmarkPhone" data-uuid="${p.item.uuid}" title="${t("Gm.Remove")}"><i class="fas fa-trash"></i></a>
-            </span>
-          </li>`;
-      })
-      .join("");
-
-    const down = game.settings.get(MODULE_ID, "networkDown");
-    const pendingCount = phones.reduce((n, p) => n + getLog(p.phone, { includePending: true }).filter((e) => e.pending).length, 0);
-
-    return `
-      <div class="spt-phone-body">
-        <div class="spt-network ${down ? "down" : ""}">
-          <span><i class="fas ${down ? "fa-ban" : "fa-signal"}"></i> ${down ? t("Net.DownAll") : t("Net.Ok")}${pendingCount ? ` · ${t("Net.Pending", { n: pendingCount })}` : ""}</span>
-          <button type="button" data-action="toggleNetwork">${down ? t("Net.Restore") : t("Net.Cut")}</button>
-        </div>
-        ${inboxRows ? `<fieldset class="spt-inbox">
-          <legend><i class="fas fa-inbox"></i> ${t("Gm.Inbox")} ${unread ? `<span class="spt-badge">${unread}</span>` : ""}</legend>
-          <ul class="spt-inbox-list">${inboxRows}</ul>
-          ${unread ? `<a class="spt-mark-all" data-action="markAllSeen">${t("Gm.MarkAllSeen")}</a>` : ""}
-        </fieldset>` : ""}
-        <div class="form-group">
-          <label>${t("Gm.Recipient")}</label>
-          <div class="spt-icon-select"><i class="fas fa-mobile-screen"></i>
-          <select name="target" data-icon-select>
-            ${phoneOpts ? `<optgroup label="${t("Devices")}">${phoneOpts}</optgroup>` : ""}
-            <optgroup label="${t("Gm.PlayersDirect")}">${userOpts}</optgroup>
-          </select></div>
-        </div>
-        <div class="form-group">
-          <label>${t("Gm.Sender")}</label>
-          <input type="text" name="sender" value="${esc(this._state.sender)}" placeholder="${t("Masked")}">
-        </div>
-        <fieldset>
-          ${anyMessaging() ? `<legend><i class="fas fa-comment-sms"></i> ${smsOn() ? t("Gm.SmsMail") : t("Gm.Mail")}</legend>
-          <div class="spt-drop" title="${t("DropHere")}">
-            ${attChipHtml(this._state.att)}
-            <textarea name="text" rows="3" placeholder="${t("Gm.MessagePlaceholder")}">${esc(this._state.text)}</textarea>
-          </div>` : `<legend><i class="fas fa-phone"></i> ${t("Gm.Call")}</legend>`}
-          <div class="spt-phone-row">
-            ${anyMessaging() ? `<button type="button" data-action="attach" title="${t("AttachImage")}" class="spt-icon-btn"><i class="fas fa-paperclip"></i></button>
-            <button type="button" data-action="sms"><i class="fas fa-paper-plane"></i> ${t("Send")}</button>` : ""}
-            <button type="button" data-action="ring"><i class="fas fa-phone-volume"></i> ${t("Gm.Ring")}</button>
-            <button type="button" data-action="hangup" ${pendingCalls.size ? "" : "disabled"} title="${t("Call.HangUp")}" class="spt-icon-btn"><i class="fas fa-phone-slash"></i></button>
-            <button type="button" data-action="copyLink" title="${t("Gm.CopyLink")}" class="spt-icon-btn"><i class="fas fa-link"></i></button>
-          </div>
-          ${ringing ? `<p class="spt-phone-status">${t("Gm.RingingAt", { who: ringing })}</p>` : ""}
-        </fieldset>
-        <fieldset>
-          <legend><i class="fas fa-mobile-screen"></i> ${t("Devices")}</legend>
-          ${rows ? `<ul class="spt-phone-list">${rows}</ul>` : `<p class="spt-phone-status">${t("Gm.NoDevices")}</p>`}
-          <div class="spt-phone-row">
-            <button type="button" data-action="newPhone"><i class="fas fa-plus"></i> ${t("NewDevice")}</button>
-            <button type="button" data-action="markItem"><i class="fas fa-tag"></i> ${t("Gm.MarkItem")}</button>
-          </div>
-        </fieldset>
-      </div>`;
-  }
-
-  _replaceHTML(result, content) {
-    content.innerHTML = result;
+    // Ce que le destinataire choisi accepte : on ne montre que les formulaires possibles.
+    const [kind, id] = (this._state.target ?? "").split(/:(.*)/s);
+    const tp = kind === "phone" ? phones.filter((p) => norm(p.phone.number) === norm(id)) : [];
+    const canMessage = kind === "phone" ? tp.some((p) => msgOn(p.phone)) : kind === "user" && anyMessaging();
+    const canCall = kind === "phone" ? tp.some((p) => !modelOf(p.phone).noCalls) : kind === "user";
+    if (!canMessage && canCall) this._state.mode = "call";
+    if (!canCall && canMessage) this._state.mode = "message";
+    const messaging = canMessage && canCall;
+    return {
+      tab: this._state.tab,
+      mode: this._state.mode,
+      messaging,
+      down: game.settings.get(MODULE_ID, "networkDown"),
+      pending: phones.reduce((n, p) => n + getLog(p.phone, { includePending: true }).filter((e) => e.pending).length, 0),
+      ringing: [...pendingCalls.values()].map((c) => c.label).join(", "),
+      targetDevices,
+      targetPlayers,
+      sender: this._state.sender,
+      text: this._state.text,
+      attChip: attChipHtml(this._state.att),
+      inbox,
+      inboxUnread: inboxAll.filter((x) => x.e.seen === false).length,
+      groups: sortedGroups,
+      deviceCount: phones.length
+    };
   }
 
   _onRender(context, options) {
     super._onRender?.(context, options);
     PhonePanel.instance = this;
     bindIconSelects(this.element);
+    this.element.querySelector("select[name=target]")?.addEventListener("change", (ev) => {
+      this._focusSend = true;
+      this._setState({ target: ev.target.value });
+    });
+    if (this._focusSend) {
+      this._focusSend = false;
+      this.element.querySelector(".spt-gm-send textarea[name=text], .spt-gm-send [data-action=ring]")?.focus();
+    }
+    for (const input of this.element.querySelectorAll("[data-draft]")) {
+      input.addEventListener("keydown", (ev) => {
+        if (ev.key !== "Enter" || ev.shiftKey) return;
+        ev.preventDefault();
+        this._sendReply(input.closest("[data-thread]"));
+      });
+    }
     bindDrop(this.element.querySelector(".spt-drop"), (att) => {
       this._readForm();
       this._state.att = att;
       this._skipRead = true;
       this.render();
     });
+  }
+
+  /** Réponse en ligne dans un fil : envoyée sous l'identité du PNJ, le fil passe en lu. */
+  async _sendReply(th) {
+    const input = th?.querySelector("[data-draft]");
+    const text = input?.value.trim();
+    if (!text) return;
+    const item = await fromUuid(th.dataset.uuid);
+    const phone = getPhoneData(item);
+    const key = th.dataset.key;
+    input.value = "";
+    delete this._state.drafts[th.dataset.thread];
+    await patchLog(item, (e) => e.dir === "out" && sameConv(phone, e.with, key), { seen: true });
+    await sendSms(`phone:${phone.number}`, text, { sender: displayName(phone, key) });
   }
 
   _doRing() {
