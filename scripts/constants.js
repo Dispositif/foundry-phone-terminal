@@ -11,6 +11,7 @@ export const RINGBACK_SRC = `modules/${MODULE_ID}/sounds/ringback.wav`;
 export const VIBRATE_SRC = `modules/${MODULE_ID}/sounds/vibrate.wav`;
 /** Stored value for a hidden number (internal data, shown translated). */
 export const MASKED = "Numéro masqué"; // kept in French: stored in existing data
+export const PAGER_MAX = 12; // characters on a pager's one-line screen
 export const LOG_MAX = 200; // non-prepared entries kept per device (entries prepared by the GM are always kept)
 
 export const { ApplicationV2, DialogV2, HandlebarsApplicationMixin } = foundry.applications.api;

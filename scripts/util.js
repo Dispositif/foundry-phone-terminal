@@ -3,6 +3,7 @@ import { updateFab } from "./fab.js";
 import { t } from "./i18n.js";
 import { PhonePanel } from "./gm-panel.js";
 import { PlayerPhone } from "./player-phone.js";
+import { rerenderPagers } from "./pager.js";
 /* -------------------------------------------- */
 /*  Utilities                                   */
 /* -------------------------------------------- */
@@ -78,6 +79,7 @@ export function rerenderAll() {
     rerenderTimer = null;
     if (PhonePanel.instance?.rendered) PhonePanel.instance.render();
     if (PlayerPhone.instance?.rendered) PlayerPhone.instance.render();
+    rerenderPagers();
     updateFab();
   }, 50);
 }

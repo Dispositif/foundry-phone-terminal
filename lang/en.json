@@ -24,6 +24,7 @@
     "Model": {
       "landline": "Landline",
       "mobile": "Mobile phone",
+      "pager": "Pager",
       "smartphone": "Smartphone",
       "computer": "Laptop",
       "desktop": "Terminal"
@@ -40,7 +41,6 @@
       "NoAttachments": "this model cannot display attachments, only the text is sent.",
       "GmOnlySms": "Only the GM can send a message.",
       "Empty": "The message is empty.",
-      "SmsDisabled": "Text messages are disabled in the module settings.",
       "NobodyHolds": "message received, but nobody holds this device.",
       "DocGone": "This document no longer exists.",
       "NoAccess": "You do not have access to this document.",
@@ -57,7 +57,9 @@
       "NoRecipient": "No recipient.",
       "NoCorrespondent": "Enter a contact.",
       "NameOrNumber": "Enter a name or a number.",
-      "GmOnlyPanel": "GM only panel."
+      "GmOnlyPanel": "GM only panel.",
+      "PagerCut": "pager message cut to {n} characters.",
+      "NoCalls": "this device does not take calls."
     },
     "Caller": "Caller",
     "Info": {
@@ -327,10 +329,6 @@
         "name": "Floating button for players",
         "hint": "An always visible phone icon showing the number of unread messages. Click to open the phone; drag to move it."
       },
-      "smsEnabled": {
-        "name": "Text messages",
-        "hint": "Uncheck for an era without text messages: only calls (and computer emails) remain."
-      },
       "keybinding": "Phone: GM panel / My phone (player)",
       "numberPrefix": {
         "name": "Phone number prefix",
@@ -379,6 +377,11 @@
       "Uninstall": "You can now uninstall the old module <em>Phone &amp; Terminal</em> (Add-on Modules screen).",
       "Disable": "The old module Phone &amp; Terminal is still enabled: disable it in Manage Modules, otherwise phones ring twice. Then uninstall it.",
       "Ok": "Got it"
+    },
+    "Pager": {
+      "Empty": "NO PAGE",
+      "Newer": "Newer page",
+      "Older": "Older page"
     }
   }
 }

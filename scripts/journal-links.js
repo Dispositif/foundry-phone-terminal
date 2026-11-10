@@ -1,5 +1,5 @@
 import { MASKED } from "./constants.js";
-import { allPhones, anyMessaging, phonesByNumber } from "./devices.js";
+import { allPhones, phonesByNumber } from "./devices.js";
 import { sendSms } from "./messages.js";
 import { ring } from "./ring.js";
 import { esc, isMasked, maskedLabel, norm } from "./util.js";
@@ -53,7 +53,7 @@ export async function copyJournalLink({ target, sender, text, att }) {
   const from = clean(sender) && !isMasked(sender) ? clean(sender) : "";
   const attStr = att ? (att.type === "image" ? `img:${att.src}` : `doc:${att.uuid}`) : "";
   const body = clean(text);
-  const isSms = anyMessaging() && (body || attStr);
+  const isSms = !!(body || attStr);
   const args = [clean(to), from, isSms ? attStr : ""];
   while (args.length > 1 && !args[args.length - 1]) args.pop();
   const link = isSms ? `@SMS[${args.join("|")}]{${body}}` : `@Call[${args.join("|")}]`;

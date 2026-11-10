@@ -1,6 +1,6 @@
 import { attChipHtml, attFromDrop, pickImage } from "./attachments.js";
 import { ApplicationV2, DialogV2, HandlebarsApplicationMixin, MASKED, MODES, MODULE_ID } from "./constants.js";
-import { allPhones, anyMessaging, holders, sharedUsers, displayName, getLog, getPhoneData, holderName, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc } from "./devices.js";
+import { allPhones, holders, sharedUsers, displayName, getLog, getPhoneData, holderName, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc } from "./devices.js";
 import { contactsDialog, directoryDialog, editPhoneDialog, giveDialog, newPhoneDialog } from "./dialogs.js";
 import { copyJournalLink } from "./journal-links.js";
 import { openPhone } from "./main.js";
@@ -289,7 +289,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     // What the chosen recipient accepts: only the possible forms are shown.
     const [kind, id] = (this._state.target ?? "").split(/:(.*)/s);
     const tp = kind === "phone" ? phones.filter((p) => norm(p.phone.number) === norm(id)) : [];
-    const canMessage = kind === "phone" ? tp.some((p) => msgOn(p.phone)) : kind === "user" && anyMessaging();
+    const canMessage = kind === "phone" ? tp.some((p) => msgOn(p.phone)) : kind === "user";
     const canCall = kind === "phone" ? tp.some((p) => !modelOf(p.phone).noCalls) : kind === "user";
     if (!canMessage && canCall) this._state.mode = "call";
     if (!canCall && canMessage) this._state.mode = "message";

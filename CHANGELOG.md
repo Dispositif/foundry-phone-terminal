@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.32.0
+- New device: **Pager** (1980s-1990s). One line of 12 characters sent by the GM (a number to call back, a code, a word); longer text is cut. It beeps, or buzzes in silent mode, and opens by itself in its own small window next to the phone. ◀ ▶ browse the history; the red light blinks until a key is pressed. No calls; an agent writing to a pager number reaches the GM.
+- Removed the **Text messages** world setting: texting is always available on phones that support it (smartphone, old mobile). Emails were never affected.
+
 ## 0.30.0
 - Module renamed **Phones & Computers**, new id `soren-phones-computers` (was `soren-phone-terminal`). Same manifest URL, but Foundry sees a new module: install it, enable it instead of the old one, reload the world, then uninstall the old one. Devices, histories, contacts, settings and the NPC directory are migrated automatically.
 - GitHub repository renamed `foundry-phones-computers`; old links redirect.

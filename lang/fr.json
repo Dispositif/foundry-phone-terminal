@@ -24,6 +24,7 @@
     "Model": {
       "landline": "Téléphone fixe",
       "mobile": "Téléphone mobile",
+      "pager": "Bipeur",
       "smartphone": "Smartphone",
       "computer": "Ordinateur",
       "desktop": "Terminal"
@@ -40,7 +41,6 @@
       "NoAttachments": "ce modèle n'affiche pas les pièces jointes, seul le texte est envoyé.",
       "GmOnlySms": "Seul le MJ peut envoyer un message.",
       "Empty": "Le message est vide.",
-      "SmsDisabled": "Les SMS sont désactivés dans les réglages du module.",
       "NobodyHolds": "message reçu, mais personne n'a cet appareil en main.",
       "DocGone": "Ce document n'existe plus.",
       "NoAccess": "Vous n'avez pas accès à ce document.",
@@ -57,7 +57,9 @@
       "NoRecipient": "Aucun destinataire.",
       "NoCorrespondent": "Indiquez un correspondant.",
       "NameOrNumber": "Indiquez un nom ou un numéro.",
-      "GmOnlyPanel": "Panneau réservé au MJ."
+      "GmOnlyPanel": "Panneau réservé au MJ.",
+      "PagerCut": "message de bipeur coupé à {n} caractères.",
+      "NoCalls": "cet appareil ne reçoit pas d'appels."
     },
     "Caller": "Appelant",
     "Info": {
@@ -327,10 +329,6 @@
         "name": "Bouton flottant pour les joueurs",
         "hint": "Une icône de téléphone toujours visible, avec le nombre de messages non lus. Un clic ouvre le téléphone ; elle se déplace par glisser."
       },
-      "smsEnabled": {
-        "name": "SMS",
-        "hint": "Décochez pour une époque sans SMS : seuls les appels (et les mails des ordinateurs) restent possibles."
-      },
       "keybinding": "Téléphone : panneau MJ / Mon téléphone (joueur)",
       "numberPrefix": {
         "name": "Préfixe des numéros",
@@ -379,6 +377,11 @@
       "Uninstall": "Vous pouvez maintenant désinstaller l'ancien module <em>Phone &amp; Terminal</em> (écran Modules).",
       "Disable": "L'ancien module Phone &amp; Terminal est encore activé : désactivez-le dans Gérer les modules, sinon les téléphones sonnent en double. Désinstallez-le ensuite.",
       "Ok": "Compris"
+    },
+    "Pager": {
+      "Empty": "AUCUN MSG",
+      "Newer": "Message plus récent",
+      "Older": "Message plus ancien"
     }
   }
 }

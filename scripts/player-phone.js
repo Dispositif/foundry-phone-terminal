@@ -1,7 +1,7 @@
 import { attChipHtml, attHtml, openAttachment, pickImage } from "./attachments.js";
 import { openSystemSheet } from "./item-sheet.js";
 import { ApplicationV2, MODES, MODULE_ID, SOCKET } from "./constants.js";
-import { SKINS, addLog, allPhones, conversations, displayName, findContact, getLog, getPhoneData, hasSignal, holders, isComputer, isFixed, isLandline, keyFor, markRead, modelOf, msgOn, mutateLog, phoneLabel, sameConv, isUnread, skinOf, unreadCount, modeOf, npcDirectory } from "./devices.js";
+import { SKINS, addLog, allPhones, conversations, displayName, findContact, getLog, getPhoneData, hasSignal, holders, isComputer, isFixed, isLandline, isPager, keyFor, markRead, modelOf, msgOn, mutateLog, phoneLabel, sameConv, isUnread, skinOf, unreadCount, modeOf, npcDirectory } from "./devices.js";
 import { addContactDialog, contactsDialog } from "./dialogs.js";
 import { loadLastDevice, myPhones, saveLastDevice } from "./fab.js";
 import { bindDrop, bindIconSelects, deviceSelect } from "./gm-panel.js";
@@ -9,6 +9,7 @@ import { grantAttachments } from "./messages.js";
 import { playerCall, playerSendSms } from "./player-calls.js";
 import { attShowHtml, findEntry, forwardEntry, showScreen } from "./share.js";
 import { esc, isMasked, nl2br } from "./util.js";
+import { openPager } from "./pager.js";
 import { t, tn } from "./i18n.js";
 /* -------------------------------------------- */
 /*  Player window: My phone                      */
@@ -152,8 +153,10 @@ export class PlayerPhone extends ApplicationV2 {
   _current() {
     const mine = this._mine();
     const want = this._state.phoneUuid ?? loadLastDevice();
+    // A player's pager opens in its own window, never in this one.
+    const usable = this.gm ? mine : mine.filter((p) => !isPager(p.phone));
     // Wanted device missing (terminal or landline out of reach): fall back to a personal device.
-    return mine.find((p) => p.item.uuid === want) ?? mine.find((p) => !isFixed(p.phone)) ?? mine[0] ?? null;
+    return usable.find((p) => p.item.uuid === want) ?? usable.find((p) => !isFixed(p.phone)) ?? usable[0] ?? null;
   }
 
   /** The GM edits every address book; a player only the personal devices they hold (not installed or shared ones). */
@@ -245,8 +248,8 @@ export class PlayerPhone extends ApplicationV2 {
 
   async _renderHTML() {
     const mine = this._mine();
-    if (!mine.length) return `<p class="spt-phone-empty">${this.gm ? t("NoDevice") : t("NoPhone")}</p>`;
     const p = this._current();
+    if (!p) return `<p class="spt-phone-empty">${this.gm ? t("NoDevice") : t("NoPhone")}</p>`;
     const prev = this._state.phoneUuid;
     if (prev && prev !== p.item.uuid) {
       // The displayed device is no longer reachable (the agent left the room, or it was removed).
@@ -427,7 +430,8 @@ export class PlayerPhone extends ApplicationV2 {
   /** GM: writes into the history (nothing is sent, no notification). */
   _gmComposer(rows) {
     const cur = this._current()?.phone;
-    const types = Object.entries(GM_ENTRY_TYPES).filter(([, ty]) => (ty.kind === "call" ? !modelOf(cur).noCalls : msgOn(cur)));
+    // A pager only receives: no outgoing entries.
+    const types = Object.entries(GM_ENTRY_TYPES).filter(([, ty]) => (ty.kind === "call" ? !modelOf(cur).noCalls : msgOn(cur) && !(isPager(cur) && ty.entry.dir === "out")));
     if (!types.some(([k]) => k === this._state.entryType)) this._state.entryType = types[0][0];
     const opts = types
       .map(([k, ty]) => `<option value="${k}" ${k === this._state.entryType ? "selected" : ""}>${ty.label}</option>`)
@@ -502,6 +506,11 @@ export class PlayerPhone extends ApplicationV2 {
 
     bindIconSelects(el);
     el.querySelector("[data-phone-select]")?.addEventListener("change", (ev) => {
+      const uuid = ev.currentTarget.value;
+      if (!this.gm && isPager(getPhoneData(fromUuidSync(uuid)))) {
+        openPager(uuid, { latest: true });
+        return this.render();
+      }
       this._state.phoneUuid = ev.currentTarget.value;
       saveLastDevice(ev.currentTarget.value);
       this._go("list");

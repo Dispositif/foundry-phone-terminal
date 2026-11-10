@@ -10,9 +10,10 @@
 
 import { DIRECTORY_SAMPLE, LEGACY_IDS, MODULE_ID, SHEET_ID, SOCKET } from "./constants.js";
 import { ensureDeviceItems, registerPhoneSheet } from "./item-sheet.js";
-import { allPhones, createPhone, getLog, getPhoneData, isFixed, markPhone, phoneUsers, randomAddress } from "./devices.js";
+import { allPhones, createPhone, getLog, getPhoneData, isFixed, isPager, markPhone, phoneUsers, randomAddress } from "./devices.js";
+import { openPager } from "./pager.js";
 import { transferPhone } from "./dialogs.js";
-import { updateFab } from "./fab.js";
+import { myPhones, updateFab } from "./fab.js";
 import { PhonePanel } from "./gm-panel.js";
 import { registerEnrichers, runJournalLink } from "./journal-links.js";
 import { flushAll, flushPending, grantAttachments, sendSms } from "./messages.js";
@@ -40,6 +41,12 @@ export function openPanel({ tab = null } = {}) {
 }
 
 export function openPhone(phoneUuid = null) {
+  if (!game.user.isGM) {
+    // A pager has its own window, next to the phone.
+    if (phoneUuid && isPager(getPhoneData(fromUuidSync(phoneUuid)))) return openPager(phoneUuid, { latest: true });
+    const mine = myPhones();
+    if (!phoneUuid && mine.length && mine.every((p) => isPager(p.phone))) return mine.map((p) => openPager(p.item.uuid));
+  }
   const app = PlayerPhone.instance ?? new PlayerPhone();
   if (phoneUuid) {
     app._state.phoneUuid = phoneUuid;
@@ -121,15 +128,6 @@ Hooks.once("init", () => {
     type: Boolean,
     default: true,
     onChange: () => updateFab()
-  });
-  game.settings.register(MODULE_ID, "smsEnabled", {
-    name: "SPT.Settings.smsEnabled.name",
-    hint: "SPT.Settings.smsEnabled.hint",
-    scope: "world",
-    config: true,
-    type: Boolean,
-    default: true,
-    onChange: () => rerenderAll()
   });
   game.settings.register(MODULE_ID, "networkDown", {
     scope: "world",

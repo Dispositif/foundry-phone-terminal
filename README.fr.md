@@ -87,11 +87,13 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 |---|---|---|---|---|---|
 | **Smartphone** | porté | oui | SMS | oui | oui |
 | **Téléphone mobile** (années 90-2000) | porté | oui | SMS texte | non | oui |
+| **Bipeur** (années 80-90) | porté | non | reçoit une ligne, du MJ | non | non |
 | **Ordinateur** (portable) | porté | non | mails | oui | oui |
 | **Terminal** | installé dans une scène | non | mails | oui | oui |
 | **Téléphone fixe** | installé dans une scène | oui | non | non | non |
 
-- **Mails** : la première ligne fait office d'objet. Les mails fonctionnent même si les SMS sont désactivés dans les réglages.
+- **Mails** : la première ligne fait office d'objet.
+- **Bipeur** : une ligne de 12 caractères (un numéro à rappeler, un code, un mot), envoyée par le MJ depuis l'onglet Envoyer ; un texte plus long est coupé. Il bipe (vibre en mode silencieux) et sa fenêtre s'ouvre toute seule à côté du téléphone ; ◀ ▶ parcourent l'historique, la LED rouge reste allumée jusqu'à l'appui sur une touche. Un message qu'un agent écrit à un bipeur arrive au MJ. La cloche sur l'écran passe en normal, silencieux ou éteint.
 - **Appareils installés** (fixe, terminal) : rattachés à une scène, ils ne dépendent pas du réseau mobile et ont toujours la ligne.
 
 ### Habillages

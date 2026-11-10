@@ -1,6 +1,6 @@
 import { attChatHtml } from "./attachments.js";
-import { MASKED, MODULE_ID, SOCKET } from "./constants.js";
-import { addLog, allPhones, displayName, getLog, getPhoneData, hasSignal, holders, isComputer, keyFor, modelOf, msgOn, phoneLabel, phonesByNumber, smsOn, withItemLock, modeOf } from "./devices.js";
+import { MASKED, MODULE_ID, PAGER_MAX, SOCKET } from "./constants.js";
+import { addLog, allPhones, displayName, getLog, getPhoneData, hasSignal, holders, isComputer, keyFor, modelOf, msgOn, phoneLabel, phonesByNumber, withItemLock, modeOf } from "./devices.js";
 import { esc, maskedLabel, nl2br } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
@@ -58,6 +58,13 @@ export async function deliverToPhone(p, senderKeyOrName, text, att = null, { fwd
     att = null;
     if (!text) return "nosms";
   }
+  if (model.pager) {
+    // One line of PAGER_MAX characters: a callback number, a code, a word.
+    const line = (text ?? "").replace(/\s+/g, " ").trim();
+    text = line.slice(0, PAGER_MAX).trim();
+    if (!text) return "nosms";
+    if (line.length > PAGER_MAX && game.user.isGM) ui.notifications.warn(`📟 ${phoneLabel(p)} : ${t("Warn.PagerCut", { n: PAGER_MAX })}`);
+  }
   const key = keyFor(p.phone, senderKeyOrName);
   const shown = displayName(p.phone, key);
   const extra = { ...(att ? { att } : {}), ...(fwd ? { fwd: true } : {}) };
@@ -72,8 +79,11 @@ export async function deliverToPhone(p, senderKeyOrName, text, att = null, { fwd
   const users = holders(p);
   if (!users.length) return false;
   await whisperMessage(p.phone, users, shown, text, att);
-  if (modeOf(p.phone) === "on") {
-    for (const u of users) game.socket.emit(SOCKET, { type: "sms", targetUserId: u.id, notif: modelOf(p.phone).notif });
+  const mode = modeOf(p.phone);
+  // A pager also buzzes in silent mode, and opens by itself on the player's screen.
+  if (mode === "on" || (model.pager && mode === "silent")) {
+    const extraSock = model.pager ? { open: p.item.uuid, silent: mode === "silent" } : {};
+    for (const u of users) game.socket.emit(SOCKET, { type: "sms", targetUserId: u.id, notif: model.notif, ...extraSock });
   }
   return true;
 }
@@ -101,7 +111,8 @@ export async function flushPendingNow(item) {
   }
   const calls = pending.length - sms.length;
   for (const u of users) {
-    game.socket.emit(SOCKET, { type: "signalBack", targetUserId: u.id, sms: sms.length, calls, label: phone.label, bip: modeOf(phone) === "on", notif: modelOf(phone).notif });
+    const open = modelOf(phone).pager && sms.length && modeOf(phone) !== "off" ? item.uuid : undefined;
+    game.socket.emit(SOCKET, { type: "signalBack", targetUserId: u.id, sms: sms.length, calls, label: phone.label, bip: modeOf(phone) === "on", notif: modelOf(phone).notif, open });
   }
 }
 
@@ -117,7 +128,6 @@ export async function sendSms(target, text, { sender = MASKED, att = null } = {}
   const [kind, value] = String(target).split(/:(.*)/s);
 
   if (kind === "user") {
-    if (!smsOn()) return ui.notifications.warn(t("Warn.SmsDisabled"));
     const user = game.users.get(value);
     if (!user) return ui.notifications.warn(t("Warn.PlayerNotFound"));
     if (att) await grantAttachments([att], [user]);

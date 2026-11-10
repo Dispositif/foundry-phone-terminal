@@ -87,11 +87,13 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 |---|---|---|---|---|---|
 | **Smartphone** | carried | yes | texts | yes | yes |
 | **Mobile phone** (1990s-2000s) | carried | yes | plain texts | no | yes |
+| **Pager** (1980s-1990s) | carried | no | receives one line, from the GM | no | no |
 | **Laptop** | carried | no | emails | yes | yes |
 | **Terminal** | installed in a scene | no | emails | yes | yes |
 | **Landline** | installed in a scene | yes | no | no | no |
 
-- **Emails:** the first line acts as the subject. Emails work even when text messages are disabled.
+- **Emails:** the first line acts as the subject.
+- **Pager:** one line of 12 characters (a number to call back, a code, a word), sent by the GM from the Send tab; longer text is cut. It beeps (buzzes in silent mode) and its window opens by itself next to the phone; ◀ ▶ browse the history, the red light stays on until a key is pressed. A message an agent writes to a pager number reaches the GM. Click the bell on its screen to switch on, silent or off.
 - **Installed devices** (landline, terminal) are bound to a scene and don't depend on the mobile network: they always have a line.
 
 ### Looks

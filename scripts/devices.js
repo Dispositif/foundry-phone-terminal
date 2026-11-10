@@ -13,15 +13,21 @@ export function getPhoneData(item) {
 export const MODELS = {
   landline: { get label() { return t("Model.landline"); }, icon: "fa-phone", fixed: true, sms: false, callerId: false, attachments: false, ring: "ring-bell.wav" },
   mobile: { get label() { return t("Model.mobile"); }, icon: "fa-mobile-retro", sms: true, callerId: true, attachments: false, ring: "ring-mobile.wav" },
+  pager: { get label() { return t("Model.pager"); }, icon: "fa-pager", sms: true, pager: true, noCalls: true, callerId: true, attachments: false, notif: "pager.wav" },
   smartphone: { get label() { return t("Model.smartphone"); }, icon: "fa-mobile-screen", sms: true, callerId: true, attachments: true, ring: "ring.wav" },
   computer: { get label() { return t("Model.computer"); }, icon: "fa-laptop", sms: true, mail: true, noCalls: true, callerId: true, attachments: true, notif: "mail.wav" },
   desktop: { get label() { return t("Model.desktop"); }, icon: "fa-desktop", fixed: true, sms: true, mail: true, noCalls: true, callerId: true, attachments: true, notif: "mail.wav" }
 };
 
-/** Can this device send messages? (emails do not depend on the texts setting) */
+/** Can this device send messages (texts or emails)? */
 export function msgOn(phone) {
   const model = modelOf(phone);
-  return model.mail ? true : smsOn() && model.sms;
+  return !!(model.mail || model.sms);
+}
+
+/** Pager: receives one short line of text, nothing else. */
+export function isPager(phone) {
+  return !!modelOf(phone).pager;
 }
 
 export function isComputer(phone) {
@@ -31,11 +37,6 @@ export function isComputer(phone) {
 /** Ring mode (on, silent, off). Computers have none: always on. */
 export function modeOf(phone) {
   return isComputer(phone) ? "on" : phone?.mode ?? "on";
-}
-
-/** Is there at least one device able to receive messages? (GM panel display) */
-export function anyMessaging() {
-  return smsOn() || allPhones().some((p) => isComputer(p.phone));
 }
 
 /**
@@ -122,11 +123,6 @@ export function landlineUsers(phone) {
   const actors = scene.tokens.map((t) => t.actor).filter(Boolean);
   const present = players.filter((u) => actors.some((a) => a.testUserPermission(u, "OWNER")));
   return present.length ? present : players.filter((u) => u.viewedScene === scene.id);
-}
-
-/** Texts enabled in this world? (disabled = phones from before texting) */
-export function smsOn() {
-  return game.settings.get(MODULE_ID, "smsEnabled");
 }
 
 /** Does the device have signal? (network cut, or no signal for this device) */
@@ -288,6 +284,11 @@ export function isUnread(e) {
 
 export function unreadCount(phone) {
   return getLog(phone).filter(isUnread).length;
+}
+
+/** Marks one received message as read (pager: one message at a time). */
+export function markEntryRead(item, id) {
+  return patchLog(item, (e) => isUnread(e) && e.id === id, { read: true });
 }
 
 export function markRead(item, key) {

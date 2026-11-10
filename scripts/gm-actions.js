@@ -29,7 +29,8 @@ export async function onPlayerSms({ fromItemUuid, to, text, att = null, fwd = fa
   if (!text.trim() && !att) return;
   const extra = { ...(att ? { att } : {}), ...(fwd ? { fwd: true } : {}) };
   const key = keyFor(fromPhone, to);
-  const targets = phonesByNumber(key).concat(phonesByNumber(to)).filter((p, i, arr) => p.item !== from && arr.findIndex((q) => q.item === p.item) === i);
+  // A pager only gets pages from the GM: an agent writing to one reaches the GM, who decides.
+  const targets = phonesByNumber(key).concat(phonesByNumber(to)).filter((p, i, arr) => p.item !== from && !modelOf(p.phone).pager && arr.findIndex((q) => q.item === p.item) === i);
   const who = `${holderName(from, fromPhone)} (${fromPhone.label})`;
 
   if (targets.length) {

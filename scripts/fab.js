@@ -1,6 +1,6 @@
 import { MODULE_ID } from "./constants.js";
 import { t, tn } from "./i18n.js";
-import { allPhones, getLog, holders, isFixed, landlineUsers, modelOf, unreadCount } from "./devices.js";
+import { allPhones, getLog, getPhoneData, holders, isFixed, isPager, landlineUsers, modelOf, unreadCount } from "./devices.js";
 import { openPanel, openPhone } from "./main.js";
 import { activeCall } from "./player-calls.js";
 /* -------------------------------------------- */
@@ -29,6 +29,12 @@ export function saveLastDevice(uuid) {
   try {
     localStorage.setItem(lastDeviceKey(), uuid);
   } catch {}
+}
+
+/** Device opened by the main button: the last one chosen, a phone rather than a pager. */
+function mainDevice(personal) {
+  const phones = personal.filter((p) => !isPager(p.phone));
+  return phones.find((p) => p.item.uuid === loadLastDevice()) ?? phones[0] ?? personal[0] ?? null;
 }
 
 export function fabButton(cls) {
@@ -66,7 +72,7 @@ export function updateFab() {
   let main = fab.querySelector(".spt-fab-main");
   if (!main) fab.prepend((main = fabButton("spt-fab-main")));
   main.hidden = !personal.length;
-  const pIcon = modelOf((personal.find((p) => p.item.uuid === loadLastDevice()) ?? personal[0])?.phone).icon;
+  const pIcon = modelOf(mainDevice(personal)?.phone).icon;
   main.querySelector("i").className = `fas ${pIcon}`;
   const n = personal.reduce((sum, p) => sum + unreadCount(p.phone), 0);
   setFabBadge(main, n);
@@ -149,10 +155,10 @@ export function createFab() {
       if (!uuid) {
         // Main phone: the last personal device chosen.
         const personal = myPhones().filter((p) => !isFixed(p.phone));
-        uuid = (personal.find((p) => p.item.uuid === loadLastDevice()) ?? personal[0])?.item.uuid;
+        uuid = mainDevice(personal)?.item.uuid;
       }
       if (uuid) {
-        saveLastDevice(uuid);
+        if (!isPager(getPhoneData(fromUuidSync(uuid)))) saveLastDevice(uuid);
         openPhone(uuid);
       }
     }

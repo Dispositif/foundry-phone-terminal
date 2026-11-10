@@ -41,7 +41,7 @@ export function ring(target, { caller = MASKED, origin = null, callId = foundry.
       const users = holders(p, { activeOnly: true });
       if (modelOf(p.phone).noCalls) {
         call.lastResult = "unassigned";
-        if (!origin) ui.notifications.warn(`💻 ${phoneLabel(p)} : ${t("Warn.ComputerNoCalls")}`);
+        if (!origin) ui.notifications.warn(`💻 ${phoneLabel(p)} : ${t(modelOf(p.phone).mail ? "Warn.ComputerNoCalls" : "Warn.NoCalls")}`);
         continue;
       }
       const result = !hasSignal(p.phone) ? "nosignal" : mode === "off" ? "off" : !users.length ? "nobody" : null;
