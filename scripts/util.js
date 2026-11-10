@@ -71,6 +71,23 @@ export function randomEmail() {
   return `user${Math.floor(Math.random() * 90) + 10}@mail.net`;
 }
 
+/**
+ * Short feedback shown on the device screen (players never get Foundry notifications,
+ * except the nearby ringing/calling ones). The GM gets a regular notification.
+ */
+export function deviceNotice(text, { warn = false } = {}) {
+  if (game.user.isGM) return void ui.notifications[warn ? "warn" : "info"](text);
+  const el = PlayerPhone.instance?.rendered ? PlayerPhone.instance.element : null;
+  if (!el) return;
+  el.querySelector(":scope > .spt-device-notice")?.remove();
+  const div = document.createElement("div");
+  div.className = `spt-device-notice${warn ? " warn" : ""}`;
+  div.textContent = text;
+  el.append(div);
+  div.addEventListener("click", () => div.remove());
+  setTimeout(() => div.remove(), 10000);
+}
+
 /** Redraws open windows: close requests (tokens, bursts of messages) are merged into one. */
 let rerenderTimer = null;
 export function rerenderAll() {

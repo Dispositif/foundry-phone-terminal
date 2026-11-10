@@ -52,7 +52,7 @@ export function ring(target, { caller = MASKED, origin = null, callId = foundry.
           gmWhisper(`<p><strong>📞 ${esc(phoneLabel(p))}</strong> : ${RESULT_LABELS[result]}</p><p><em>${t("Caller")} : ${esc(maskedLabel(caller))}</em></p>`);
         }
         // Without signal, the missed call only shows when signal returns.
-        addLog(p.item, { kind: "call", dir: "in", with: keyFor(p.phone, caller), result: "missed", pending: result === "nosignal" });
+        addLog(p.item, { kind: "call", dir: "in", with: keyFor(p.phone, caller), result: "missed", pending: result === "nosignal" || result === "off" });
         continue;
       }
       for (const u of users) {

@@ -1,7 +1,9 @@
 import { DialogV2, HANGUP_SRC, MODULE_ID, PICKUP_SRC, RINGBACK_SRC, RING_SRC, SOCKET, VIBRATE_SRC } from "./constants.js";
 import { displayName, getPhoneData, hasSignal, keyFor, modelOf, msgOn, skinOf, modeOf } from "./devices.js";
 import { updateFab } from "./fab.js";
-import { esc, isMasked, maskedLabel, playLocal } from "./util.js";
+import { deviceNotice, esc, isMasked, maskedLabel, nl2br, playLocal, rerenderAll } from "./util.js";
+import { PlayerPhone } from "./player-phone.js";
+import { attHtml, openAttachment } from "./attachments.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
 /*  Player: incoming calls                      */
@@ -25,26 +27,36 @@ export async function receiveRing({ callId, caller, callerNumber, timeout, phone
 
   const ringing = getPhoneData(fromUuidSync(itemUuid));
   const icon = ringing ? modelOf(ringing).icon : "fa-mobile-screen";
-  const which = label ? `<p class="spt-which"><i class="fas ${icon}"></i> ${esc(label)}${silent ? ` (${t("Mode.silent").toLowerCase()})` : ""}</p>` : "";
-  const dialog = new RingDialog({
-    window: { title: t("Call.Incoming"), icon: `fas ${icon}` },
-    classes: ["spt-phone-ring-dialog", "spt-player-phone", `spt-skin-${ringing ? skinOf(ringing) : "smartphone"}`],
-    position: { width: 320 },
-    content: caller
-      ? `<div class="spt-phone-ring ${silent ? "silent" : ""}">${which}<i class="fas fa-phone-volume"></i><p class="spt-caller">${esc(maskedLabel(caller))}</p><p>${t("Call.IsCalling")}</p></div>`
-      : `<div class="spt-phone-ring ${silent ? "silent" : ""}">${which}<i class="fas fa-phone-volume"></i><p class="spt-caller">${callerNumber ? esc(callerNumber) : t("Call.Ringing")}</p></div>`,
-    buttons: [
-      { action: "answer", label: t("Call.Answer"), icon: "fas fa-phone", default: true, callback: () => "answer" },
-      { action: "decline", label: t("Call.Decline"), icon: "fas fa-phone-slash", callback: () => "decline" }
-    ],
-    submit: (result) => {
-      call.dialog = null; // DialogV2 closes by itself after submit
-      endCall(result, call);
-    }
-  });
-  dialog.onClosed = () => endCall("decline", call); // closing with the cross = decline
-  call.dialog = dialog;
-  dialog.render({ force: true });
+  const onScreen = ["smartphone", "mobile"].includes(ringing?.model) || (ringing?.model === "landline" && skinOf(ringing) === "modern");
+  if (!game.user.isGM && onScreen) {
+    // Smartphone, mobile and modern landline show the call on the device itself: open it (or bring it forward).
+    call.screen = { caller: caller ? maskedLabel(caller) : callerNumber || null, known: !!caller, silent };
+    const app = PlayerPhone.instance ?? new PlayerPhone();
+    app._state.phoneUuid = itemUuid;
+    app._skipRead = true;
+    app.render({ force: true }).then(() => app.bringToFront?.());
+  } else {
+    const which = label ? `<p class="spt-which"><i class="fas ${icon}"></i> ${esc(label)}${silent ? ` (${t("Mode.silent").toLowerCase()})` : ""}</p>` : "";
+    const dialog = new RingDialog({
+      window: { title: t("Call.Incoming"), icon: `fas ${icon}` },
+      classes: ["spt-phone-ring-dialog", "spt-player-phone", `spt-skin-${ringing ? skinOf(ringing) : "smartphone"}`],
+      position: { width: 320 },
+      content: caller
+        ? `<div class="spt-phone-ring ${silent ? "silent" : ""}">${which}<i class="fas fa-phone-volume"></i><p class="spt-caller">${esc(maskedLabel(caller))}</p><p>${t("Call.IsCalling")}</p></div>`
+        : `<div class="spt-phone-ring ${silent ? "silent" : ""}">${which}<i class="fas fa-phone-volume"></i><p class="spt-caller">${callerNumber ? esc(callerNumber) : t("Call.Ringing")}</p></div>`,
+      buttons: [
+        { action: "answer", label: t("Call.Answer"), icon: "fas fa-phone", default: true, callback: () => "answer" },
+        { action: "decline", label: t("Call.Decline"), icon: "fas fa-phone-slash", callback: () => "decline" }
+      ],
+      submit: (result) => {
+        call.dialog = null; // DialogV2 closes by itself after submit
+        endCall(result, call);
+      }
+    });
+    dialog.onClosed = () => endCall("decline", call); // closing with the cross = decline
+    call.dialog = dialog;
+    dialog.render({ force: true });
+  }
 
   // Silent mode: the agent still feels the phone buzz (only them).
   const src = silent ? VIBRATE_SRC : ringSrc ? `modules/${MODULE_ID}/sounds/${ringSrc}` : RING_SRC;
@@ -62,10 +74,10 @@ export function endCall(result, call = activeCall) {
   if (activeCall === call) activeCall = null;
   updateFab();
   if (call.dialog?.rendered) call.dialog.close();
+  if (call.screen) rerenderAll();
 
   if (result === "answer") playLocal(PICKUP_SRC);
   else if (result === "decline") playLocal(HANGUP_SRC);
-  if (result === "cancelled" || result === "missed") ui.notifications.info(`📱 ${t("Call.Missed", { caller: call.caller })}`);
   if (result === "cancelled") return;
   game.socket.emit(SOCKET, { type: "response", callId: call.callId, result, userId: game.user.id });
 }
@@ -77,11 +89,11 @@ export function endCall(result, call = activeCall) {
 export function networkUp(phone) {
   if (!game.users.activeGM) {
     // The GM's client acts as the network: without it, no network.
-    ui.notifications.warn(`📱 ${t("Net.GmAbsent")}`);
+    deviceNotice(t("Net.GmAbsent"), { warn: true });
     return false;
   }
   if (hasSignal(phone)) return true;
-  ui.notifications.warn(`📵 ${t("Net.NoSignal")}`);
+  deviceNotice(t("Net.NoSignal"), { warn: true });
   return false;
 }
 
@@ -90,9 +102,9 @@ export function playerSendSms(item, to, text, { att = null, fwd = false } = {}) 
   text = text?.trim() ?? "";
   to = to?.trim();
   if ((!text && !att) || !to) return false;
-  if (isMasked(to)) return ui.notifications.warn(t("Warn.CantReplyMasked")), false;
-  if (getPhoneData(item)?.locked) return ui.notifications.warn(`🔒 ${t("Warn.Locked")}`), false;
-  if (modeOf(getPhoneData(item)) === "off") return ui.notifications.warn(t("Warn.PhoneOff")), false;
+  if (isMasked(to)) return deviceNotice(t("Warn.CantReplyMasked"), { warn: true }), false;
+  if (getPhoneData(item)?.locked) return deviceNotice(t("Warn.Locked"), { warn: true }), false;
+  if (modeOf(getPhoneData(item)) === "off") return deviceNotice(t("Warn.PhoneOff"), { warn: true }), false;
   if (!networkUp(getPhoneData(item))) return false;
   game.socket.emit(SOCKET, { type: "playerSms", fromItemUuid: item.uuid, to, text, att, fwd, userId: game.user.id });
   return true;
@@ -103,12 +115,12 @@ export let outgoing = null; // { callId, dialog, done }
 export function playerCall(item, to) {
   to = to?.trim();
   if (!to) return;
-  if (isMasked(to)) return ui.notifications.warn(t("Warn.CantCallMasked"));
+  if (isMasked(to)) return deviceNotice(t("Warn.CantCallMasked"), { warn: true });
   const phone = getPhoneData(item);
   if (modelOf(phone).noCalls) return;
-  if (phone?.locked) return ui.notifications.warn(`🔒 ${t("Warn.Locked")}`);
-  if (modeOf(phone) === "off") return ui.notifications.warn(t("Warn.PhoneOff"));
-  if (outgoing) return ui.notifications.warn(t("Warn.AlreadyCalling"));
+  if (phone?.locked) return deviceNotice(t("Warn.Locked"), { warn: true });
+  if (modeOf(phone) === "off") return deviceNotice(t("Warn.PhoneOff"), { warn: true });
+  if (outgoing) return deviceNotice(t("Warn.AlreadyCalling"), { warn: true });
   if (!networkUp(phone)) return;
 
   const callId = foundry.utils.randomID();
@@ -153,11 +165,11 @@ function stopOutgoingSound(call) {
 }
 
 export const CALLER_RESULTS = {
-  answer: (name) => `📞 ${t("CallerResult.answer", { name })}`,
-  voicemail: (name) => `📞 ${t("CallerResult.voicemail", { name })}`,
-  unassigned: () => `📞 ${t("CallerResult.unassigned")}`,
-  unreachable: () => `📞 ${t("CallerResult.unreachable")}`,
-  noanswer: (name) => `📞 ${t("CallerResult.noanswer", { name })}`
+  answer: (name) => t("CallerResult.answer", { name }),
+  voicemail: (name) => t("CallerResult.voicemail", { name }),
+  unassigned: () => t("CallerResult.unassigned"),
+  unreachable: () => t("CallerResult.unreachable"),
+  noanswer: (name) => t("CallerResult.noanswer", { name })
 };
 
 export function onCallResult({ callId, result, name }) {
@@ -169,8 +181,7 @@ export function onCallResult({ callId, result, name }) {
   if (call.dialog?.rendered) call.dialog.close();
   if (result === "answer") playLocal(PICKUP_SRC);
   const msg = (CALLER_RESULTS[result] ?? CALLER_RESULTS.noanswer)(name);
-  if (result === "answer") ui.notifications.info(msg);
-  else ui.notifications.warn(msg);
+  deviceNotice(msg, { warn: result !== "answer" });
 }
 
 
@@ -220,4 +231,18 @@ function stopEntry(id, { tombstone = false } = {}) {
   // Keep a finished ringback entry so a late callNearby does not start it again.
   if (id.startsWith("call:")) setTimeout(() => nearby.delete(id), 10000);
   else nearby.delete(id);
+}
+
+/** Message from the GM to a player without a device: a small phone-styled window, nothing in the chat. */
+export function messagePopup({ sender, text, att = null }) {
+  const body = [attHtml(att), text ? `<div>${nl2br(text)}</div>` : ""].filter(Boolean).join("");
+  const dlg = new DialogV2({
+    classes: ["spt-player-phone", "spt-skin-smartphone", "spt-message-popup"],
+    window: { title: t("NewMessage"), icon: "fas fa-comment-sms" },
+    content: `<header class="spt-phone-top conv"><strong>${esc(sender)}</strong></header><div class="spt-thread"><div class="spt-bubble in">${body}</div></div>`,
+    buttons: [{ action: "ok", label: t("Close"), default: true }]
+  });
+  dlg.render({ force: true }).then(() => {
+    for (const a of dlg.element?.querySelectorAll("[data-att-img], [data-att-doc]") ?? []) a.addEventListener("click", () => openAttachment(a));
+  });
 }

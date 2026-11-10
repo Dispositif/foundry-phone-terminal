@@ -70,7 +70,7 @@ game.modules.get("soren-phones-computers").api.removeDemo()
 
 ### Sans appareil
 
-Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans **Destinataire**). L'appel ou le message n'arrive qu'à ce joueur, dans le chat. Ni historique ni réponse : pour que les joueurs puissent répondre et garder une trace, donnez-leur un appareil.
+Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans **Destinataire**). L'appel ou le message n'arrive qu'à ce joueur, dans une petite fenêtre à son écran (jamais dans le chat). Ni historique ni réponse : pour que les joueurs puissent répondre et garder une trace, donnez-leur un appareil.
 
 ### Un appareil, c'est un objet
 
@@ -145,7 +145,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 - Ouvrir une conversation la marque comme lue.
 - **Répondre**, **écrire un nouveau message** ou **appeler** depuis une conversation. Entrée envoie, Maj+Entrée va à la ligne.
 - Impossible de répondre ou de rappeler un numéro masqué.
-- Bip discret à la réception (son de mail pour les ordinateurs), et copie du message dans le chat, en privé.
+- Bip discret à la réception (son de mail pour les ordinateurs) et pastille sur le bouton flottant. Les messages n'apparaissent jamais dans le chat des joueurs : on les lit sur l'appareil.
 
 ### Partager
 

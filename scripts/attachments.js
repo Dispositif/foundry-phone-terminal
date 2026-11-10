@@ -2,7 +2,7 @@ import { SOCKET } from "./constants.js";
 import { getLog, getPhoneData } from "./devices.js";
 import { senderHolds } from "./gm-actions.js";
 import { grantAttachments } from "./messages.js";
-import { esc } from "./util.js";
+import { deviceNotice, esc } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
 /*  Attachments (image or journal)           */
@@ -79,11 +79,11 @@ export async function openAttachment(el, item = null) {
     return new globalThis.ImagePopout(el.dataset.attImg, { title: t("Attachment") }).render(true);
   }
   const doc = await fromUuid(el.dataset.attDoc);
-  if (!doc) return ui.notifications.warn(t("Warn.DocGone"));
+  if (!doc) return deviceNotice(t("Warn.DocGone"), { warn: true });
   if (!doc.testUserPermission(game.user, "LIMITED")) {
     // Shared device (terminal) or received later: ask the GM for access; the GM checks the agent holds the device.
     if (item && game.users.activeGM) game.socket.emit(SOCKET, { type: "playerAccess", itemUuid: item.uuid, docUuid: el.dataset.attDoc, userId: game.user.id });
-    if (!item || !(await waitForAccess(doc))) return ui.notifications.warn(t("Warn.NoAccess"));
+    if (!item || !(await waitForAccess(doc))) return deviceNotice(t("Warn.NoAccess"), { warn: true });
   }
   if (doc.documentName === "JournalEntryPage") return doc.parent.sheet.render(true, { pageId: doc.id });
   return doc.sheet.render(true);

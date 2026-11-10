@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.32.1
+- **Rotary landline**: no device menu any more, only its number on a paper label stuck on the set. The GM view is the same as the players' (it has no contacts, history, caller display, ring modes or power button); the GM cannot dial from it.
+- **Incoming calls show on the device itself** instead of a separate window, on the smartphone, the mobile (caller, green and red keys) and the modern landline (caller's number on the display when it is a number, Answer and Hang up keys). The device opens, or comes forward, on the ringing device; a phone can be answered even when locked. The rotary landline and computers keep the incoming call window.
+- GM panel, Send tab: the recipients list shows the agents' devices first, then the other carried devices, then the fixed ones.
+- **Players get no Foundry notifications any more**, except the table cues: another agent's phone is ringing, another agent is on the phone. Call results, errors (no signal, locked, switched off) and share/forward feedback now show as a short banner on the device screen. The missed call notice is gone (the call is in the device history).
+- No more "signal back" notice for players when the network (global or per device) comes back: they check the signal on their device. Waiting messages still beep on arrival, and a pager still opens.
+- **Nothing in the players' chat any more**: messages and emails are read only on the devices (beep, floating button badge, device window). A message the GM sends to a player without a device opens in a small phone-styled window. The GM still gets the copies of agent-to-agent messages and the call reports.
+- A switched-off device (phone, pager) no longer shows incoming messages in its holder's chat: they wait, like without signal, and arrive (beep, pager window) when it is switched back on. Calls missed while off are reported at that moment too.
+
 ## 0.32.0
 - New device: **Pager** (1980s-1990s). One line of 12 characters sent by the GM (a number to call back, a code, a word); longer text is cut. It beeps, or buzzes in silent mode, and opens by itself in its own small window next to the phone. ◀ ▶ browse the history; the red light blinks until a key is pressed. No calls; an agent writing to a pager number reaches the GM.
 - Removed the **Text messages** world setting: texting is always available on phones that support it (smartphone, old mobile). Emails were never affected.

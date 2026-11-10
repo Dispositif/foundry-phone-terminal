@@ -1,6 +1,6 @@
 import { attChatHtml } from "./attachments.js";
 import { MASKED, MODULE_ID, PAGER_MAX, SOCKET } from "./constants.js";
-import { addLog, allPhones, displayName, getLog, getPhoneData, hasSignal, holders, isComputer, keyFor, modelOf, msgOn, phoneLabel, phonesByNumber, withItemLock, modeOf } from "./devices.js";
+import { addLog, allPhones, getLog, getPhoneData, hasSignal, holders, keyFor, modelOf, msgOn, phoneLabel, phonesByNumber, withItemLock, modeOf } from "./devices.js";
 import { esc, maskedLabel, nl2br } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
@@ -13,18 +13,6 @@ export function smsHtml(sender, text, phoneName, att = null, mail = false, icon 
   return `<div class="spt-sms ${mail ? "spt-mail" : ""}"><div class="spt-sms-header"><i class="fas ${mail ? "fa-envelope" : "fa-comment-sms"}"></i> ${esc(maskedLabel(sender))} ${to}</div><div class="spt-sms-body">${body}</div></div>`;
 }
 
-
-/** Copy of a received message in the chat, whispered to those holding the device (text hidden if locked). */
-export function whisperMessage(phone, users, shown, text, att = null) {
-  return ChatMessage.create({
-    content: phone.locked
-      ? smsHtml(shown, `🔒 ${t("LockedMessage")}`, phone.label, null, isComputer(phone), modelOf(phone).icon)
-      : smsHtml(shown, text, phone.label, att, isComputer(phone), modelOf(phone).icon),
-    whisper: users.map((u) => u.id),
-    speaker: { alias: shown },
-    flags: { [MODULE_ID]: { sms: true } }
-  });
-}
 
 /** The GM grants recipients permission to read attached pages/journals. */
 export async function grantAttachments(atts, users) {
@@ -66,19 +54,19 @@ export async function deliverToPhone(p, senderKeyOrName, text, att = null, { fwd
     if (line.length > PAGER_MAX && game.user.isGM) ui.notifications.warn(`📟 ${phoneLabel(p)} : ${t("Warn.PagerCut", { n: PAGER_MAX })}`);
   }
   const key = keyFor(p.phone, senderKeyOrName);
-  const shown = displayName(p.phone, key);
   const extra = { ...(att ? { att } : {}), ...(fwd ? { fwd: true } : {}) };
   if (att) await grantAttachments([att], holders(p));
-  if (!hasSignal(p.phone)) {
-    // Pending: delivered when signal returns.
+  const switchedOff = modeOf(p.phone) === "off";
+  if (!hasSignal(p.phone) || switchedOff) {
+    // Pending: delivered (chat copy, beep) when signal returns or the device is switched on.
     await addLog(p.item, { kind: "sms", dir: "in", with: key, text, read: false, pending: true, ...extra });
-    ui.notifications.info(`📵 ${phoneLabel(p)} : ${t("Info.SmsPending")}`);
+    ui.notifications.info(`📵 ${phoneLabel(p)} : ${t(switchedOff ? "Info.SmsPendingOff" : "Info.SmsPending")}`);
     return true;
   }
   await addLog(p.item, { kind: "sms", dir: "in", with: key, text, read: false, ...extra });
+  // Nothing in the chat: the player reads it on the device (window, floating button badge).
   const users = holders(p);
   if (!users.length) return false;
-  await whisperMessage(p.phone, users, shown, text, att);
   const mode = modeOf(p.phone);
   // A pager also buzzes in silent mode, and opens by itself on the player's screen.
   if (mode === "on" || (model.pager && mode === "silent")) {
@@ -96,7 +84,7 @@ export function flushPending(item) {
 
 export async function flushPendingNow(item) {
   const phone = getPhoneData(item);
-  if (!phone || !hasSignal(phone)) return;
+  if (!phone || !hasSignal(phone) || modeOf(phone) === "off") return;
   const pending = getLog(phone, { includePending: true }).filter((e) => e.pending);
   if (!pending.length) return;
   await item.update({ [`flags.${MODULE_ID}.phone.log`]: (phone.log ?? []).map(({ pending: _, ...e }) => e) });
@@ -104,11 +92,7 @@ export async function flushPendingNow(item) {
   const actor = item.parent instanceof Actor ? item.parent : null;
   const users = holders({ item, phone, actor });
   if (!users.length) return;
-  const sms = pending.filter((e) => e.kind === "sms").reverse(); // chronological order
-  for (const e of sms) {
-    const shown = displayName(phone, e.with);
-    await whisperMessage(phone, users, shown, e.text, e.att);
-  }
+  const sms = pending.filter((e) => e.kind === "sms");
   const calls = pending.length - sms.length;
   for (const u of users) {
     const open = modelOf(phone).pager && sms.length && modeOf(phone) !== "off" ? item.uuid : undefined;
@@ -131,8 +115,9 @@ export async function sendSms(target, text, { sender = MASKED, att = null } = {}
     const user = game.users.get(value);
     if (!user) return ui.notifications.warn(t("Warn.PlayerNotFound"));
     if (att) await grantAttachments([att], [user]);
-    await ChatMessage.create({ content: smsHtml(sender, text, null, att), whisper: [user.id], speaker: { alias: sender } });
-    game.socket.emit(SOCKET, { type: "sms", targetUserId: user.id });
+    // No device: the message pops up on the player's screen only (never in the chat).
+    if (!user.active) return ui.notifications.warn(`📱 ${t("Warn.UserOffline", { name: user.name })}`);
+    game.socket.emit(SOCKET, { type: "sms", targetUserId: user.id, popup: { sender: maskedLabel(sender), text, att } });
     return ui.notifications.info(`📱 ${t("Info.SentTo", { name: user.name })}`);
   }
 

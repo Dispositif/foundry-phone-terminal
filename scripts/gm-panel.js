@@ -204,7 +204,10 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     const countByNumber = phones.reduce((m, p) => m.set(norm(p.phone.number), (m.get(norm(p.phone.number)) ?? 0) + 1), new Map());
 
     // Recipients: one line per number, however it is written (555-133 = 555133).
-    const numbers = [...new Map(phones.map((p) => [norm(p.phone.number), p.phone.number])).values()];
+    // Order: agents' devices first, then other carried devices, then fixed ones (by label within each group).
+    const rank = (p) => (isFixed(p.phone) ? 2 : p.actor?.hasPlayerOwner ? 0 : 1);
+    const byRank = [...phones].sort((a, b) => rank(a) - rank(b));
+    const numbers = [...new Map(byRank.map((p) => [norm(p.phone.number), p.phone.number])).values()];
     const targets = [...numbers.map((n) => `phone:${n}`), ...players.map((u) => `user:${u.id}`)];
     if (!targets.includes(this._state.target)) this._state.target = targets[0] ?? "";
     const targetDevices = numbers.map((n) => {

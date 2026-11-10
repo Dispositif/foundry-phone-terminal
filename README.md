@@ -70,7 +70,7 @@ game.modules.get("soren-phones-computers").api.removeDemo()
 
 ### Without any device
 
-The GM can ring a player or send them a message (choose the player in **Recipient**). The call window or the message reaches only that player, in the chat. No history, no reply: to let players write back and keep a history, give them a device.
+The GM can ring a player or send them a message (choose the player in **Recipient**). The call window or the message reaches only that player, in a small window on their screen (never in the chat). No history, no reply: to let players write back and keep a history, give them a device.
 
 ### A device is an item
 
@@ -145,7 +145,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 - Opening a conversation marks it as read.
 - **Reply**, **write a new message** or **call** from a conversation. Enter sends, Shift+Enter adds a line.
 - A hidden number can't be answered or called back.
-- A discreet beep on arrival (a mail sound for computers), and a private copy in the chat.
+- A discreet beep on arrival (a mail sound for computers) and a badge on the floating button. Messages never appear in the players' chat: they are read on the device.
 
 ### Sharing
 

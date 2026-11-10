@@ -66,6 +66,7 @@
       "Calling": "Calling {label} ({caller})…",
       "CallInterrupted": "Call interrupted.",
       "SmsPending": "no signal, message pending.",
+      "SmsPendingOff": "switched off, message pending.",
       "SentTo": "Message sent to {name}.",
       "Installed": "{model} \"{label}\" installed.",
       "Created": "Device \"{label}\" ({number}) created."
@@ -127,7 +128,6 @@
       "Status": "Network status",
       "Shared": "Shared access"
     },
-    "LockedMessage": "Unlock the phone to read this message.",
     "Document": "Document",
     "RemoveAttachment": "Remove attachment",
     "Enlarge": "Enlarge",
@@ -173,7 +173,6 @@
       "Ringing": "The phone is ringing…",
       "Answer": "Answer",
       "Decline": "Decline",
-      "Missed": "Missed call: {caller}",
       "Outgoing": "Calling",
       "Calling": "Calling…",
       "HangUp": "Hang up",
@@ -184,15 +183,6 @@
     "Net": {
       "GmAbsent": "No phone network [GM away]",
       "NoSignal": "No signal.",
-      "NewMessages": {
-        "one": "{n} new message",
-        "other": "{n} new messages"
-      },
-      "MissedCalls": {
-        "one": "{n} missed call",
-        "other": "{n} missed calls"
-      },
-      "Back": "signal back",
       "DownAll": "Network down for everyone",
       "Ok": "Network OK",
       "Pending": "{n} pending",
@@ -382,6 +372,7 @@
       "Empty": "NO PAGE",
       "Newer": "Newer page",
       "Older": "Older page"
-    }
+    },
+    "Close": "Close"
   }
 }

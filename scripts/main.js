@@ -287,8 +287,9 @@ for (const hook of ["createItem", "updateItem", "deleteItem"]) {
     // Ownership counts too: giving a world device to players gives them access.
     const touched = hook === "updateItem" ? changes?.flags?.[MODULE_ID] !== undefined || (!!changes?.ownership && !!getPhoneData(item)) : !!getPhoneData(item);
     if (touched) rerenderAll();
-    // Signal back for this device: deliver what was waiting.
-    if (hook === "updateItem" && changes?.flags?.[MODULE_ID]?.phone?.noSignal === false && isActiveGM()) flushPending(item);
+    // Signal back, or switched back on: deliver what was waiting.
+    const ph = changes?.flags?.[MODULE_ID]?.phone;
+    if (hook === "updateItem" && isActiveGM() && (ph?.noSignal === false || (ph?.mode && ph.mode !== "off"))) flushPending(item);
   });
 }
 

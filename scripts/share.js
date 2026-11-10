@@ -1,7 +1,7 @@
 import { DialogV2, SOCKET } from "./constants.js";
 import { conversations, displayName, getLog, modelOf, skinOf } from "./devices.js";
 import { playerSendSms } from "./player-calls.js";
-import { esc, gmWhisper, isMasked } from "./util.js";
+import { deviceNotice, esc, gmWhisper, isMasked } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
 /*  Sharing: show screen, forward               */
@@ -46,7 +46,7 @@ export async function attShowHtml(att) {
 /** Shows the screen to nearby agents: they see it but keep nothing. */
 export async function showScreen(p, title, html) {
   const users = nearbyUsers();
-  if (!users.length) return ui.notifications.info(t("Share.NobodyNear"));
+  if (!users.length) return deviceNotice(t("Share.NobodyNear"));
   const boxes = users.map((u) => `<label class="spt-check"><input type="checkbox" name="u" value="${u.id}" checked> ${esc(userName(u))}</label>`).join("");
   const ids = await DialogV2.wait({
     window: { title: t("Share.ShowScreen"), icon: "fas fa-eye" },
@@ -63,7 +63,7 @@ export async function showScreen(p, title, html) {
   game.socket.emit(SOCKET, { type: "show", targetUserIds: ids, from, title, html, skin: skinOf(p.phone) });
   const names = users.filter((u) => ids.includes(u.id)).map(userName).join(", ");
   gmWhisper(`<p class="spt-gm-copy"><i class="fas fa-eye"></i> ${t("Share.GmCopy", { from: `<strong>${esc(from)}</strong>`, title: esc(title), names: esc(names) })}</p>`);
-  ui.notifications.info(t("Share.YouShow", { names }));
+  deviceNotice(t("Share.YouShow", { names }));
 }
 
 export function receiveShow({ from, title, html, skin }) {
@@ -80,9 +80,9 @@ export function receiveShow({ from, title, html, skin }) {
 export async function forwardEntry(p, e) {
   let att = e.att ?? null;
   if (att && !modelOf(p.phone).attachments) {
-    if (!e.text) return ui.notifications.warn(t("Fwd.NoAttachments"));
+    if (!e.text) return deviceNotice(t("Fwd.NoAttachments"), { warn: true });
     att = null;
-    ui.notifications.info(t("Fwd.TextOnly"));
+    deviceNotice(t("Fwd.TextOnly"));
   }
   const known = conversations(p.phone)
     .filter((c) => !isMasked(c.key))
@@ -102,6 +102,6 @@ export async function forwardEntry(p, e) {
     rejectClose: false
   });
   if (!to) return;
-  if (playerSendSms(p.item, to, e.text ?? "", { att, fwd: true })) ui.notifications.info(t("Fwd.Done", { to }));
+  if (playerSendSms(p.item, to, e.text ?? "", { att, fwd: true })) deviceNotice(t("Fwd.Done", { to }));
 }
 

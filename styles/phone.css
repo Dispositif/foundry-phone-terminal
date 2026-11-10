@@ -618,3 +618,63 @@ a.spt-link:hover { filter: brightness(1.15); }
 .spt-pager-led.on { background: #ff3b30; box-shadow: 0 0 8px #ff3b30; animation: spt-pager-blink 1.2s steps(2, start) infinite; }
 @keyframes spt-pager-blink { to { opacity: 0.35; } }
 .spt-pager-clip { right: -7px; top: 30px; width: 7px; height: 64px; border-radius: 0 6px 6px 0; background: linear-gradient(90deg, #222, #3a3c40); }
+
+/* Short feedback on the device screen (replaces Foundry notifications for players). */
+.spt-device-notice {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  transform: translateX(-50%);
+  z-index: 5;
+  max-width: 80%;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(20, 20, 24, 0.88);
+  color: #f2f2f2;
+  font-size: 13px;
+  text-align: center;
+  animation: spt-notice 10s ease forwards;
+  cursor: pointer;
+}
+.spt-device-notice.warn { background: rgba(120, 30, 30, 0.9); }
+@keyframes spt-notice {
+  0% { opacity: 0; transform: translate(-50%, 6px); }
+  3%, 95% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; }
+}
+
+/* Incoming call on the smartphone screen. */
+.spt-incoming { opacity: 1; justify-content: space-around; }
+.spt-incoming .spt-phone-ring > i { font-size: 3rem; opacity: 1; }
+.spt-incoming-keys { display: flex; gap: 3rem; }
+.spt-incoming-keys button {
+  width: 56px; height: 56px; border-radius: 50%; border: none;
+  color: #fff; font-size: 1.4rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.spt-incoming-keys .spt-answer { background: #2e9e4f; }
+.spt-incoming-keys .spt-decline { background: #c0392b; }
+.spt-incoming-keys button:hover { filter: brightness(1.15); }
+
+/* Modern landline ringing: caller number on the display, answer / hang up keys. */
+.spt-lcd-ringing { align-items: center; }
+.spt-lcd-ringing > i { flex: 0 0 auto; width: 2.2em; text-align: center; font-size: 1.2em; animation: spt-phone-shake 0.6s infinite; }
+.spt-player-phone.spt-skin-modern .spt-dialer .spt-incoming-row { display: flex; gap: 8px; }
+.spt-player-phone.spt-skin-modern .spt-dialer .spt-incoming-row button { flex: 1; }
+.spt-player-phone.spt-skin-modern .spt-dialer .spt-incoming-row .spt-decline { background: #b4443a; border-color: #8e3229; }
+
+/* Rotary landline: its number on a paper label stuck on the set, instead of the device menu. */
+.spt-player-phone .spt-phone-top.spt-sticker-top { justify-content: center; background: none; border: none; }
+.spt-number-sticker {
+  display: inline-block;
+  min-width: 7em;
+  padding: 3px 12px;
+  background: #f6efd9;
+  color: #2b2a6e;
+  border: 1px solid #c9bd9c;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  transform: rotate(-2deg);
+  font: 1.15em "Bradley Hand", "Segoe Print", "Marker Felt", cursive;
+  letter-spacing: 0.05em;
+  text-align: center;
+}

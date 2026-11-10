@@ -66,6 +66,7 @@
       "Calling": "Appel en cours vers {label} ({caller})…",
       "CallInterrupted": "Appel interrompu.",
       "SmsPending": "pas de réseau, message en attente.",
+      "SmsPendingOff": "éteint, message en attente.",
       "SentTo": "Message envoyé à {name}.",
       "Installed": "{model} « {label} » installé.",
       "Created": "Appareil « {label} » ({number}) créé."
@@ -127,7 +128,6 @@
       "Status": "État du réseau",
       "Shared": "Accès partagé"
     },
-    "LockedMessage": "Déverrouillez le téléphone pour lire ce message.",
     "Document": "Document",
     "RemoveAttachment": "Retirer la pièce jointe",
     "Enlarge": "Agrandir",
@@ -173,7 +173,6 @@
       "Ringing": "Le téléphone sonne…",
       "Answer": "Répondre",
       "Decline": "Refuser",
-      "Missed": "Appel manqué : {caller}",
       "Outgoing": "Appel en cours",
       "Calling": "Appel en cours…",
       "HangUp": "Raccrocher",
@@ -184,15 +183,6 @@
     "Net": {
       "GmAbsent": "Pas de réseau téléphonique [MJ absent]",
       "NoSignal": "Pas de réseau.",
-      "NewMessages": {
-        "one": "{n} nouveau message",
-        "other": "{n} nouveaux messages"
-      },
-      "MissedCalls": {
-        "one": "{n} appel manqué",
-        "other": "{n} appels manqués"
-      },
-      "Back": "réseau retrouvé",
       "DownAll": "Réseau coupé pour tous",
       "Ok": "Réseau OK",
       "Pending": "{n} en attente",
@@ -382,6 +372,7 @@
       "Empty": "AUCUN MSG",
       "Newer": "Message plus récent",
       "Older": "Message plus ancien"
-    }
+    },
+    "Close": "Fermer"
   }
 }

@@ -6,9 +6,9 @@ import { addContactDialog, contactsDialog } from "./dialogs.js";
 import { loadLastDevice, myPhones, saveLastDevice } from "./fab.js";
 import { bindDrop, bindIconSelects, deviceSelect } from "./gm-panel.js";
 import { grantAttachments } from "./messages.js";
-import { playerCall, playerSendSms } from "./player-calls.js";
+import { activeCall, endCall, playerCall, playerSendSms } from "./player-calls.js";
 import { attShowHtml, findEntry, forwardEntry, showScreen } from "./share.js";
-import { esc, isMasked, nl2br } from "./util.js";
+import { deviceNotice, esc, isMasked, nl2br } from "./util.js";
 import { openPager } from "./pager.js";
 import { t, tn } from "./i18n.js";
 /* -------------------------------------------- */
@@ -92,6 +92,8 @@ export class PlayerPhone extends ApplicationV2 {
         const p = this._current();
         if (p && this._canEditContacts(p)) addContactDialog(p.item, this._state.key);
       },
+      answer: function () { if (activeCall?.screen) endCall("answer", activeCall); },
+      decline: function () { if (activeCall?.screen) endCall("decline", activeCall); },
       powerOn: function () { this._current()?.item.update({ [`flags.${MODULE_ID}.phone.mode`]: "on" }); },
       gmItemSheet: function () { const p = this._current(); if (p) openSystemSheet(p.item); },
       showEntry: async function (event, target) {
@@ -194,6 +196,7 @@ export class PlayerPhone extends ApplicationV2 {
   }
 
   async _send() {
+    if (this.gm) return;
     this._readForm();
     const p = this._current();
     if (!p) return;
@@ -212,12 +215,12 @@ export class PlayerPhone extends ApplicationV2 {
   /** GM: adds an entry to the history without sending anything (preparation). */
   async _gmAdd(p, to) {
     to = to?.trim();
-    if (!to) return ui.notifications.warn(t("Warn.NoCorrespondent")), false;
+    if (!to) return deviceNotice(t("Warn.NoCorrespondent"), { warn: true }), false;
     const key = keyFor(p.phone, to);
     const text = this._state.draft?.trim();
     const type = GM_ENTRY_TYPES[this._state.entryType] ?? GM_ENTRY_TYPES.smsIn;
     const att = type.kind === "sms" ? this._state.att : null;
-    if (type.kind === "sms" && !text && !att) return ui.notifications.warn(t("Warn.Empty")), false;
+    if (type.kind === "sms" && !text && !att) return deviceNotice(t("Warn.Empty"), { warn: true }), false;
     await addLog(p.item, { ...type.entry, with: key, ...(type.kind === "sms" ? { text } : {}), ...(att ? { att } : {}), read: true, prep: true });
     if (att) await grantAttachments([att], holders(p));
     this._state.att = null;
@@ -229,7 +232,7 @@ export class PlayerPhone extends ApplicationV2 {
     const p = this._current();
     if (!p) return;
     const to = this._state.view === "new" ? this._state.to : this._state.key;
-    if (!to?.trim()) return ui.notifications.warn(t("Warn.NameOrNumber"));
+    if (!to?.trim()) return deviceNotice(t("Warn.NameOrNumber"), { warn: true });
     playerCall(p.item, to);
   }
 
@@ -255,18 +258,37 @@ export class PlayerPhone extends ApplicationV2 {
       // The displayed device is no longer reachable (the agent left the room, or it was removed).
       this._state.view = "list";
       this._state.key = null;
-      const lost = fromUuidSync(prev);
-      const lostPhone = getPhoneData(lost);
-      if (!this.gm && lostPhone) ui.notifications.info(`📍 ${t("OutOfReach", { label: lostPhone.label })}`);
+      const lostPhone = getPhoneData(fromUuidSync(prev));
+      if (!this.gm && lostPhone) deviceNotice(t("OutOfReach", { label: lostPhone.label }));
     }
     this._state.phoneUuid = p.item.uuid;
 
+    const incoming = !this.gm && activeCall?.screen && !activeCall.done && activeCall.itemUuid === p.item.uuid ? activeCall.screen : null;
+    if (incoming && isLandline(p.phone)) return this._renderDialer(p, mine, incoming);
+    if (incoming) return this._renderIncoming(p, mine, incoming);
     if (!this.gm && modeOf(p.phone) === "off") return this._renderOff(p, mine);
     if (!this.gm && p.phone.locked) return this._renderLocked(p, mine);
-    if (!this.gm && isLandline(p.phone)) return this._renderDialer(p, mine);
+    // A rotary landline has nothing but its dial: the GM sees it as the players do.
+    if (isLandline(p.phone) && (!this.gm || skinOf(p.phone) !== "modern")) return this._renderDialer(p, mine);
     if (this._state.view === "conv") return this._renderConv(p);
     if (this._state.view === "new") return this._renderNew(p);
     return this._renderList(p, mine);
+  }
+
+  /** Incoming call on a smartphone or mobile: shown on its own screen, even when locked. */
+  _renderIncoming(p, mine, { caller, known, silent }) {
+    return `${this._renderHeader(p, mine)}
+      <div class="spt-lockscreen spt-incoming">
+        <div class="spt-phone-ring ${silent ? "silent" : ""}">
+          <i class="fas fa-phone-volume"></i>
+          <p class="spt-caller">${caller ? esc(caller) : t("Call.Ringing")}</p>
+          ${known ? `<p>${t("Call.IsCalling")}</p>` : ""}
+        </div>
+        <div class="spt-incoming-keys">
+          <button type="button" class="spt-decline" data-action="decline" title="${t("Call.Decline")}"><i class="fas fa-phone-slash"></i></button>
+          <button type="button" class="spt-answer" data-action="answer" title="${t("Call.Answer")}"><i class="fas fa-phone"></i></button>
+        </div>
+      </div>`;
   }
 
   /** Device switched off: a dark screen, nothing from its history or contacts. */
@@ -390,18 +412,34 @@ export class PlayerPhone extends ApplicationV2 {
   }
 
   /** Landline on the player side: a plain dial, no history or contacts. */
-  _renderDialer(p, mine) {
+  /** Landline dialer. While it rings (modern look), the display shows the caller's number and the keys answer or hang up. */
+  _renderDialer(p, mine, incoming = null) {
     this._state.view = "new";
-    return `${this._renderHeader(p, mine)}
-      <div class="spt-new spt-dialer">
-        ${skinOf(p.phone) === "modern" ? "" : rotaryDial(p.phone.number)}
-        <div class="spt-dial-strip">
+    const strip = incoming
+      ? `<div class="spt-dial-strip spt-lcd-ringing">
+          <input type="text" value="${esc(incoming.caller ?? "")}" placeholder="${t("Call.Ringing")}" readonly tabindex="-1">
+          <i class="fas fa-phone-volume"></i>
+        </div>`
+      : `<div class="spt-dial-strip">
           <input type="text" name="to" list="spt-yellow" value="${esc(this._state.to)}" placeholder="${t("Number")}" autocomplete="off">
           <datalist id="spt-yellow">${publicOptions()}</datalist>
           <button type="button" data-action="dialBack" title="${t("Delete")}"><i class="fas fa-delete-left"></i></button>
-        </div>
+        </div>`;
+    const keys = incoming
+      ? `<div class="spt-phone-row spt-incoming-row">
+          <button type="button" class="spt-answer" data-action="answer"><i class="fas fa-phone"></i> ${t("Call.Answer")}</button>
+          <button type="button" class="spt-decline" data-action="decline"><i class="fas fa-phone-slash"></i> ${t("Call.HangUp")}</button>
+        </div>`
+      : `<div class="spt-phone-row"><button type="button" data-action="call" ${this.gm ? "disabled" : ""}><i class="fas fa-phone"></i> ${t("Call.Call")}</button></div>`;
+    // Rotary landline: no device menu, only its number on a paper label stuck on the set.
+    const rotary = skinOf(p.phone) !== "modern";
+    const header = rotary ? `<header class="spt-phone-top spt-sticker-top"><span class="spt-number-sticker">${esc(p.phone.number ?? "")}</span></header>` : this._renderHeader(p, mine);
+    return `${header}
+      <div class="spt-new spt-dialer">
+        ${rotary ? rotaryDial() : ""}
+        ${strip}
         ${skinOf(p.phone) === "modern" ? keypad() : ""}
-        <div class="spt-phone-row"><button type="button" data-action="call"><i class="fas fa-phone"></i> ${t("Call.Call")}</button></div>
+        ${keys}
       </div>`;
   }
 
