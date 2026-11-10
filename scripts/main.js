@@ -195,10 +195,10 @@ Hooks.once("ready", async () => {
 });
 
 Hooks.on("userConnected", rerenderAll);
-// Renaming the item also renames the device, if it still had the item's old name.
+// Renaming the item also renames the device: they share one name.
 Hooks.on("preUpdateItem", (item, changes) => {
   const phone = getPhoneData(item);
-  if (!phone || typeof changes.name !== "string" || phone.label !== item.name) return;
+  if (!phone || typeof changes.name !== "string") return;
   foundry.utils.setProperty(changes, `flags.${MODULE_ID}.phone.label`, changes.name);
 });
 // Presence on a scene: who sees installed devices (terminal).
@@ -229,7 +229,8 @@ Hooks.on("createItem", async (item, options) => {
 
 for (const hook of ["createItem", "updateItem", "deleteItem"]) {
   Hooks.on(hook, (item, changes) => {
-    const touched = hook === "updateItem" ? changes?.flags?.[MODULE_ID] !== undefined : !!getPhoneData(item);
+    // Ownership counts too: giving a world device to players gives them access.
+    const touched = hook === "updateItem" ? changes?.flags?.[MODULE_ID] !== undefined || (!!changes?.ownership && !!getPhoneData(item)) : !!getPhoneData(item);
     if (touched) rerenderAll();
     // Signal back for this device: deliver what was waiting.
     if (hook === "updateItem" && changes?.flags?.[MODULE_ID]?.phone?.noSignal === false && isActiveGM()) flushPending(item);

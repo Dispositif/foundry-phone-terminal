@@ -1,10 +1,10 @@
 import { DialogV2, MODULE_ID } from "./constants.js";
-import { DEFAULT_THEME, MODELS, THEMES, createPhone, getLog, getPhoneData, markPhone, phoneUsers, randomAddress } from "./devices.js";
+import { DEFAULT_THEME, MODELS, THEMES, createPhone, newTheme, getLog, getPhoneData, markPhone, phoneUsers, randomAddress } from "./devices.js";
 import { grantAttachments } from "./messages.js";
 import { esc, norm } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
-/*  GM dialogs                                  */
+/*  Dialogs (GM, and contacts for the player)    */
 /* -------------------------------------------- */
 
 export async function phoneFormDialog({ title, selectHtml = "", label = null, number = null, model = "smartphone", sceneId = null, theme = null, withModel = true }) {
@@ -16,8 +16,12 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
   const modelOpts = Object.entries(MODELS)
     .map(([k, m]) => `<option value="${k}" ${k === model ? "selected" : ""}>${m.label}</option>`)
     .join("");
+  // A landline has no "default" choice: modern (new devices) or vintage (rotary dial, also the old "default").
+  const notLandline = Object.keys(MODELS).filter((k) => k !== "landline").join(" ");
+  const current = theme ?? newTheme(model);
+  const shown = model === "landline" && current === DEFAULT_THEME ? "vintage" : current;
   const themeOpts = [DEFAULT_THEME, ...Object.keys(THEMES)]
-    .map((k) => `<option value="${k}" data-models="${THEMES[k]?.models.join(" ") ?? ""}" ${k === (theme ?? DEFAULT_THEME) ? "selected" : ""}>${t(`Theme.${k}`)}</option>`)
+    .map((k) => `<option value="${k}" data-models="${k === DEFAULT_THEME ? notLandline : THEMES[k].models.join(" ")}" ${k === shown ? "selected" : ""}>${t(`Theme.${k}`)}</option>`)
     .join("");
   const scenes = game.scenes.map((sc) => `<option value="${esc(sc.name)}">`).join("");
   const sceneName = game.scenes.get(sceneId)?.name ?? canvas?.scene?.name ?? "";
@@ -62,7 +66,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
         for (const o of themeSel?.options ?? []) {
           const ok = !o.dataset.models || o.dataset.models.split(" ").includes(m);
           o.hidden = o.disabled = !ok;
-          if (!ok && o.selected) themeSel.value = DEFAULT_THEME;
+          if (!ok && o.selected) themeSel.value = newTheme(m);
         }
       };
       select?.addEventListener("change", sync);
@@ -192,6 +196,8 @@ export async function markItemDialog() {
   });
   if (!res) return;
   const item = await fromUuid(res.target);
+  // Name left at the model label: the device takes the item's name (they share one name).
+  if (res.label === MODELS[res.model]?.label) res.label = item.name;
   await markPhone(item, res);
   ui.notifications.info(`📱 ${t("Mark.Done", { name: item.name, number: res.number })}`);
 }
@@ -237,3 +243,21 @@ export async function contactsDialog(item) {
   await item.update({ [`flags.${MODULE_ID}.phone.contacts`]: contacts });
 }
 
+
+/** Names a correspondent: adds a contact with this number (or address). */
+export async function addContactDialog(item, key) {
+  const name = await DialogV2.prompt({
+    window: { title: t("Contacts.Add"), icon: "fas fa-user-plus" },
+    position: { width: 340 },
+    content: `<div class="spt-phone-form">
+        <label>${t("Contacts.Name")} <input type="text" name="name" autofocus></label>
+        <p class="hint">${esc(key)}</p>
+      </div>`,
+    ok: { label: t("Save"), icon: "fas fa-check", callback: (event, button) => button.form.elements.name.value.trim() },
+    rejectClose: false
+  });
+  if (!name) return;
+  const phone = getPhoneData(item);
+  const contacts = [...(phone.contacts ?? []), { name, number: key }];
+  await item.update({ [`flags.${MODULE_ID}.phone.contacts`]: contacts });
+}

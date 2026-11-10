@@ -1,8 +1,8 @@
 import { attChipHtml, attHtml, openAttachment, pickImage } from "./attachments.js";
 import { openSystemSheet } from "./item-sheet.js";
 import { ApplicationV2, MODES, MODULE_ID, SOCKET } from "./constants.js";
-import { SKINS, addLog, allPhones, conversations, displayName, getLog, getPhoneData, hasSignal, holders, isComputer, isFixed, isLandline, keyFor, markRead, modelOf, msgOn, mutateLog, phoneLabel, sameConv, isUnread, skinOf, unreadCount } from "./devices.js";
-import { contactsDialog } from "./dialogs.js";
+import { SKINS, addLog, allPhones, conversations, displayName, findContact, getLog, getPhoneData, hasSignal, holders, isComputer, isFixed, isLandline, keyFor, markRead, modelOf, msgOn, mutateLog, phoneLabel, sameConv, isUnread, skinOf, unreadCount } from "./devices.js";
+import { addContactDialog, contactsDialog } from "./dialogs.js";
 import { loadLastDevice, myPhones, saveLastDevice } from "./fab.js";
 import { bindDrop, bindIconSelects, deviceSelect } from "./gm-panel.js";
 import { grantAttachments } from "./messages.js";
@@ -45,7 +45,11 @@ export class PlayerPhone extends ApplicationV2 {
         this._state.att = null;
         this._rerender();
       },
-      gmContacts: function () { const p = this._current(); if (p) contactsDialog(p.item); },
+      contacts: function () { const p = this._current(); if (p && this._canEditContacts(p)) contactsDialog(p.item); },
+      addContact: function () {
+        const p = this._current();
+        if (p && this._canEditContacts(p)) addContactDialog(p.item, this._state.key);
+      },
       gmItemSheet: function () { const p = this._current(); if (p) openSystemSheet(p.item); },
       showEntry: async function (event, target) {
         const p = this._current();
@@ -108,6 +112,11 @@ export class PlayerPhone extends ApplicationV2 {
     const want = this._state.phoneUuid ?? loadLastDevice();
     // Wanted device missing (terminal or landline out of reach): fall back to a personal device.
     return mine.find((p) => p.item.uuid === want) ?? mine.find((p) => !isFixed(p.phone)) ?? mine[0] ?? null;
+  }
+
+  /** The GM edits every address book; a player only the personal devices they hold (not installed or shared ones). */
+  _canEditContacts(p) {
+    return this.gm || (!isFixed(p.phone) && p.item.parent instanceof Actor && p.item.isOwner);
   }
 
   _readForm() {
@@ -218,11 +227,16 @@ export class PlayerPhone extends ApplicationV2 {
     const phoneSel = deviceSelect(mine, p, (q) => q.phone.label);
     const unread = unreadCount(p.phone);
     const federal = skinOf(p.phone) === "federal";
+    // Terminals (any look) and the federal look show an inactive login form.
+    const login = federal || p.phone.model === "desktop";
+    const icon = federal ? "fa-id-card" : login ? "fa-user-lock" : "fa-lock";
+    const text = federal ? t("Theme.IdRequired") : isComputer(p.phone) ? t("Lock.Session") : t("Warn.Locked");
+    const user = federal ? t("Theme.AgentId") : t("Lock.User");
     return `<header class="spt-phone-top">${phoneSel}</header>
       <div class="spt-lockscreen">
-        <i class="fas ${federal ? "fa-id-card" : "fa-lock"}"></i>
-        <p>${federal ? t("Theme.IdRequired") : isComputer(p.phone) ? t("Lock.Session") : t("Warn.Locked")}</p>
-        ${federal ? `<input type="text" class="spt-fake-login" placeholder="${t("Theme.AgentId")}" readonly><input type="password" class="spt-fake-login" placeholder="••••••••" readonly>` : ""}
+        <i class="fas ${icon}"></i>
+        <p>${text}</p>
+        ${login ? `<input type="text" class="spt-fake-login" placeholder="${user}" readonly tabindex="-1"><input type="password" class="spt-fake-login" placeholder="••••••••" readonly tabindex="-1">` : ""}
         ${unread ? `<p class="spt-lock-notif">${tn("Unread", unread)}</p>` : ""}
       </div>`;
   }
@@ -239,9 +253,12 @@ export class PlayerPhone extends ApplicationV2 {
       : hasSignal(p.phone)
         ? `<i class="fas fa-signal spt-signal" title="${t("Net.Signal")}"></i>`
         : `<span class="spt-signal off" title="${t("Net.NoSignalShort")}">📵</span>`;
-    const gmTools = this.gm
-      ? `<a data-action="gmContacts" title="${t("Contacts.Title")}" aria-label="${t("Contacts.Title")}"><i class="fas fa-address-book"></i></a><a data-action="gmItemSheet" title="${t("Sheet.ItemSheet")}" aria-label="${t("Sheet.ItemSheet")}"><i class="fas fa-file-lines"></i></a>`
+    const contactsBtn = this._canEditContacts(p)
+      ? `<a data-action="contacts" title="${t("Contacts.Title")}" aria-label="${t("Contacts.Title")}"><i class="fas fa-address-book"></i></a>`
       : "";
+    const gmTools = this.gm
+      ? `${contactsBtn}<a data-action="gmItemSheet" title="${t("Sheet.ItemSheet")}" aria-label="${t("Sheet.ItemSheet")}"><i class="fas fa-file-lines"></i></a>`
+      : contactsBtn;
     return `<header class="spt-phone-top">${phoneSel}${signal}${gmTools}<div class="spt-modes">${modeBtns}</div></header>`;
   }
 
@@ -291,6 +308,10 @@ export class PlayerPhone extends ApplicationV2 {
       )
       .join("");
     const masked = isMasked(key);
+    // Unknown correspondent: offer to name it.
+    const addBtn = !masked && !findContact(p.phone, key) && this._canEditContacts(p)
+      ? `<a data-action="addContact" title="${t("Contacts.Add")}"><i class="fas fa-user-plus"></i></a>`
+      : "";
     const composer = this.gm
       ? this._gmComposer(2)
       : !msgOn(p.phone)
@@ -302,7 +323,7 @@ export class PlayerPhone extends ApplicationV2 {
     return `<header class="spt-phone-top conv">
         <a data-action="back" title="${t("Back")}"><i class="fas fa-chevron-left"></i></a>
         <strong>${esc(displayName(p.phone, key))}</strong>
-        <span class="spt-top-actions">${this.gm || !entries.length ? "" : `<a data-action="showConv" title="${t("Share.ShowConversation")}"><i class="fas fa-eye"></i></a>`}${masked || this.gm || modelOf(p.phone).noCalls ? "" : `<a data-action="call" title="${t("Call.Call")}"><i class="fas fa-phone"></i></a>`}</span>
+        <span class="spt-top-actions">${addBtn}${this.gm || !entries.length ? "" : `<a data-action="showConv" title="${t("Share.ShowConversation")}"><i class="fas fa-eye"></i></a>`}${masked || this.gm || modelOf(p.phone).noCalls ? "" : `<a data-action="call" title="${t("Call.Call")}"><i class="fas fa-phone"></i></a>`}</span>
       </header>
       <div class="spt-thread ${isComputer(p.phone) ? "mail" : ""}">${bubbles || `<p class="spt-phone-empty">${t("NoMessage")}.</p>`}</div>
       ${composer}`;

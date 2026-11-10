@@ -35,6 +35,7 @@ A Foundry VTT module that gives your characters phones, laptops and room termina
 - **A terminal in a room.** Anyone standing there reads its mail. Attach journal pages to simulate files: archives, logs, case reports.
 - **A hack, a stolen phone.** Lock a device, unlock it when the roll succeeds. Hand it to another character with its whole history.
 - **A ready-to-play scenario.** `@SMS` and `@Call` links in a journal send a message or ring a phone in one click.
+- **A remote case file.** A terminal in the Items sidebar, given to one or more players: they reach its mail from anywhere, like a secure FBI database. Attach journal pages as files.
 - **A prepared clue.** Write a device's history in advance: messages, photos, missed calls.
 - **Show, don't tell.** A player shows their screen to the agents in the same room, or forwards the photo.
 
@@ -72,9 +73,10 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 - A **carried device** is an item in a character's inventory. An **installed device** (landline, terminal) is tied to a Foundry scene.
 - Any item can become a device: create one from the GM panel (**New device**) or turn an existing item into one (**Mark an item**).
-- Each device has a **model**, a **name** ("personal", "burner", "office"…; defaults to the model name) and a **number** (or an email address for computers).
+- Each device has a **model**, a **name** ("personal", "burner", "office"…; defaults to the model name; it is also the item's name) and a **number** (or an email address for computers).
 - A character can carry several devices.
 - Clicking a device item opens the device itself. The GM reaches the system's item sheet from the device view.
+- The item gets the model's icon and a short description (model and number), unless you chose your own.
 
 ### Models
 
@@ -93,9 +95,9 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 ![Skins](docs/skins.png)
 
-- Each model has its own look: dark rounded smartphone, green LCD mobile, light mail client for the laptop, grey office workstation for the terminal, and black Bakelite with a rotary dial for the landline (1920s to 1980s).
+- Each model has its own look: dark rounded smartphone, green LCD mobile, light mail client for the laptop, grey office workstation for the terminal, and a keypad phone for the landline (1980-2020: small display, push buttons).
 - The GM can pick another look per device (**Edit device**), among those that fit the model:
-  - landline: **Modern, keypad** (1980-2020: small display, push buttons);
+  - landline: **Vintage, rotary dial** (1920-1980: black Bakelite);
   - phones and computers: **Text console** (green phosphor on black, text only) or **Secure (military)** (khaki, upper case, "Classified" banner);
   - laptop and terminal: **Federal (FBI)**, a navy and gold government workstation, emails shown as case files with a reference and a "Confidential" stamp, and an "Identification required" lock screen.
 - Every device stores its look ("default" means the model's look). A look removed or renamed in a future version falls back to the model's look.
@@ -105,7 +107,8 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 - **Carried device:** the player whose assigned character carries it; otherwise the character's owners. Assign a character to each player, or a player who owns several characters would see their devices too.
 - **Installed device:** every agent with a token on the scene; otherwise the players viewing the scene. The device appears and disappears from their window as they move.
-- **Held by nobody** (world item, or NPC): nobody picks up. Handy to prepare a phone in advance.
+- **Shared access:** a device in the Items sidebar is held by the players you give it to (Observer or Owner), wherever they are. An installed one stays usable on its scene too.
+- **Held by nobody** (world item given to no one, or NPC): nobody picks up. Handy to prepare a phone in advance.
 
 ### Changing hands
 
@@ -124,7 +127,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
   - red badge with the number of unread messages;
   - shakes when the phone rings;
   - opens the last personal device used.
-- In a room with a landline or a terminal, a **small room button** appears under the phone, with its own unread count. It shakes when the landline rings, opens the room's device, and disappears when the agent leaves.
+- In a room with a landline or a terminal, a **small room button** appears under the phone, with its own unread count. It shakes when the landline rings, opens the room's device, and disappears when the agent leaves. A shared device used from elsewhere gets no button: open it with Ctrl+Shift+P or from the Items sidebar.
 - With several devices, the window reopens on the **last device used**. If it is out of reach (room left, device given away), it falls back to a personal device and says so.
 
 ### Messages
@@ -138,13 +141,13 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 ### Sharing
 
 - **Show the screen** (eye icon, on a message or at the top of a conversation): the agent hands the device to the agents on the same scene. They see the image, the journal page (its content, without needing read permission) or the conversation, in a "X shows you their screen" window. Nothing remains once it is closed. Works without network. The GM is notified.
-- **Forward** (arrow icon, on a message): the message and its attachment go out over the network to a contact or a number, like a real message (network needed, kept in the history, copy to the GM). An agent recipient automatically gets permission to read the attached journal; an NPC recipient lands in the GM's inbox. The message is marked "Forwarded". An old mobile forwards text only.
+- **Forward** (arrow icon, on a message): the message and its attachment go out over the network to a contact or a number, like a real message (network needed, kept in the history, copy to the GM). An agent recipient automatically gets permission to read the attached journal; an NPC recipient lands in the **Messages** tab of the GM panel. The message is marked "Forwarded". An old mobile forwards text only.
 
 ### Calls
 
 - An incoming call shows the caller (except on a landline) with **Answer** / **Decline**. Distinct sounds for the ring (per model), pick-up and hang-up.
 - No answer within the GM's delay: missed call.
-- The **landline** is only a dial. Click a finger hole to dial a digit (the dial turns), or type the number. Enter places the call. No history, no call list, no contacts.
+- The **landline** is only a keypad (or a rotary dial in Vintage). Click to dial a digit (in Vintage, the dial turns), or type the number. Enter places the call. No history, no call list, no contacts.
 
 ### Modes
 
@@ -180,6 +183,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 - The address book builds up in play: anyone who wrote or called appears.
 - The GM can give contacts to a device, one per line: `Name | number` (number optional).
+- The player edits the address book of a personal device they hold (address book icon), and names an unknown correspondent from the conversation (person icon). Landlines, terminals and shared devices stay in the GM's hands.
 - Numbers are compared without dashes, spaces, dots or brackets: `555-0133` is `5550133`.
 
 ---
@@ -196,7 +200,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 - **Devices** tab, grouped by holder (character portrait) or place (scene thumbnail). Click a device to make it the recipient. For each one:
   - model icon, mode, number of messages the player hasn't read;
   - flags: shared number, locked, no signal;
-  - actions on hover: open and prepare history, contacts, lock, no signal, give to…, edit, remove.
+  - actions on hover: open and prepare history, contacts, lock, no signal, give to…, edit, remove (deletes the item, or keeps it as an ordinary item).
 
 ### Preparing a device
 

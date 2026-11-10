@@ -1,6 +1,6 @@
 import { attChipHtml, attFromDrop, pickImage } from "./attachments.js";
 import { ApplicationV2, DialogV2, HandlebarsApplicationMixin, MASKED, MODES, MODULE_ID } from "./constants.js";
-import { allPhones, anyMessaging, displayName, getLog, getPhoneData, holderName, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount } from "./devices.js";
+import { allPhones, anyMessaging, sharedUsers, displayName, getLog, getPhoneData, holderName, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount } from "./devices.js";
 import { contactsDialog, editPhoneDialog, giveDialog, markItemDialog, newPhoneDialog } from "./dialogs.js";
 import { copyJournalLink } from "./journal-links.js";
 import { openPhone } from "./main.js";
@@ -254,7 +254,9 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
         return { key: `s:${p.phone.sceneId}`, order: 1, name: scene?.name ?? t("NoPlace"), img: scene?.thumb ?? null, icon: "fa-location-dot" };
       }
       if (p.actor) return { key: `a:${p.actor.id}`, order: 0, name: p.actor.name, img: p.actor.img, icon: "fa-user" };
-      return { key: "none", order: 2, name: t("Gm.Nobody"), img: null, icon: "fa-ghost" };
+      const shared = sharedUsers(p.item);
+      if (shared.length) return { key: "shared", order: 2, name: t("Gm.Shared"), img: null, icon: "fa-users" };
+      return { key: "none", order: 3, name: t("Gm.Nobody"), img: null, icon: "fa-ghost" };
     };
     for (const p of phones) {
       const g = groupOf(p);

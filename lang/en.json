@@ -120,7 +120,8 @@
       "Places": "Places",
       "Nobody": "Not held",
       "Actions": "Actions",
-      "Status": "Network status"
+      "Status": "Network status",
+      "Shared": "Shared access"
     },
     "LockedMessage": "Unlock the phone to read this message.",
     "Document": "Document",
@@ -232,6 +233,8 @@
     "EditDevice": "Edit device",
     "Contacts": {
       "Title": "Contacts",
+      "Add": "Add to contacts",
+      "Name": "Name",
       "Hint": "One contact per line: <code>Name | number</code>. The number is optional for an NPC.",
       "Placeholder": "Marlin Hunt | 555-0142&#10;The Program"
     },
@@ -259,7 +262,8 @@
     "NoPhone": "You don't have a phone.",
     "OutOfReach": "{label} is out of reach.",
     "Lock": {
-      "Session": "Session locked"
+      "Session": "Session locked",
+      "User": "User name"
     },
     "NoMessage": "No message",
     "You": "You",
@@ -348,7 +352,8 @@
       "IdRequired": "Identification required",
       "AgentId": "Agent ID",
       "Ref": "Ref.",
-      "Confidential": "Confidential"
+      "Confidential": "Confidential",
+      "vintage": "Vintage, rotary dial (1920-1980)"
     },
     "Sheet": {
       "Label": "Phone & Terminal device",

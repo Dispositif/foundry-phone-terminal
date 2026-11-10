@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.25.0
+- Players edit the address book of a personal device they hold, and name an unknown correspondent from the conversation ("Add to contacts"). Landlines, terminals and shared devices stay GM-only.
+- Floating button: a room button only shows for an installed device on the agent's current scene. A shared terminal used from afar opens with Ctrl+Shift+P or from the Items sidebar.
+- Device and item share one name: renaming one renames the other. Marking an item keeps its name unless you type another.
+- Changing a device's model also changes the item image to the model's icon.
+- New landlines use the **Modern** keypad look. The rotary dial becomes the **Vintage** look; existing landlines keep their rotary dial.
+- Shared access: a device in the Items sidebar is held by the players given Observer or Owner permission, wherever they are (remote terminal, case file).
+- A locked terminal shows an inactive login form, whatever its look.
+- Fix: release zip now includes the templates and icons folders (GM panel, item icons).
+
 ## 0.24.0
 - Clicking a device item opens the device itself (the phone for the player, the GM view for the GM) instead of an empty item sheet. The GM reaches the system's item sheet from the device view.
 - Device items get an icon per model (smartphone, mobile, laptop, terminal, landline), unless the GM chose another image.

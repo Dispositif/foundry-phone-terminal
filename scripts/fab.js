@@ -1,6 +1,6 @@
 import { MODULE_ID } from "./constants.js";
 import { t, tn } from "./i18n.js";
-import { allPhones, holders, isFixed, modelOf, unreadCount } from "./devices.js";
+import { allPhones, holders, isFixed, landlineUsers, modelOf, unreadCount } from "./devices.js";
 import { openPhone } from "./main.js";
 import { activeCall } from "./player-calls.js";
 /* -------------------------------------------- */
@@ -52,11 +52,12 @@ export function updateFab() {
   if (!game.ready) return;
   let fab = document.getElementById("spt-phone-fab");
   const mine = myPhones();
-  const wanted = !game.user.isGM && game.settings.get(MODULE_ID, "floatingButton") && mine.length > 0;
+  const personal = mine.filter((p) => !isFixed(p.phone));
+  // Room buttons only for installed devices in the room where the agent is (not a shared one used from afar).
+  const rooms = mine.filter((p) => isFixed(p.phone) && landlineUsers(p.phone).some((u) => u.id === game.user.id));
+  const wanted = !game.user.isGM && game.settings.get(MODULE_ID, "floatingButton") && personal.length + rooms.length > 0;
   if (!wanted) return fab?.remove();
   if (!fab) fab = createFab();
-  const personal = mine.filter((p) => !isFixed(p.phone));
-  const rooms = mine.filter((p) => isFixed(p.phone));
   const ringingUuid = activeCall?.itemUuid ?? null;
   const ringsHere = (p) => !!activeCall && p.item.uuid === ringingUuid;
 

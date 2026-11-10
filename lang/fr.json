@@ -120,7 +120,8 @@
       "Places": "Lieux",
       "Nobody": "Sans porteur",
       "Actions": "Actions",
-      "Status": "État du réseau"
+      "Status": "État du réseau",
+      "Shared": "Accès partagé"
     },
     "LockedMessage": "Déverrouillez le téléphone pour lire ce message.",
     "Document": "Document",
@@ -232,6 +233,8 @@
     "EditDevice": "Modifier l'appareil",
     "Contacts": {
       "Title": "Contacts",
+      "Add": "Ajouter aux contacts",
+      "Name": "Nom",
       "Hint": "Un contact par ligne : <code>Nom | numéro</code>. Le numéro est facultatif pour un PNJ.",
       "Placeholder": "Marlin Hunt | 555-0142&#10;Le Programme"
     },
@@ -259,7 +262,8 @@
     "NoPhone": "Vous n'avez pas de téléphone.",
     "OutOfReach": "{label} n'est plus à portée.",
     "Lock": {
-      "Session": "Session verrouillée"
+      "Session": "Session verrouillée",
+      "User": "Identifiant"
     },
     "NoMessage": "Aucun message",
     "You": "Vous",
@@ -348,7 +352,8 @@
       "IdRequired": "Identification requise",
       "AgentId": "Identifiant agent",
       "Ref": "Réf.",
-      "Confidential": "Confidentiel"
+      "Confidential": "Confidentiel",
+      "vintage": "Vintage, cadran rotatif (1920-1980)"
     },
     "Sheet": {
       "Label": "Appareil Phone & Terminal",

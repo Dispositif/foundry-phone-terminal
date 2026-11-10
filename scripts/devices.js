@@ -42,6 +42,7 @@ const SCREENS = ["mobile", "smartphone", "computer", "desktop"];
 export const DEFAULT_THEME = "default";
 export const THEMES = {
   modern: { models: ["landline"] },
+  vintage: { models: ["landline"], skin: "landline" },
   federal: { models: ["computer", "desktop"] },
   console: { models: SCREENS },
   military: { models: SCREENS }
@@ -52,6 +53,11 @@ export function themeFits(theme, model) {
   return !!THEMES[theme]?.models.includes(model);
 }
 
+/** Look a new device gets when none is chosen: a landline is modern unless "vintage" is picked. */
+export function newTheme(model) {
+  return model === "landline" ? "modern" : DEFAULT_THEME;
+}
+
 /** Look to store: the choice if it fits the model, otherwise "default". */
 export function cleanTheme(theme, model) {
   return themeFits(theme, model) ? theme : DEFAULT_THEME;
@@ -60,7 +66,8 @@ export function cleanTheme(theme, model) {
 /** Look to display: the chosen one if it fits, otherwise the model's look (fallback). */
 export function skinOf(phone) {
   const model = MODELS[phone?.model] ? phone.model : "smartphone";
-  return themeFits(phone?.theme, model) ? phone.theme : model;
+  // "default" keeps the model's look (rotary dial for a landline), so existing devices do not change.
+  return themeFits(phone?.theme, model) ? THEMES[phone.theme].skin ?? phone.theme : model;
 }
 
 export function modelOf(phone) {
@@ -76,15 +83,30 @@ export function isFixed(phone) {
   return !!modelOf(phone).fixed;
 }
 
-/** Who holds the device: agents on its scene if installed, otherwise its carrier. */
+/**
+ * Who holds the device: its carrier, or the agents on its scene if installed.
+ * A world item (Items sidebar) is also held by the players the GM gave it to (Observer or more),
+ * wherever they are: remote access to a shared terminal, a case file…
+ */
 export function holders(p, { activeOnly = false } = {}) {
-  return isFixed(p.phone) ? landlineUsers(p.phone) : phoneUsers(p.actor, { activeOnly });
+  if (p.actor) return phoneUsers(p.actor, { activeOnly });
+  const shared = sharedUsers(p.item).filter((u) => !activeOnly || u.active);
+  if (!isFixed(p.phone)) return shared;
+  const here = landlineUsers(p.phone);
+  return [...here, ...shared.filter((u) => !here.includes(u))];
+}
+
+/** Players given a world device item (Observer or more). */
+export function sharedUsers(item) {
+  if (!item || item.parent) return [];
+  return game.users.filter((u) => !u.isGM && item.testUserPermission(u, "OBSERVER"));
 }
 
 /** Holder name for GM messages (the place for an installed device). */
 export function holderName(item, phone) {
   if (isFixed(phone)) return `📍 ${game.scenes.get(phone.sceneId)?.name ?? t("NoPlace")}`;
-  return item?.parent instanceof Actor ? item.parent.name : "?";
+  if (item?.parent instanceof Actor) return item.parent.name;
+  return sharedUsers(item).length ? t("Gm.Shared") : "?";
 }
 
 /** An installed device rings for agents with a token on its scene (otherwise, players viewing it). */
@@ -138,9 +160,10 @@ export function phoneUsers(actor, { activeOnly = false } = {}) {
   return assignedOn.length ? assignedOn : owners.filter((u) => u.active);
 }
 
-export function phoneLabel({ actor, phone }) {
+export function phoneLabel({ item, actor, phone }) {
   if (isFixed(phone)) return `📍 ${game.scenes.get(phone.sceneId)?.name ?? t("NoPlace")} — ${phone.label} (${phone.number})`;
-  return `${actor?.name ?? t("NoHolder")} — ${phone.label} (${phone.number})`;
+  const who = actor?.name ?? (sharedUsers(item).length ? t("Gm.Shared") : t("NoHolder"));
+  return `${who} — ${phone.label} (${phone.number})`;
 }
 
 export function findContact(phone, str) {
@@ -316,7 +339,7 @@ export async function createPhone(actor, { label, number, model = "smartphone", 
       img: modelImg(model),
       flags: {
         core: { sheetClass: SHEET_ID },
-        [MODULE_ID]: { phone: { label, number, model, sceneId, theme: cleanTheme(theme, model), mode: "on", contacts: [], log: [] } }
+        [MODULE_ID]: { phone: { label, number, model, sceneId, theme: cleanTheme(theme ?? newTheme(model), model), mode: "on", contacts: [], log: [] } }
       }
     },
     options
@@ -333,8 +356,10 @@ export async function markPhone(item, { label, number, model, sceneId, theme }) 
   if (sceneId !== undefined) next.sceneId = sceneId;
   if (theme !== undefined || !next.theme) next.theme = cleanTheme(theme ?? next.theme, next.model ?? "smartphone");
   const patch = deviceItemPatch(item, next);
-  // The item follows the device's new name if it still had the old one (a deliberate name is kept).
-  if (prev.label && item.name === prev.label && label && label !== prev.label) patch.name = label;
+  // Device and item share one name.
+  if (label && item.name !== label) patch.name = label;
+  // Changing the model changes the item image too.
+  if (prev.model && next.model !== prev.model) patch.img = modelImg(next.model);
   return item.update({ [`flags.${MODULE_ID}.phone`]: next, ...patch });
 }
 

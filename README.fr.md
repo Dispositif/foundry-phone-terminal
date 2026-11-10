@@ -35,6 +35,7 @@ Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateur
 - **Un terminal dans une pièce.** Quiconque s'y trouve lit son courrier. Joignez des pages de journal pour simuler des fichiers : archives, journaux système, rapports d'enquête.
 - **Un piratage, un téléphone volé.** Verrouillez un appareil, déverrouillez-le quand le jet réussit. Remettez-le à un autre personnage avec tout son historique.
 - **Un scénario prêt à jouer.** Les liens `@SMS` et `@Call` dans un journal envoient un message ou font sonner un téléphone d'un clic.
+- **Un dossier à distance.** Un terminal dans la barre latérale Objets, donné à un ou plusieurs joueurs : ils consultent son courrier de n'importe où, comme une base de données sécurisée du FBI. Joignez des pages de journal en guise de fichiers.
 - **Un indice préparé.** Écrivez à l'avance l'historique d'un appareil : messages, photos, appels manqués.
 - **Montrer plutôt que raconter.** Un joueur montre son écran aux agents dans la même pièce, ou transfère la photo.
 
@@ -72,9 +73,10 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 - Un **appareil porté** est un objet de l'inventaire d'un personnage. Un **appareil installé** (fixe, terminal) est rattaché à une scène Foundry.
 - N'importe quel objet peut devenir un appareil : on le crée depuis le panneau MJ (« Nouvel appareil ») ou on transforme un objet existant.
-- Chaque appareil a un **modèle**, un **nom** (« perso », « jetable », « bureau »… ; par défaut le nom du modèle) et un **numéro** (ou une adresse mail pour les ordinateurs).
+- Chaque appareil a un **modèle**, un **nom** (« perso », « jetable », « bureau »… ; par défaut le nom du modèle ; c'est aussi le nom de l'objet) et un **numéro** (ou une adresse mail pour les ordinateurs).
 - Un personnage peut avoir plusieurs appareils.
 - Un clic sur un objet-appareil ouvre l'appareil lui-même. Le MJ retrouve la fiche d'objet du système depuis la vue de l'appareil.
+- L'objet prend l'icône du modèle et une courte description (modèle et numéro), sauf si vous en avez choisi d'autres.
 
 ### Modèles
 
@@ -93,9 +95,9 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 ![Habillages](docs/skins.png)
 
-- Chaque modèle a son habillage : smartphone sombre et arrondi, écran LCD vert pour le mobile, client de messagerie clair pour l'ordinateur, poste de bureau gris pour le terminal, bakélite noire et cadran rotatif pour le fixe (années 1920 à 1980).
+- Chaque modèle a son habillage : smartphone sombre et arrondi, écran LCD vert pour le mobile, client de messagerie clair pour l'ordinateur, poste de bureau gris pour le terminal, téléphone à touches pour le fixe (1980-2020 : petit afficheur, clavier).
 - Le MJ peut choisir un autre habillage par appareil (**Modifier l'appareil**), parmi ceux qui conviennent au modèle :
-  - fixe : **Moderne, à touches** (1980-2020 : petit afficheur, clavier) ;
+  - fixe : **Vintage, cadran rotatif** (1920-1980 : bakélite noire) ;
   - téléphones et ordinateurs : **Console texte** (vert phosphore sur noir, texte seul) ou **Sécurisé (militaire)** (kaki, majuscules, bandeau « Confidentiel défense ») ;
   - ordinateur et terminal : **Fédéral (FBI)**, poste gouvernemental bleu marine et or, mails présentés en fiches de dossier (référence, tampon « Confidentiel »), écran de verrouillage « Identification requise ».
 - Chaque appareil enregistre son habillage (« default » = celui du modèle). Un habillage retiré ou renommé dans une version future retombe sur celui du modèle.
@@ -105,7 +107,8 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 - **Appareil porté** : le joueur dont c'est le personnage assigné ; à défaut, les joueurs propriétaires du personnage. Pensez à assigner son personnage à chaque joueur, sinon un joueur propriétaire de plusieurs PJ verrait les appareils des autres.
 - **Appareil installé** : tous les agents dont un jeton est sur la scène ; à défaut, les joueurs qui regardent la scène. L'appareil apparaît et disparaît de leur fenêtre au fil de leurs déplacements.
-- **Porté par personne** (objet du monde, ou PNJ) : personne ne décroche. Pratique pour préparer un téléphone à l'avance.
+- **Accès partagé** : un appareil de la barre latérale Objets est entre les mains des joueurs à qui vous le donnez (Observateur ou Propriétaire), où qu'ils soient. S'il est installé, il reste aussi utilisable sur sa scène.
+- **Porté par personne** (objet du monde donné à personne, ou PNJ) : personne ne décroche. Pratique pour préparer un téléphone à l'avance.
 
 ### Changer de main
 
@@ -124,7 +127,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
   - pastille rouge avec le nombre de messages non lus ;
   - vibre quand le téléphone sonne ;
   - ouvre le dernier appareil personnel choisi.
-- Dans une pièce équipée d'un fixe ou d'un terminal, un **petit bouton de lieu** apparaît sous le téléphone, avec ses propres non-lus. Il vibre quand le fixe sonne, ouvre directement l'appareil de la pièce et disparaît quand l'agent s'en va.
+- Dans une pièce équipée d'un fixe ou d'un terminal, un **petit bouton de lieu** apparaît sous le téléphone, avec ses propres non-lus. Il vibre quand le fixe sonne, ouvre directement l'appareil de la pièce et disparaît quand l'agent s'en va. Un appareil partagé utilisé à distance n'a pas de bouton : on l'ouvre avec Ctrl+Shift+P ou depuis la barre latérale Objets.
 - Avec plusieurs appareils, la fenêtre rouvre sur le **dernier appareil choisi**. S'il n'est plus à portée (pièce quittée, appareil donné), elle revient à un appareil personnel et le signale.
 
 ### Messages
@@ -138,13 +141,13 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 ### Partager
 
 - **Montrer l'écran** (icône œil, sur un message ou en haut d'une conversation) : l'agent tend son appareil aux agents présents sur la même scène, cochés par défaut. Ils voient l'image, la page de journal (son contenu, sans avoir besoin du droit de lecture) ou la conversation, dans une fenêtre « X vous montre son écran ». Une fois fermée, il ne leur reste rien. Fonctionne sans réseau. Le MJ est prévenu.
-- **Transférer** (icône flèche, sur un message) : le message et sa pièce jointe repartent par le réseau vers un contact ou un numéro, comme un vrai message (réseau nécessaire, trace dans l'historique, copie au MJ). Un agent destinataire reçoit automatiquement le droit de lire le journal joint ; un PNJ le reçoit dans la boîte du MJ. Le message porte la mention « Transféré ». Un vieux mobile ne transfère que le texte.
+- **Transférer** (icône flèche, sur un message) : le message et sa pièce jointe repartent par le réseau vers un contact ou un numéro, comme un vrai message (réseau nécessaire, trace dans l'historique, copie au MJ). Un agent destinataire reçoit automatiquement le droit de lire le journal joint ; un PNJ le reçoit dans l'onglet **Messages** du panneau MJ. Le message porte la mention « Transféré ». Un vieux mobile ne transfère que le texte.
 
 ### Appels
 
 - Un appel entrant affiche l'appelant (sauf sur un fixe) avec **Répondre** / **Refuser**. Sons distincts pour la sonnerie (selon le modèle), le décroché et le refus.
 - Sans réponse au bout du délai réglé par le MJ : appel manqué.
-- Le **téléphone fixe** n'est qu'un cadran rotatif : un clic sur un trou compose le chiffre (le disque tourne), ou on tape le numéro au clavier. Entrée appelle. Ni historique, ni liste d'appels, ni contacts.
+- Le **téléphone fixe** n'est qu'un clavier (ou un cadran rotatif en Vintage) : un clic compose le chiffre (en Vintage, le disque tourne), ou on tape le numéro au clavier. Entrée appelle. Ni historique, ni liste d'appels, ni contacts.
 
 ### Modes
 
@@ -180,6 +183,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 - Le carnet se construit en jouant : tout correspondant qui a écrit ou appelé apparaît.
 - Le MJ peut donner des contacts à un appareil, une ligne par contact : `Nom | numéro` (numéro facultatif).
+- Le joueur modifie le carnet d'un appareil personnel qu'il a en main (icône carnet), et nomme un correspondant inconnu depuis la conversation (icône personnage). Fixes, terminaux et appareils partagés restent entre les mains du MJ.
 - Les numéros sont comparés sans tirets, espaces, points ni parenthèses : `555-0133` est `5550133`.
 
 ---
@@ -196,7 +200,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 - Onglet **Appareils**, groupés par porteur (portrait du personnage) ou par lieu (vignette de la scène). Un clic sur un appareil le choisit comme destinataire. Pour chacun :
   - icône du modèle, mode, nombre de messages non lus par le joueur ;
   - signalements : numéro partagé, verrouillé, pas de réseau ;
-  - actions au survol : ouvrir et préparer l'historique, contacts, verrouiller, pas de réseau, donner à…, modifier, retirer.
+  - actions au survol : ouvrir et préparer l'historique, contacts, verrouiller, pas de réseau, donner à…, modifier, retirer (supprime l'objet, ou le garde comme objet ordinaire).
 
 ### Préparer un appareil
 

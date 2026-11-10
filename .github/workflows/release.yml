@@ -1,5 +1,5 @@
-# Publie le module à chaque release GitHub : met à jour module.json (version, manifest, download),
-# construit le zip et joint les deux fichiers à la release.
+# Publishes the module on each GitHub release: updates module.json (version, manifest, download),
+# builds the zip and attaches both files to the release.
 name: Release
 
 on:
@@ -27,7 +27,7 @@ jobs:
              '.version=$v | .manifest=$m | .download=$d' module.json > module.tmp && mv module.tmp module.json
 
       - name: Build zip
-        run: zip -r soren-phone-terminal.zip module.json README.md README.fr.md LICENSE scripts styles lang sounds
+        run: zip -r soren-phone-terminal.zip module.json README.md README.fr.md CHANGELOG.md LICENSE scripts styles lang sounds templates icons
 
       - name: Upload assets
         env:
