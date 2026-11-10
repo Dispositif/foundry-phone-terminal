@@ -1,10 +1,10 @@
 import { MODULE_ID } from "./constants.js";
 import { t, tn } from "./i18n.js";
-import { allPhones, holders, isFixed, landlineUsers, modelOf, unreadCount } from "./devices.js";
-import { openPhone } from "./main.js";
+import { allPhones, getLog, holders, isFixed, landlineUsers, modelOf, unreadCount } from "./devices.js";
+import { openPanel, openPhone } from "./main.js";
 import { activeCall } from "./player-calls.js";
 /* -------------------------------------------- */
-/*  Floating button (players)                   */
+/*  Floating button (players, and GM network)   */
 /* -------------------------------------------- */
 
 /** Current player's devices (same rule as for ringing). */
@@ -50,6 +50,7 @@ export function setFabBadge(btn, n) {
  */
 export function updateFab() {
   if (!game.ready) return;
+  if (game.user.isGM) return updateGmFab();
   let fab = document.getElementById("spt-phone-fab");
   const mine = myPhones();
   const personal = mine.filter((p) => !isFixed(p.phone));
@@ -90,6 +91,29 @@ export function updateFab() {
   }
 }
 
+/** Agents' messages the GM has not opened yet (same count as the Messages tab). */
+function gmUnread() {
+  let n = 0;
+  for (const p of allPhones()) {
+    for (const e of getLog(p.phone)) if (e.kind === "sms" && e.dir === "out" && !e.pj && !e.prep && e.seen === false) n++;
+  }
+  return n;
+}
+
+/** GM: one telecom button that opens the Network panel (on Messages when something is unread). */
+function updateGmFab() {
+  let fab = document.getElementById("spt-phone-fab");
+  if (!game.settings.get(MODULE_ID, "gmFloatingButton")) return fab?.remove();
+  if (!fab) fab = createFab();
+  let main = fab.querySelector(".spt-fab-main");
+  if (!main) fab.prepend((main = fabButton("spt-fab-main")));
+  main.dataset.gm = "1";
+  main.querySelector("i").className = "fas fa-tower-cell";
+  const n = gmUnread();
+  setFabBadge(main, n);
+  main.title = n ? tn("Unread", n) : t("Gm.PanelTitle");
+}
+
 export function createFab() {
   const fab = document.createElement("div");
   fab.id = "spt-phone-fab";
@@ -118,6 +142,8 @@ export function createFab() {
       try {
         localStorage.setItem(FAB_POS_KEY, JSON.stringify({ left: fab.offsetLeft, top: fab.offsetTop }));
       } catch {}
+    } else if (drag.btn?.dataset.gm) {
+      openPanel(gmUnread() ? { tab: "inbox" } : {});
     } else if (drag.btn) {
       let uuid = drag.btn.dataset.uuid;
       if (!uuid) {

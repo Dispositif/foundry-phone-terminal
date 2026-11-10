@@ -31,9 +31,10 @@ loadLanguages();
 /*  Opening                                     */
 /* -------------------------------------------- */
 
-export function openPanel() {
+export function openPanel({ tab = null } = {}) {
   if (!game.user.isGM) return ui.notifications.warn(t("Warn.GmOnlyPanel"));
   const panel = PhonePanel.instance ?? new PhonePanel();
+  if (tab) panel._state.tab = tab;
   panel.render({ force: true });
   return panel;
 }
@@ -86,11 +87,20 @@ Hooks.once("init", () => {
     config: true,
     type: Number,
     range: { min: 0, max: 120, step: 5 },
-    default: 30
+    default: 60
   });
   game.settings.register(MODULE_ID, "floatingButton", {
     name: "SPT.Settings.floatingButton.name",
     hint: "SPT.Settings.floatingButton.hint",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+    onChange: () => updateFab()
+  });
+  game.settings.register(MODULE_ID, "gmFloatingButton", {
+    name: "SPT.Settings.gmFloatingButton.name",
+    hint: "SPT.Settings.gmFloatingButton.hint",
     scope: "world",
     config: true,
     type: Boolean,

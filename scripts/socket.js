@@ -2,7 +2,7 @@ import { onPlayerAccess } from "./attachments.js";
 import { MODULE_ID, SMS_SRC } from "./constants.js";
 import { markRead } from "./devices.js";
 import { onPlayerCall, onPlayerHangup, onPlayerSms, senderHolds } from "./gm-actions.js";
-import { activeCall, endCall, onCallResult, receiveRing } from "./player-calls.js";
+import { activeCall, endCall, onCallResult, receiveNearbyCall, receiveNearbyRing, receiveRing, stopNearbyRing } from "./player-calls.js";
 import { onResponse } from "./ring.js";
 import { receiveShow } from "./share.js";
 import { isActiveGM, playLocal } from "./util.js";
@@ -16,6 +16,16 @@ export function onSocket(data) {
   switch (data.type) {
     case "ring":
       if (forMe) receiveRing(data);
+      break;
+    case "ringNearby":
+      receiveNearbyRing(data);
+      break;
+    case "callNearby":
+      receiveNearbyCall(data);
+      break;
+    case "ringNearbyStop":
+    case "nearbyStop":
+      stopNearbyRing(data);
       break;
     case "cancel":
       if (forMe && activeCall?.callId === data.callId) endCall("cancelled");

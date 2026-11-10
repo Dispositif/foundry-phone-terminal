@@ -28,6 +28,11 @@ export function isComputer(phone) {
   return !!modelOf(phone).mail;
 }
 
+/** Ring mode (on, silent, off). Computers have none: always on. */
+export function modeOf(phone) {
+  return isComputer(phone) ? "on" : phone?.mode ?? "on";
+}
+
 /** Is there at least one device able to receive messages? (GM panel display) */
 export function anyMessaging() {
   return smsOn() || allPhones().some((p) => isComputer(p.phone));

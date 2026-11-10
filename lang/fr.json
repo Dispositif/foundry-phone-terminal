@@ -72,6 +72,8 @@
       "OnLine": "{who} est en ligne avec {name}.",
       "WritesTo": "{who} écrit à {name}.",
       "AgentCalling": "Un agent appelle",
+      "EmptyLandlineCall": "Appel vers un fixe vide",
+      "NobodyThere": "Personne sur place : vous répondez pour le lieu.",
       "CalledBy": "appelé par {who}",
       "AgentHungUp": "L'agent a raccroché.",
       "PanelTitle": "Réseau",
@@ -173,7 +175,9 @@
       "Outgoing": "Appel en cours",
       "Calling": "Appel en cours…",
       "HangUp": "Raccrocher",
-      "Call": "Appeler"
+      "Call": "Appeler",
+      "NearbyRinging": "Le téléphone de {name} sonne",
+      "NearbyCalling": "{name} a l'oreille sur son téléphone"
     },
     "Net": {
       "GmAbsent": "Pas de réseau téléphonique [MJ absent]",
@@ -315,6 +319,10 @@
         "name": "Durée de sonnerie (secondes)",
         "hint": "Au-delà, l'appel est considéré comme manqué. 0 = sonne jusqu'à réponse."
       },
+      "gmFloatingButton": {
+        "name": "Bouton flottant pour le MJ",
+        "hint": "Une icône télécom avec le nombre de messages d'agents non lus. Un clic ouvre le panneau Réseau ; elle se déplace par glisser."
+      },
       "floatingButton": {
         "name": "Bouton flottant pour les joueurs",
         "hint": "Une icône de téléphone toujours visible, avec le nombre de messages non lus. Un clic ouvre le téléphone ; elle se déplace par glisser."
@@ -352,6 +360,7 @@
     "Sheet": {
       "Label": "Appareil Phone & Terminal",
       "ItemSheet": "Fiche de l'objet"
-    }
+    },
+    "PowerOn": "Allumer"
   }
 }

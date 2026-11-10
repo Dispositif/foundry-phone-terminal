@@ -1,5 +1,5 @@
 import { MODULE_ID, RING_SRC, SMS_SRC } from "./constants.js";
-import { addLog, displayName, getPhoneData, holderName, holders, keyFor, modelOf, phonesByNumber } from "./devices.js";
+import { addLog, displayName, getPhoneData, holderName, holders, isLandline, keyFor, modelOf, phonesByNumber } from "./devices.js";
 import { deliverToPhone, smsHtml } from "./messages.js";
 import { RingDialog } from "./player-calls.js";
 import { finishOrigin, hangUp, pendingCalls, ring } from "./ring.js";
@@ -66,13 +66,16 @@ export async function onPlayerCall({ fromItemUuid, to, callId, userId }) {
   if (!fromPhone || !to?.trim()) return;
   const key = keyFor(fromPhone, to);
   const origin = { userId, itemUuid: fromItemUuid, callId, key, name: displayName(fromPhone, key) };
-  const isPJ = phonesByNumber(key).concat(phonesByNumber(to)).some((p) => p.item !== from);
+  const number = phonesByNumber(key).length ? key : to;
+  const targets = phonesByNumber(number).filter((p) => p.item !== from);
+  // A landline with nobody in the room: the GM answers in place of whoever is there (NPC).
+  const emptyRooms = targets.length > 0 && targets.every((p) => isLandline(p.phone) && !holders(p, { activeOnly: true }).length);
 
-  if (isPJ) {
-    const number = phonesByNumber(key).length ? key : to;
+  if (targets.length && !emptyRooms) {
     ring(`phone:${number}`, { caller: fromPhone.number, origin, callId });
     return;
   }
+  const place = emptyRooms ? `📍 ${targets.map((p) => `${p.phone.label} (${game.scenes.get(p.phone.sceneId)?.name ?? t("NoPlace")})`).join(", ")}` : "";
 
   // To an NPC: the GM picks the outcome.
   const who = `${holderName(from, fromPhone)} (${fromPhone.label})`;
@@ -88,10 +91,10 @@ export async function onPlayerCall({ fromItemUuid, to, callId, userId }) {
     else addLog(from, { kind: "call", dir: "out", with: key, result: "cancelled" });
   };
   const dialog = new RingDialog({
-    window: { title: t("Gm.AgentCalling"), icon: "fas fa-mobile-screen" },
+    window: { title: emptyRooms ? t("Gm.EmptyLandlineCall") : t("Gm.AgentCalling"), icon: emptyRooms ? "fas fa-phone" : "fas fa-mobile-screen" },
     classes: ["spt-phone-ring-dialog"],
     position: { width: 520 },
-    content: `<div class="spt-phone-ring"><i class="fas fa-phone-volume"></i><p class="spt-caller">${esc(origin.name)}</p><p>${t("Gm.CalledBy", { who: `<strong>${esc(who)}</strong>` })}</p></div>`,
+    content: `<div class="spt-phone-ring"><i class="fas fa-phone-volume"></i><p class="spt-caller">${esc(origin.name)}</p>${place ? `<p><strong>${esc(place)}</strong><br><em>${t("Gm.NobodyThere")}</em></p>` : ""}<p>${t("Gm.CalledBy", { who: `<strong>${esc(who)}</strong>` })}</p></div>`,
     buttons: Object.entries(NPC_OUTCOMES).map(([action, o]) => ({ action, label: o.label, icon: o.icon, default: action === "answer", callback: () => action })),
     submit: (result) => {
       call.dialog = null;

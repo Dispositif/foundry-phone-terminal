@@ -104,8 +104,8 @@
               <i class="fas {{icon}}" title="{{modelLabel}}"></i>
               <span class="spt-dev-label">{{label}} <small>{{number}}</small></span>
               {{#if modeIcon}}<i class="fas {{modeIcon}} spt-dim" title="{{modeLabel}}"></i>{{/if}}
-              {{#if locked}}<i class="fas fa-lock spt-warn" title="{{spt "Gm.Locked"}}"></i>{{/if}}
-              {{#if noSignal}}<i class="fas fa-signal spt-nosignal" title="{{spt "Gm.NoSignal"}}"></i>{{/if}}
+              {{#if locked}}<i class="fas fa-lock spt-warn spt-dev-state" title="{{spt "Gm.Locked"}}"></i>{{/if}}
+              {{#if noSignal}}<i class="fas fa-signal spt-nosignal spt-dev-state" title="{{spt "Gm.NoSignal"}}"></i>{{/if}}
               {{#if cloned}}<i class="fas fa-clone spt-warn" title="{{spt "Gm.ClonedHint"}}"></i>{{/if}}
               {{#if unread}}<span class="spt-row-unread" title="{{unreadTitle}}"><i class="fas fa-envelope"></i> {{unread}}</span>{{/if}}
             </a>

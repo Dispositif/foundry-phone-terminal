@@ -1,6 +1,6 @@
 import { attChatHtml } from "./attachments.js";
 import { MASKED, MODULE_ID, SOCKET } from "./constants.js";
-import { addLog, allPhones, displayName, getLog, getPhoneData, hasSignal, holders, isComputer, keyFor, modelOf, msgOn, phoneLabel, phonesByNumber, smsOn, withItemLock } from "./devices.js";
+import { addLog, allPhones, displayName, getLog, getPhoneData, hasSignal, holders, isComputer, keyFor, modelOf, msgOn, phoneLabel, phonesByNumber, smsOn, withItemLock, modeOf } from "./devices.js";
 import { esc, maskedLabel, nl2br } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
@@ -72,7 +72,7 @@ export async function deliverToPhone(p, senderKeyOrName, text, att = null, { fwd
   const users = holders(p);
   if (!users.length) return false;
   await whisperMessage(p.phone, users, shown, text, att);
-  if ((p.phone.mode ?? "on") === "on") {
+  if (modeOf(p.phone) === "on") {
     for (const u of users) game.socket.emit(SOCKET, { type: "sms", targetUserId: u.id, notif: modelOf(p.phone).notif });
   }
   return true;
@@ -101,7 +101,7 @@ export async function flushPendingNow(item) {
   }
   const calls = pending.length - sms.length;
   for (const u of users) {
-    game.socket.emit(SOCKET, { type: "signalBack", targetUserId: u.id, sms: sms.length, calls, label: phone.label, bip: (phone.mode ?? "on") === "on", notif: modelOf(phone).notif });
+    game.socket.emit(SOCKET, { type: "signalBack", targetUserId: u.id, sms: sms.length, calls, label: phone.label, bip: modeOf(phone) === "on", notif: modelOf(phone).notif });
   }
 }
 

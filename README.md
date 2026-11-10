@@ -6,7 +6,7 @@
 
 A Foundry VTT module that gives your characters phones, laptops and room terminals. Every call or message to an NPC lands with the GM, who answers, lets it ring, or decides the number doesn't exist. Built for investigation and narrative play, not as a smartphone simulator.
 
-- **One shortcut: Ctrl+Shift+P** opens the GM panel, or the player's phone. Players also get a floating phone button.
+- **One shortcut: Ctrl+Shift+P** opens the GM panel, or the player's phone. Players get a floating phone button, the GM a telecom one with the unread count.
 - **No setup needed:** the GM can ring a player or send them a message right away, from the GM panel.
 - **Devices are optional extras.** A device is an item in a character's inventory (phone, laptop), or is installed in a place: a landline or a terminal tied to a Foundry scene, used by whoever stands there. Devices bring history, contacts, replies, sharing and looks.
 - **Agents talk to each other too.** With devices, characters call and text one another directly, without the GM stepping in; the GM gets a discreet copy of the messages.
@@ -109,6 +109,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 - **Installed device:** every agent with a token on the scene; otherwise the players viewing the scene. The device appears and disappears from their window as they move.
 - **Shared access:** a device in the Items sidebar is held by the players you give it to (Observer or Owner), wherever they are. An installed one stays usable on its scene too.
 - **Held by nobody** (world item given to no one, or NPC): nobody picks up. Handy to prepare a phone in advance.
+- **Landline in an empty room:** an agent's call rings the GM instead ("Call to an empty landline", with the place), who answers for whoever is there.
 
 ### Changing hands
 
@@ -145,13 +146,16 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 ### Calls
 
-- An incoming call shows the caller (except on a landline) with **Answer** / **Decline**. Distinct sounds for the ring (per model), pick-up and hang-up.
+- An incoming call shows the caller with **Answer** / **Decline**; a Modern landline shows only a number, a Vintage one nothing. Distinct sounds for the ring (per model), pick-up and hang-up.
+- When an agent's phone rings (ring mode), every other player hears it softly, with a small notice ("Reyes's phone is ringing"). Narration over realism: the whole table knows.
+- When an agent places a call, they hear a ringback tone; every other player hears it too, softly, with a notice ("Reyes has an ear to the phone"). Between two agents, everyone just hears the ringing phone.
 - No answer within the GM's delay: missed call.
 - The **landline** is only a keypad (or a rotary dial in Vintage). Click to dial a digit (in Vintage, the dial turns), or type the number. Enter places the call. No history, no call list, no contacts.
 
 ### Modes
 
-- Normal, **silent** (no ring or beep) or **off** (calls missed, messages received without a beep).
+- Normal, **silent** (no ring or beep; an incoming call only buzzes for its holder) or **off** (calls missed, messages received without a beep; the screen stays dark, with a **Switch on** button).
+- Laptops and terminals have no modes: they are always on.
 - No modes on installed devices, since they are shared.
 
 ### Device states
@@ -194,6 +198,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 ### The GM panel: Network (Ctrl+Shift+P)
 
+- The GM's **floating telecom button** opens it (on **Messages** when agents' messages are unread) and shows their count. It has its own setting.
 - Top bar: network status, pending messages, and a **Cut network** toggle for the whole mobile network.
 - **Send** tab: recipient (with the model's icon), displayed sender (free text, hidden number when empty, with suggestions: the recipient's contacts, recent senders, other devices' numbers), then **Message** or **Call**. Only what the recipient can do is offered (no message to a landline, no call to a terminal). **Send** or **Ring**, attachment, and **Copy as a link** to paste into a journal.
 - **Messages** tab: one thread per agent and NPC, as chat bubbles. Reply right under the thread (Enter sends), or call the agent back.

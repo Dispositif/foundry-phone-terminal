@@ -1,7 +1,7 @@
 import { attChipHtml, attHtml, openAttachment, pickImage } from "./attachments.js";
 import { openSystemSheet } from "./item-sheet.js";
 import { ApplicationV2, MODES, MODULE_ID, SOCKET } from "./constants.js";
-import { SKINS, addLog, allPhones, conversations, displayName, findContact, getLog, getPhoneData, hasSignal, holders, isComputer, isFixed, isLandline, keyFor, markRead, modelOf, msgOn, mutateLog, phoneLabel, sameConv, isUnread, skinOf, unreadCount } from "./devices.js";
+import { SKINS, addLog, allPhones, conversations, displayName, findContact, getLog, getPhoneData, hasSignal, holders, isComputer, isFixed, isLandline, keyFor, markRead, modelOf, msgOn, mutateLog, phoneLabel, sameConv, isUnread, skinOf, unreadCount, modeOf } from "./devices.js";
 import { addContactDialog, contactsDialog } from "./dialogs.js";
 import { loadLastDevice, myPhones, saveLastDevice } from "./fab.js";
 import { bindDrop, bindIconSelects, deviceSelect } from "./gm-panel.js";
@@ -50,6 +50,7 @@ export class PlayerPhone extends ApplicationV2 {
         const p = this._current();
         if (p && this._canEditContacts(p)) addContactDialog(p.item, this._state.key);
       },
+      powerOn: function () { this._current()?.item.update({ [`flags.${MODULE_ID}.phone.mode`]: "on" }); },
       gmItemSheet: function () { const p = this._current(); if (p) openSystemSheet(p.item); },
       showEntry: async function (event, target) {
         const p = this._current();
@@ -216,11 +217,22 @@ export class PlayerPhone extends ApplicationV2 {
     }
     this._state.phoneUuid = p.item.uuid;
 
+    if (!this.gm && modeOf(p.phone) === "off") return this._renderOff(p, mine);
     if (!this.gm && p.phone.locked) return this._renderLocked(p, mine);
     if (!this.gm && isLandline(p.phone)) return this._renderDialer(p, mine);
     if (this._state.view === "conv") return this._renderConv(p);
     if (this._state.view === "new") return this._renderNew(p);
     return this._renderList(p, mine);
+  }
+
+  /** Device switched off: a dark screen, nothing from its history or contacts. */
+  _renderOff(p, mine) {
+    return `${this._renderHeader(p, mine)}
+      <div class="spt-lockscreen spt-offscreen">
+        <i class="fas fa-power-off"></i>
+        <p>${t("Mode.off")}</p>
+        ${isFixed(p.phone) ? "" : `<button type="button" data-action="powerOn"><i class="fas fa-power-off"></i> ${t("PowerOn")}</button>`}
+      </div>`;
   }
 
   _renderLocked(p, mine) {
@@ -242,19 +254,21 @@ export class PlayerPhone extends ApplicationV2 {
   }
 
   _renderHeader(p, mine) {
-    const mode = p.phone.mode ?? "on";
+    const mode = modeOf(p.phone);
     const phoneSel = deviceSelect(mine, p, (q) => (this.gm ? phoneLabel(q) : `${q.phone.label} · ${q.phone.number}`));
-    const modeBtns = !this.gm && isFixed(p.phone) ? "" : Object.entries(MODES)
+    const modeBtns = isComputer(p.phone) || (!this.gm && isFixed(p.phone)) ? "" : Object.entries(MODES)
       .map(([k, m]) => `<button type="button" class="spt-mode ${k === mode ? "active" : ""}" data-mode="${k}" title="${m.label}"><i class="fas ${m.icon}"></i></button>`)
       .join("");
     const gmOffline = !this.gm && !game.users.activeGM;
+    // Signal icon: bars (or Wi-Fi on a laptop), red without network. Installed devices always have a line.
+    const netIcon = isComputer(p.phone) ? "fa-wifi" : "fa-signal";
     const signal = gmOffline
-      ? `<span class="spt-signal off" title="${t("Net.GmAbsent")}">📵 <small>[${t("Net.GmAway")}]</small></span>`
+      ? `<span class="spt-signal off" title="${t("Net.GmAbsent")}"><i class="fas ${netIcon}"></i> <small>[${t("Net.GmAway")}]</small></span>`
       : isFixed(p.phone)
-        ? "" // Installed devices always have a line: no signal icon.
+        ? ""
         : hasSignal(p.phone)
-        ? `<i class="fas fa-signal spt-signal" title="${t("Net.Signal")}"></i>`
-        : `<span class="spt-signal off" title="${t("Net.NoSignalShort")}">📵</span>`;
+        ? `<i class="fas ${netIcon} spt-signal" title="${t("Net.Signal")}"></i>`
+        : `<i class="fas ${netIcon} spt-signal off" title="${t("Net.NoSignalShort")}"></i>`;
     const contactsBtn = this._canEditContacts(p)
       ? `<a data-action="contacts" title="${t("Contacts.Title")}" aria-label="${t("Contacts.Title")}"><i class="fas fa-address-book"></i></a>`
       : "";

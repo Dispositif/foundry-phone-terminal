@@ -128,6 +128,8 @@ a.spt-link:hover { filter: brightness(1.15); }
 .spt-dev-label small { opacity: 0.6; margin-left: 0.3em; }
 .spt-dev-actions { display: flex; gap: 0.55rem; white-space: nowrap; opacity: 0; transition: opacity 0.15s; }
 .spt-dev:hover .spt-dev-actions, .spt-dev:focus-within .spt-dev-actions { opacity: 1; }
+/* On hover, the lock and signal actions show the state: hide the duplicate status icons. */
+.spt-dev:hover .spt-dev-state, .spt-dev:focus-within .spt-dev-state { display: none; }
 .spt-dev-actions a { cursor: pointer; opacity: 0.8; }
 .spt-dev-actions a:hover { opacity: 1; }
 .spt-row-unread { font-size: 0.8em; color: var(--spt-warn); white-space: nowrap; }
@@ -143,8 +145,8 @@ a.spt-link:hover { filter: brightness(1.15); }
 .spt-modes { display: flex; gap: 2px; }
 .spt-modes .spt-mode { width: 2em; height: 1.9em; line-height: 1; padding: 0; opacity: 0.45; }
 .spt-modes .spt-mode.active { opacity: 1; box-shadow: 0 0 0 1px currentColor inset; }
-.spt-player-phone .spt-signal { opacity: 0.7; }
-.spt-player-phone .spt-signal.off { opacity: 1; }
+.spt-player-phone .spt-signal { opacity: 0.85; color: #4caf50; }
+.spt-player-phone .spt-signal.off { opacity: 1; color: #d9534f; }
 .spt-player-phone .spt-signal.off small { font-size: 0.75em; opacity: 0.8; }
 .spt-phone-foot { padding: 0.5rem; border-top: 1px solid var(--spt-line); }
 .spt-phone-foot button { width: 100%; }
@@ -185,6 +187,8 @@ a.spt-link:hover { filter: brightness(1.15); }
 .spt-lockscreen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem; opacity: 0.85; }
 .spt-lockscreen > i { font-size: 3rem; opacity: 0.6; }
 .spt-lockscreen p { margin: 0; font-size: 1.1em; }
+.spt-offscreen > i { opacity: 0.35; }
+.spt-offscreen button { width: auto; margin-top: 0.6rem; }
 .spt-lockscreen .spt-lock-notif { font-size: 0.9em; padding: 2px 10px; border-radius: 1em; background: rgba(128,128,128,0.2); }
 
 /* GM preparation in a device window */

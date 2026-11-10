@@ -6,7 +6,7 @@
 
 Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateurs portables et des terminaux installés dans les lieux. Chaque appel ou message vers un PNJ arrive chez le MJ, qui répond, laisse sonner ou décide que le numéro n'existe pas. Pensé pour l'enquête et le jeu narratif, pas comme un simulateur de smartphone.
 
-- **Un raccourci : Ctrl+Shift+P** ouvre le panneau MJ, ou le téléphone du joueur. Les joueurs ont aussi un bouton flottant.
+- **Un raccourci : Ctrl+Shift+P** ouvre le panneau MJ, ou le téléphone du joueur. Les joueurs ont un bouton flottant de téléphone, le MJ un bouton télécom avec le nombre de non-lus.
 - **Rien à configurer :** le MJ peut tout de suite appeler un joueur ou lui envoyer un message, depuis le panneau MJ.
 - **Les appareils sont un plus.** Un appareil est un objet dans l'inventaire d'un personnage (téléphone, portable), ou il est installé dans un lieu : fixe ou terminal rattaché à une scène Foundry, utilisé par ceux qui s'y trouvent. Les appareils apportent l'historique, les contacts, les réponses, le partage et les habillages.
 - **Les agents communiquent aussi entre eux.** Avec des appareils, les personnages s'appellent et s'envoient des messages directement, sans intervention du MJ, qui reçoit une copie discrète des messages.
@@ -109,6 +109,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 - **Appareil installé** : tous les agents dont un jeton est sur la scène ; à défaut, les joueurs qui regardent la scène. L'appareil apparaît et disparaît de leur fenêtre au fil de leurs déplacements.
 - **Accès partagé** : un appareil de la barre latérale Objets est entre les mains des joueurs à qui vous le donnez (Observateur ou Propriétaire), où qu'ils soient. S'il est installé, il reste aussi utilisable sur sa scène.
 - **Porté par personne** (objet du monde donné à personne, ou PNJ) : personne ne décroche. Pratique pour préparer un téléphone à l'avance.
+- **Fixe dans une pièce vide** : l'appel d'un agent sonne chez le MJ (« Appel vers un fixe vide », avec le lieu), qui répond pour qui se trouve là.
 
 ### Changer de main
 
@@ -145,13 +146,16 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 ### Appels
 
-- Un appel entrant affiche l'appelant (sauf sur un fixe) avec **Répondre** / **Refuser**. Sons distincts pour la sonnerie (selon le modèle), le décroché et le refus.
+- Un appel entrant affiche l'appelant avec **Répondre** / **Refuser** ; un fixe Moderne n'affiche qu'un numéro, un Vintage rien. Sons distincts pour la sonnerie (selon le modèle), le décroché et le refus.
+- Quand le téléphone d'un agent sonne (mode sonnerie), tous les autres joueurs l'entendent plus doucement, avec une petite notification (« Le téléphone de Reyes sonne »). La narration avant le réalisme : toute la table le sait.
+- Quand un agent passe un appel, il entend la tonalité d'appel ; tous les autres joueurs l'entendent aussi, plus doucement, avec une notification (« Reyes a l'oreille sur son téléphone »). Entre deux agents, tout le monde entend seulement la sonnerie.
 - Sans réponse au bout du délai réglé par le MJ : appel manqué.
 - Le **téléphone fixe** n'est qu'un clavier (ou un cadran rotatif en Vintage) : un clic compose le chiffre (en Vintage, le disque tourne), ou on tape le numéro au clavier. Entrée appelle. Ni historique, ni liste d'appels, ni contacts.
 
 ### Modes
 
-- Normal, **silencieux** (pas de sonnerie ni de bip) ou **éteint** (appels manqués, messages reçus sans bip).
+- Normal, **silencieux** (pas de sonnerie ni de bip ; un appel entrant vibre seulement chez son porteur) ou **éteint** (appels manqués, messages reçus sans bip ; l'écran reste noir, avec un bouton **Allumer**).
+- Ordinateurs et terminaux n'ont pas de modes : ils sont toujours allumés.
 - Pas de modes sur un appareil installé, puisqu'il est partagé.
 
 ### Ce que le joueur voit selon l'état de l'appareil
@@ -194,6 +198,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 ### Le panneau MJ : Réseau (Ctrl+Shift+P)
 
+- Le **bouton flottant télécom** du MJ l'ouvre (sur **Messages** s'il y a des messages d'agents non lus) et affiche leur nombre. Il a son propre réglage.
 - Barre du haut : état du réseau, messages en attente, et bascule **Couper le réseau** mobile.
 - Onglet **Envoyer** : destinataire (avec l'icône du modèle), expéditeur affiché (texte libre, numéro masqué si vide, avec suggestions : contacts du destinataire, expéditeurs récents, numéros des autres appareils), puis **Message** ou **Appel**. Seul ce que le destinataire sait faire est proposé (pas de message vers une ligne fixe, pas d'appel vers un terminal). **Envoyer** ou **Faire sonner**, pièce jointe, et **Copier en lien** pour un journal.
 - Onglet **Messages** : un fil par agent et par PNJ, en bulles. Réponse directement sous le fil (Entrée envoie), ou rappel de l'agent.

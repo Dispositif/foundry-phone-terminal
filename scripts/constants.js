@@ -7,6 +7,8 @@ export const RING_SRC = `modules/${MODULE_ID}/sounds/ring.wav`;
 export const SMS_SRC = `modules/${MODULE_ID}/sounds/sms.wav`;
 export const PICKUP_SRC = `modules/${MODULE_ID}/sounds/pickup.wav`;
 export const HANGUP_SRC = `modules/${MODULE_ID}/sounds/hangup.wav`;
+export const RINGBACK_SRC = `modules/${MODULE_ID}/sounds/ringback.wav`;
+export const VIBRATE_SRC = `modules/${MODULE_ID}/sounds/vibrate.wav`;
 /** Stored value for a hidden number (internal data, shown translated). */
 export const MASKED = "Numéro masqué"; // kept in French: stored in existing data
 export const LOG_MAX = 200; // non-prepared entries kept per device (entries prepared by the GM are always kept)

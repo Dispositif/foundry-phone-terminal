@@ -1,5 +1,5 @@
 import { MASKED, MODULE_ID, RESULT_LABELS, SOCKET } from "./constants.js";
-import { addLog, displayName, getPhoneData, hasSignal, holders, isLandline, keyFor, modelOf, phoneLabel, phonesByNumber } from "./devices.js";
+import { addLog, displayName, getPhoneData, hasSignal, holders, isFixed, isLandline, keyFor, modelOf, phoneLabel, phonesByNumber, skinOf, modeOf } from "./devices.js";
 import { esc, gmWhisper, maskedLabel, rerenderAll } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
@@ -37,7 +37,7 @@ export function ring(target, { caller = MASKED, origin = null, callId = foundry.
       return ui.notifications.warn(t("Warn.NoDevice", { value }));
     }
     for (const p of phones) {
-      const mode = p.phone.mode ?? "on";
+      const mode = modeOf(p.phone);
       const users = holders(p, { activeOnly: true });
       if (modelOf(p.phone).noCalls) {
         call.lastResult = "unassigned";
@@ -58,12 +58,18 @@ export function ring(target, { caller = MASKED, origin = null, callId = foundry.
       for (const u of users) {
         const model = modelOf(p.phone);
         emitRing(u.id, {
-          caller: model.callerId ? displayName(p.phone, caller) : null,
+          caller: modelOf(p.phone).callerId ? displayName(p.phone, caller) : null,
+          callerNumber: landlineNumber(p, caller),
           itemUuid: p.item.uuid,
           phoneLabel: isLandline(p.phone) ? `${p.phone.label} (${game.scenes.get(p.phone.sceneId)?.name ?? ""})` : p.phone.label,
           silent: mode === "silent",
           ringSrc: model.ring
         });
+      }
+      // Narration: every other player hears a carried phone ring (ring mode only), softer.
+      if (mode === "on" && !isFixed(p.phone) && p.actor) {
+        call.nearby = true;
+        game.socket.emit(SOCKET, { type: "ringNearby", callId, exclude: users.map((u) => u.id), name: p.actor.name, ringSrc: modelOf(p.phone).ring, timeout });
       }
     }
   }
@@ -82,6 +88,7 @@ export function hangUp(callId, { notifyOrigin = true } = {}) {
   const call = pendingCalls.get(callId);
   if (!call) return;
   pendingCalls.delete(callId);
+  stopNearby(call, callId);
   const logged = new Set();
   for (const [userId, itemUuid] of call.open) {
     game.socket.emit(SOCKET, { type: "cancel", targetUserId: userId, callId });
@@ -125,6 +132,7 @@ export function onResponse({ callId, result, userId }) {
   }
   if (!call.open.size) {
     pendingCalls.delete(callId);
+    stopNearby(call, callId);
     if (call.origin) finishOrigin(call.origin, result === "answer" ? "answer" : result === "off" ? "voicemail" : "noanswer");
   }
   rerenderAll();
@@ -140,3 +148,18 @@ export function finishOrigin(origin, result) {
   }
 }
 
+
+/**
+ * Modern landline: the ringing popup shows the caller's number, only when it looks like one (digits).
+ * Names, emails and hidden numbers just ring; the vintage landline shows nothing.
+ */
+function landlineNumber(p, caller) {
+  const number = String(caller ?? "").trim();
+  if (!isLandline(p.phone) || skinOf(p.phone) !== "modern") return null;
+  return /^\+?\d{3,}$/.test(number.replace(/[\s\-.()]/g, "")) ? number : null;
+}
+
+/** Stops the soft ring heard by the other players. */
+function stopNearby(call, callId) {
+  if (call.nearby) game.socket.emit(SOCKET, { type: "ringNearbyStop", callId });
+}

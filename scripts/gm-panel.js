@@ -1,6 +1,6 @@
 import { attChipHtml, attFromDrop, pickImage } from "./attachments.js";
 import { ApplicationV2, DialogV2, HandlebarsApplicationMixin, MASKED, MODES, MODULE_ID } from "./constants.js";
-import { allPhones, anyMessaging, holders, sharedUsers, displayName, getLog, getPhoneData, holderName, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount } from "./devices.js";
+import { allPhones, anyMessaging, holders, sharedUsers, displayName, getLog, getPhoneData, holderName, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf } from "./devices.js";
 import { contactsDialog, editPhoneDialog, giveDialog, newPhoneDialog } from "./dialogs.js";
 import { copyJournalLink } from "./journal-links.js";
 import { openPhone } from "./main.js";
@@ -263,7 +263,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       const g = groupOf(p);
       if (!groups.has(g.key)) groups.set(g.key, { ...g, devices: [] });
       const model = modelOf(p.phone);
-      const mode = MODES[p.phone.mode ?? "on"] ?? MODES.on;
+      const mode = MODES[modeOf(p.phone)] ?? MODES.on;
       const fixed = isFixed(p.phone);
       const unread = unreadCount(p.phone);
       groups.get(g.key).devices.push({
@@ -272,7 +272,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
         label: p.phone.label,
         icon: model.icon,
         modelLabel: model.label,
-        modeIcon: fixed || (p.phone.mode ?? "on") === "on" ? null : mode.icon,
+        modeIcon: fixed || modeOf(p.phone) === "on" ? null : mode.icon,
         modeLabel: mode.label,
         fixed,
         locked: !!p.phone.locked,

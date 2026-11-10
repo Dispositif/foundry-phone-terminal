@@ -72,6 +72,8 @@
       "OnLine": "{who} is on the line with {name}.",
       "WritesTo": "{who} writes to {name}.",
       "AgentCalling": "An agent is calling",
+      "EmptyLandlineCall": "Call to an empty landline",
+      "NobodyThere": "Nobody in the room: you answer for the place.",
       "CalledBy": "called by {who}",
       "AgentHungUp": "The agent hung up.",
       "PanelTitle": "Network",
@@ -173,7 +175,9 @@
       "Outgoing": "Calling",
       "Calling": "Calling…",
       "HangUp": "Hang up",
-      "Call": "Call"
+      "Call": "Call",
+      "NearbyRinging": "{name}'s phone is ringing",
+      "NearbyCalling": "{name} has an ear to the phone"
     },
     "Net": {
       "GmAbsent": "No phone network [GM away]",
@@ -315,6 +319,10 @@
         "name": "Ring duration (seconds)",
         "hint": "After this, the call counts as missed. 0 = rings until answered."
       },
+      "gmFloatingButton": {
+        "name": "Floating button for the GM",
+        "hint": "A telecom icon showing the number of agents' messages you have not read. Click to open the Network panel; drag to move it."
+      },
       "floatingButton": {
         "name": "Floating button for players",
         "hint": "An always visible phone icon showing the number of unread messages. Click to open the phone; drag to move it."
@@ -352,6 +360,7 @@
     "Sheet": {
       "Label": "Phone & Terminal device",
       "ItemSheet": "Item sheet"
-    }
+    },
+    "PowerOn": "Switch on"
   }
 }

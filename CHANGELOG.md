@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.27.0
+- A **Modern** landline shows the caller's number when it is one (digits). Names and hidden numbers still just ring.
+- An agent calling a landline in an empty room (nobody on its scene) now rings the GM, who answers for whoever is there, like a call to an NPC.
+- When an agent's phone rings (ring mode), every other player hears it, softer, with a small notice: "Reyes's phone is ringing". It stops when the call is answered, declined or ends.
+- Silent mode: an incoming call now buzzes (vibration sound) for the agent who holds the phone; nobody else hears it.
+- Outgoing calls: the caller hears a ringback tone until the call is answered or ends. Every other player hears it too, softer, with a notice: "Reyes has an ear to the phone". In a call between agents, everyone (caller included) hears only the ringing phone.
+- A switched-off device shows a dark "Off" screen to the player (no conversations, contacts or calls), with a **Switch on** button.
+- GM floating button (telecom icon) with the number of unread agents' messages; click opens the Network panel (on Messages when something is unread). Own setting: "Floating button for the GM".
+- Laptops show a Wi-Fi icon instead of the mobile signal bars. Without network (cut, no signal, GM away), the bars or Wi-Fi icon turn red instead of the crossed-out phone emoji; with network they are green.
+- Laptops and terminals have no ring mode (silent, off): they are always on.
+- Default ring duration is now 60 seconds (was 30).
+- Fix: GM panel, Devices: a locked device no longer shows two lock icons on hover (clicking the first one sent you to the Send tab).
+
 ## 0.26.0
 - GM panel: installed devices (landline, terminal) no longer have a "no signal" toggle, and players no longer see a signal icon on them; they always have a line.
 - GM panel, Send tab: the displayed sender suggests a hidden number, the recipient's contacts, recent senders and other devices' numbers. Still free text; empty means hidden number.

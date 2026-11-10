@@ -35,8 +35,8 @@ export function maskedLabel(key) {
   return isMasked(key) ? t("Masked") : key;
 }
 
-export function playLocal(src, { loop = false } = {}) {
-  const volume = game.settings.get(MODULE_ID, "volume");
+export function playLocal(src, { loop = false, gain = 1 } = {}) {
+  const volume = game.settings.get(MODULE_ID, "volume") * gain;
   // 2nd argument false = sound played on this client only, never broadcast.
   return AudioHelper.play({ src, volume, loop, autoplay: true }, false);
 }
