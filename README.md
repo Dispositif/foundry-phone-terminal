@@ -10,11 +10,12 @@ A Foundry VTT module that gives your characters phones, laptops and room termina
 - **No setup needed:** the GM can ring a player or send them a message right away, from the GM panel.
 - **Devices are optional extras.** A device is an item in a character's inventory (phone, laptop), or is installed in a place: a landline or a terminal tied to a Foundry scene, used by whoever stands there. Devices bring history, contacts, replies, sharing and looks.
 - **Agents talk to each other too.** With devices, characters call and text one another directly, without the GM stepping in; the GM gets a discreet copy of the messages.
+- **NPC directory:** list your NPCs once, name and number. You see at a glance who the agents are calling, and public numbers (pizzeria, taxi, hospital) work as yellow pages for the players.
 - Foundry VTT v13 and v14. Any game system.
 - Interface in English and French.
 - **Manifest URL:** `https://github.com/Dispositif/foundry-phone-terminal/releases/latest/download/module.json`
 
-![Player view](docs/player.png)
+<img src="docs/player.webp" alt="Player view" width="560">
 
 > **The GM must be connected.** The GM's browser acts as the network. Without a GM online, players see "No phone network [GM away]". They can read their messages but cannot write or call.
 
@@ -93,7 +94,9 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 ### Looks
 
-![Skins](docs/skins.png)
+<img src="docs/frames-mobile.webp" alt="Phones and laptop" width="640">
+
+<img src="docs/frames-fixed.webp" alt="Terminals and landlines" width="800">
 
 - Each model has its own look: dark rounded smartphone, green LCD mobile, light mail client for the laptop, grey office workstation for the terminal, and a keypad phone for the landline (1980-2020: small display, push buttons).
 - The GM can pick another look per device (**Edit device**), among those that fit the model:

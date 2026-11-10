@@ -10,11 +10,12 @@ Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateur
 - **Rien à configurer :** le MJ peut tout de suite appeler un joueur ou lui envoyer un message, depuis le panneau MJ.
 - **Les appareils sont un plus.** Un appareil est un objet dans l'inventaire d'un personnage (téléphone, portable), ou il est installé dans un lieu : fixe ou terminal rattaché à une scène Foundry, utilisé par ceux qui s'y trouvent. Les appareils apportent l'historique, les contacts, les réponses, le partage et les habillages.
 - **Les agents communiquent aussi entre eux.** Avec des appareils, les personnages s'appellent et s'envoient des messages directement, sans intervention du MJ, qui reçoit une copie discrète des messages.
+- **Annuaire PNJ :** listez vos PNJ une fois, nom et numéro. Vous voyez d'un coup d'œil qui les agents appellent, et les numéros publics (pizzeria, taxi, hôpital) servent de pages jaunes aux joueurs.
 - Foundry VTT v13 et v14. N'importe quel système de jeu.
 - Interface en français et en anglais.
 - **URL du manifeste :** `https://github.com/Dispositif/foundry-phone-terminal/releases/latest/download/module.json`
 
-![Vue joueur](docs/player.png)
+<img src="docs/player.webp" alt="Vue joueur" width="560">
 
 > **Le MJ doit être connecté.** Son navigateur fait office de réseau : sans MJ en ligne, les joueurs voient « Pas de réseau téléphonique [MJ absent] ». Ils peuvent relire leurs messages, mais ni écrire ni appeler.
 
@@ -93,7 +94,9 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 ### Habillages
 
-![Habillages](docs/skins.png)
+<img src="docs/frames-mobile.webp" alt="Téléphones et portable" width="640">
+
+<img src="docs/frames-fixed.webp" alt="Terminaux et fixes" width="800">
 
 - Chaque modèle a son habillage : smartphone sombre et arrondi, écran LCD vert pour le mobile, client de messagerie clair pour l'ordinateur, poste de bureau gris pour le terminal, téléphone à touches pour le fixe (1980-2020 : petit afficheur, clavier).
 - Le MJ peut choisir un autre habillage par appareil (**Modifier l'appareil**), parmi ceux qui conviennent au modèle :
