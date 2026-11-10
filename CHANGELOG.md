@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.28.0
+- **NPC directory** (GM panel, Devices tab, **Directory** button): one NPC per line, `Name | number`, `#` lines as section titles, easy to paste. Directory NPCs come first in the sender suggestions; the GM sees their names in Messages and in the incoming call window, and a number known nowhere is flagged "unknown number".
+- Secret NPCs stay secret: a message sent as a directory NPC shows its number on the agent's side, unless the agent has it in their contacts.
+- `| public` entries (pizzeria, station…) are the yellow pages: agents find them by name when writing or dialing (landline too), and see their name.
+- Directory and contacts windows are resizable; the text area follows the window size.
+- The directory starts with a New Orleans sample (a handler, the cell's dead drop, two scenario numbers, public places) and a tip: list the agents' own numbers as public so they know each other. Once the GM edits it, it is stored in the world: module updates never overwrite it.
+- Directory numbers use 555-02xx: new devices never get a 555-02xx number, nor one already used by a device or the directory.
+- Player phone: the "New message" button becomes **Call / Message** (phone and message icons) on devices that can do both.
+- New setting **Phone number prefix** (555- by default) for the numbers given to new devices; <prefix>02xx stays reserved for the directory.
+
 ## 0.27.0
 - A **Modern** landline shows the caller's number when it is one (digits). Names and hidden numbers still just ring.
 - An agent calling a landline in an empty room (nobody on its scene) now rings the GM, who answers for whoever is there, like a call to an NPC.

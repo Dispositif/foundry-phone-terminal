@@ -1,5 +1,5 @@
 import { DialogV2, MODULE_ID } from "./constants.js";
-import { DEFAULT_THEME, MODELS, THEMES, createPhone, newTheme, getLog, getPhoneData, markPhone, phoneUsers, randomAddress } from "./devices.js";
+import { DEFAULT_THEME, MODELS, directoryText, THEMES, createPhone, newTheme, getLog, getPhoneData, markPhone, phoneUsers, randomAddress } from "./devices.js";
 import { grantAttachments } from "./messages.js";
 import { esc, norm } from "./util.js";
 import { t } from "./i18n.js";
@@ -197,8 +197,9 @@ export async function contactsDialog(item) {
   const phone = getPhoneData(item);
   const text = (phone.contacts ?? []).map((c) => (c.number ? `${c.name} | ${c.number}` : c.name)).join("\n");
   const res = await DialogV2.wait({
-    window: { title: `${t("Contacts.Title")} — ${item.parent?.name ?? ""} (${phone.label})`, icon: "fas fa-address-book" },
-    position: { width: 400 },
+    window: { title: `${t("Contacts.Title")} — ${item.parent?.name ?? ""} (${phone.label})`, icon: "fas fa-address-book", resizable: true },
+    classes: ["spt-text-dialog"],
+    position: { width: 480, height: 420 },
     content: `<div class="spt-phone-form">
         <p class="hint">${t("Contacts.Hint")}</p>
         <textarea name="contacts" rows="8" placeholder="${t("Contacts.Placeholder")}">${esc(text)}</textarea>
@@ -235,4 +236,24 @@ export async function addContactDialog(item, key) {
   const phone = getPhoneData(item);
   const contacts = [...(phone.contacts ?? []), { name, number: key }];
   await item.update({ [`flags.${MODULE_ID}.phone.contacts`]: contacts });
+}
+
+/** GM: the NPC directory, edited as text like contacts. */
+export async function directoryDialog() {
+  const res = await DialogV2.wait({
+    window: { title: t("Directory.Title"), icon: "fas fa-book-open", resizable: true },
+    classes: ["spt-text-dialog"],
+    position: { width: 640, height: 560 },
+    content: `<div class="spt-phone-form">
+        <p class="hint">${t("Directory.Hint")}</p>
+        <textarea name="directory" rows="16" placeholder="${t("Directory.Placeholder")}">${esc(directoryText())}</textarea>
+      </div>`,
+    buttons: [
+      { action: "ok", label: t("Save"), icon: "fas fa-check", default: true, callback: (event, button) => button.form.elements.directory.value },
+      { action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => null }
+    ],
+    rejectClose: false
+  });
+  if (res === null || res === undefined) return;
+  await game.settings.set(MODULE_ID, "directory", res.trim());
 }

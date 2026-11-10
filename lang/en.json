@@ -331,7 +331,11 @@
         "name": "Text messages",
         "hint": "Uncheck for an era without text messages: only calls (and computer emails) remain."
       },
-      "keybinding": "Phone: GM panel / My phone (player)"
+      "keybinding": "Phone: GM panel / My phone (player)",
+      "numberPrefix": {
+        "name": "Phone number prefix",
+        "hint": "Start of the numbers given to new devices (555- by default): 555-0123. Numbers ending in 02xx (555-0200 to 555-0299) are never given out: keep them for the NPC directory."
+      }
     },
     "Migrated": "{n} device(s) recovered from the previous version.",
     "Demo": {
@@ -361,6 +365,13 @@
       "Label": "Phone & Terminal device",
       "ItemSheet": "Item sheet"
     },
-    "PowerOn": "Switch on"
+    "PowerOn": "Switch on",
+    "Directory": {
+      "Title": "Directory",
+      "Hint": "One NPC per line: <code>Name | number</code>. Add <code>| public</code> for numbers anyone can look up (pizzeria, station…). Lines starting with <code>#</code> are section titles.",
+      "Placeholder": "# Scenario&#10;Marlin Hunt | 555-0242&#10;# Public&#10;Pizza Delta | 555-0202 | public",
+      "Unknown": "unknown number"
+    },
+    "CallOrMessage": "Call / Message"
   }
 }

@@ -207,6 +207,23 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
   - signalements : numéro partagé, verrouillé, pas de réseau ;
   - actions au survol : ouvrir et préparer l'historique, contacts, verrouiller, pas de réseau et donner à… (appareils portés), modifier, retirer (supprime l'objet, ou le garde comme objet ordinaire).
 
+### Annuaire PNJ
+
+- Bouton **Annuaire** (onglet Appareils du panneau MJ) : un PNJ par ligne, comme les contacts. Les lignes commençant par `#` sont des titres.
+
+  ```
+  # Scénario
+  Marlin Hunt | 555-0242
+  # Public
+  Pizza Delta | 555-0202 | public
+  ```
+- Il démarre avec un exemple à La Nouvelle-Orléans. Une fois modifié, il est enregistré dans votre monde et les mises à jour du module n'y touchent jamais.
+- Astuce : ajoutez les numéros des agents avec `| public` (`Agent Reyes | 555-0142 | public`) : ils connaissent ainsi tous le numéro des autres dès le départ.
+- Gardez les numéros d'annuaire en **555-02xx** : un nouvel appareil ne reçoit jamais de numéro dans cette plage. Le préfixe **555-** se change dans les réglages du module (par ex. `504-555-`) ; la plage réservée le suit.
+- Pour le MJ : les PNJ de l'annuaire arrivent en tête des suggestions d'expéditeur, et leur nom s'affiche dans l'onglet Messages et la fenêtre d'appel. Un numéro inconnu partout est signalé « numéro inconnu ».
+- Un PNJ secret le reste : l'agent voit son numéro, sauf s'il l'a dans ses contacts.
+- Les numéros `public` sont les pages jaunes : les agents les trouvent par leur nom en écrivant ou en composant, et voient leur nom.
+
 ### Préparer un appareil
 
 - Le MJ ouvre n'importe quel appareil, même porté par un PNJ ou par personne.

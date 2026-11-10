@@ -1,5 +1,5 @@
 import { LOG_MAX, MASKED, MODULE_ID, SHEET_ID } from "./constants.js";
-import { esc, maskedLabel, norm, randomEmail, randomNumber } from "./util.js";
+import { esc, maskedLabel, norm, randomEmail, randomNumber, isMasked } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
 /*  Model: phones, contacts, history            */
@@ -177,15 +177,59 @@ export function findContact(phone, str) {
   return (phone?.contacts ?? []).find((c) => norm(c.name) === s || (c.number && norm(c.number) === s)) ?? null;
 }
 
-/** Conversation key: the contact's number if any, otherwise its name, otherwise the raw input. */
+/** Directory text, as edited by the GM (a New Orleans sample by default). */
+export function directoryText() {
+  return game.settings.get(MODULE_ID, "directory") ?? "";
+}
+
+/* NPC directory (GM): one line per NPC, "Name | number | public"; "#" lines are section titles. */
+let dirCache = { text: null, list: [] };
+export function npcDirectory() {
+  const text = directoryText();
+  if (dirCache.text === text) return dirCache.list;
+  const list = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l && !l.startsWith("#"))
+    .map((l) => {
+      const [name, number = "", ...rest] = l.split("|").map((s) => s.trim());
+      return { name, number, pub: rest.some((s) => s.toLowerCase() === "public") };
+    })
+    .filter((e) => e.name);
+  dirCache = { text, list };
+  return list;
+}
+
+/** Directory entry for a name or a number (public ones only, unless all = true). */
+export function findNpc(str, { all = false } = {}) {
+  const s = norm(str);
+  if (!s) return null;
+  return npcDirectory().find((e) => (all || e.pub) && (norm(e.name) === s || (e.number && norm(e.number) === s))) ?? null;
+}
+
+/** Conversation key: the contact's number if any, otherwise its name, otherwise the raw input. Public directory names give their number. */
 export function keyFor(phone, str) {
-  const c = findContact(phone, str);
+  const c = findContact(phone, str) ?? findNpc(str);
   return c ? c.number || c.name : String(str ?? "").trim();
 }
 
-/** Display name for a key, as seen from this device. */
+/** Display name for a key, as seen from this device (its contacts, then the public directory). */
 export function displayName(phone, key) {
-  return findContact(phone, key)?.name ?? maskedLabel(key);
+  return findContact(phone, key)?.name ?? findNpc(key)?.name ?? maskedLabel(key);
+}
+
+/** Name for the GM: as seen from the device, otherwise from the whole directory. */
+export function gmName(phone, key) {
+  const shown = displayName(phone, key);
+  if (shown !== maskedLabel(key)) return shown;
+  const npc = findNpc(key, { all: true });
+  return npc ? `${npc.name} (${key})` : shown;
+}
+
+/** Number known nowhere (no contact, no directory entry, no device): probably a wrong number. */
+export function isUnknownNumber(phone, key) {
+  if (!key || isMasked(key) || findContact(phone, key) || findNpc(key, { all: true })) return false;
+  return !phonesByNumber(key).length;
 }
 
 /** Do two keys point to the same conversation, as seen from this device? */
@@ -326,8 +370,14 @@ export function deviceItemPatch(item, phone) {
 }
 
 /** Random number for the model: an email address for a laptop or a terminal. */
+/** Random number or email for a new device, never one already used by a device or the directory. */
 export function randomAddress(model) {
-  return MODELS[model]?.mail ? randomEmail() : randomNumber();
+  let address;
+  for (let i = 0; i < 30; i++) {
+    address = MODELS[model]?.mail ? randomEmail() : randomNumber();
+    if (!phonesByNumber(address).length && !findNpc(address, { all: true })) break;
+  }
+  return address;
 }
 
 export function pickItemType() {

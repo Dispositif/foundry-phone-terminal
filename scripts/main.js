@@ -8,7 +8,7 @@
  * Target: Foundry VTT v13-v14 (ApplicationV2 / DialogV2 only).
  */
 
-import { LEGACY_IDS, MODULE_ID, SOCKET } from "./constants.js";
+import { DIRECTORY_SAMPLE, LEGACY_IDS, MODULE_ID, SOCKET } from "./constants.js";
 import { ensureDeviceItems, registerPhoneSheet } from "./item-sheet.js";
 import { allPhones, createPhone, getLog, getPhoneData, isFixed, markPhone, phoneUsers, randomAddress } from "./devices.js";
 import { transferPhone } from "./dialogs.js";
@@ -97,6 +97,21 @@ Hooks.once("init", () => {
     type: Boolean,
     default: true,
     onChange: () => updateFab()
+  });
+  game.settings.register(MODULE_ID, "numberPrefix", {
+    name: "SPT.Settings.numberPrefix.name",
+    hint: "SPT.Settings.numberPrefix.hint",
+    scope: "world",
+    config: true,
+    type: String,
+    default: "555-"
+  });
+  game.settings.register(MODULE_ID, "directory", {
+    scope: "world",
+    config: false,
+    type: String,
+    default: DIRECTORY_SAMPLE,
+    onChange: () => rerenderAll()
   });
   game.settings.register(MODULE_ID, "gmFloatingButton", {
     name: "SPT.Settings.gmFloatingButton.name",

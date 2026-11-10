@@ -331,7 +331,11 @@
         "name": "SMS",
         "hint": "Décochez pour une époque sans SMS : seuls les appels (et les mails des ordinateurs) restent possibles."
       },
-      "keybinding": "Téléphone : panneau MJ / Mon téléphone (joueur)"
+      "keybinding": "Téléphone : panneau MJ / Mon téléphone (joueur)",
+      "numberPrefix": {
+        "name": "Préfixe des numéros",
+        "hint": "Début des numéros donnés aux nouveaux appareils (555- par défaut) : 555-0123. Les numéros en 02xx (555-0200 à 555-0299) ne sont jamais attribués : gardez-les pour l'annuaire PNJ."
+      }
     },
     "Migrated": "{n} appareil(s) repris de l'ancienne version.",
     "Demo": {
@@ -361,6 +365,13 @@
       "Label": "Appareil Phone & Terminal",
       "ItemSheet": "Fiche de l'objet"
     },
-    "PowerOn": "Allumer"
+    "PowerOn": "Allumer",
+    "Directory": {
+      "Title": "Annuaire",
+      "Hint": "Un PNJ par ligne : <code>Nom | numéro</code>. Ajoutez <code>| public</code> pour un numéro que tout le monde peut trouver (pizzeria, gare…). Les lignes commençant par <code>#</code> sont des titres.",
+      "Placeholder": "# Scénario&#10;Marlin Hunt | 555-0242&#10;# Public&#10;Pizza Delta | 555-0202 | public",
+      "Unknown": "numéro inconnu"
+    },
+    "CallOrMessage": "Appeler / Écrire"
   }
 }

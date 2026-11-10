@@ -207,6 +207,23 @@ The GM can ring a player or send them a message (choose the player in **Recipien
   - flags: shared number, locked, no signal;
   - actions on hover: open and prepare history, contacts, lock, no signal and give to… (carried devices), edit, remove (deletes the item, or keeps it as an ordinary item).
 
+### NPC directory
+
+- **Directory** button (Devices tab of the GM panel): one NPC per line, like contacts. Lines starting with `#` are titles.
+
+  ```
+  # Scenario
+  Marlin Hunt | 555-0242
+  # Public
+  Pizza Delta | 555-0202 | public
+  ```
+- It starts with a New Orleans sample. Once you edit it, it is saved in your world and module updates never touch it.
+- Tip: add the agents' own numbers with `| public` (`Agent Reyes | 555-0142 | public`): they all know each other's number from the start.
+- Keep directory numbers in **555-02xx**: new devices never get a number in that range. The **555-** prefix can be changed in the module settings (e.g. `504-555-`); the reserved range follows it.
+- For the GM: directory NPCs come first in the sender suggestions, and their names show in the Messages tab and the incoming call window. A number known nowhere shows "unknown number".
+- A secret NPC stays secret: the agent sees its number, unless it is in their contacts.
+- `public` numbers are the yellow pages: agents find them by name when writing or dialing, and see their name.
+
 ### Preparing a device
 
 - Open any device, even one held by an NPC or by nobody.

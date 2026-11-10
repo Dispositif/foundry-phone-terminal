@@ -29,3 +29,23 @@ export const RESULT_LABELS = labels("Result", ["answer", "decline", "missed", "c
 
 /** Registered "device" sheet, set in flags.core.sheetClass of device items. */
 export const SHEET_ID = `${MODULE_ID}.PhoneSheet`;
+
+/** Default NPC directory (New Orleans sample). Directory numbers use 555-02xx, never given to new devices. */
+export const DIRECTORY_SAMPLE = `# Tip: add the agents' own numbers as public, so they all know each other:
+# Agent Reyes | 555-0142 | public
+
+# Delta Green
+Marlin Hunt | 555-0242
+Cell's dead drop | 555-0287
+
+# Last Things Last
+Clyde Baughman | 555-0209
+Michael Baughman | 555-0232
+
+# Public
+Pizza Delta | 555-0202 | public
+Crescent City Taxi | 555-0203 | public
+Union Passenger Terminal | 555-0204 | public
+Charity General Hospital | 555-0205 | public
+NOPD 8th District (front desk) | 555-0206 | public
+Lafitte Motel | 555-0200 | public`;

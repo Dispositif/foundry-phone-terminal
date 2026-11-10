@@ -69,7 +69,7 @@
       <div class="spt-gthreads">
         {{#each inbox}}
         <div class="spt-gthread {{#if unread}}unread{{/if}}" data-thread="{{id}}" data-uuid="{{uuid}}" data-key="{{key}}">
-          <div class="spt-gthread-head"><strong>{{who}}</strong> <i class="fas fa-arrow-right" aria-hidden="true"></i> {{to}}{{#if unread}} <span class="spt-badge">{{unread}}</span>{{/if}}</div>
+          <div class="spt-gthread-head"><strong>{{who}}</strong> <i class="fas fa-arrow-right" aria-hidden="true"></i> {{to}}{{#if unknown}} <small class="spt-dim">({{spt "Directory.Unknown"}})</small>{{/if}}{{#if unread}} <span class="spt-badge">{{unread}}</span>{{/if}}</div>
           {{#if more}}<div class="spt-gthread-more">…</div>{{/if}}
           {{#each bubbles}}
           <div class="spt-bb {{dir}} {{#if pending}}pending{{/if}}">{{#if fwd}}<span class="spt-bb-fwd"><i class="fas fa-share"></i> {{spt "Fwd.Forwarded"}}</span>{{/if}}{{{att}}}{{#if text}}<div>{{{text}}}</div>{{/if}}</div>
@@ -132,6 +132,7 @@
   {{#if (eq tab "devices")}}
   <footer class="spt-phone-row spt-gm-foot">
     <button type="button" data-action="newPhone"><i class="fas fa-plus"></i> {{spt "NewDevice"}}</button>
+    <button type="button" data-action="directory"><i class="fas fa-book-open"></i> {{spt "Directory.Title"}}</button>
   </footer>
   {{/if}}
 </div>

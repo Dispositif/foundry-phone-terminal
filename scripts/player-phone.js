@@ -1,7 +1,7 @@
 import { attChipHtml, attHtml, openAttachment, pickImage } from "./attachments.js";
 import { openSystemSheet } from "./item-sheet.js";
 import { ApplicationV2, MODES, MODULE_ID, SOCKET } from "./constants.js";
-import { SKINS, addLog, allPhones, conversations, displayName, findContact, getLog, getPhoneData, hasSignal, holders, isComputer, isFixed, isLandline, keyFor, markRead, modelOf, msgOn, mutateLog, phoneLabel, sameConv, isUnread, skinOf, unreadCount, modeOf } from "./devices.js";
+import { SKINS, addLog, allPhones, conversations, displayName, findContact, getLog, getPhoneData, hasSignal, holders, isComputer, isFixed, isLandline, keyFor, markRead, modelOf, msgOn, mutateLog, phoneLabel, sameConv, isUnread, skinOf, unreadCount, modeOf, npcDirectory } from "./devices.js";
 import { addContactDialog, contactsDialog } from "./dialogs.js";
 import { loadLastDevice, myPhones, saveLastDevice } from "./fab.js";
 import { bindDrop, bindIconSelects, deviceSelect } from "./gm-panel.js";
@@ -297,7 +297,7 @@ export class PlayerPhone extends ApplicationV2 {
       .join("");
     return `${this._renderHeader(p, mine)}
       <ul class="spt-conv-list">${rows || `<li class="spt-phone-empty">${t("NoConversation")}</li>`}</ul>
-      <footer class="spt-phone-foot"><button type="button" data-action="compose"><i class="fas fa-pen-to-square"></i> ${this.gm ? t("NewConversation") : isComputer(p.phone) ? t("NewMail") : msgOn(p.phone) ? t("NewMessage") : t("Dial")}</button></footer>`;
+      <footer class="spt-phone-foot"><button type="button" data-action="compose">${composeLabel(p.phone, this.gm)}</button></footer>`;
   }
 
   _renderConv(p) {
@@ -352,7 +352,8 @@ export class PlayerPhone extends ApplicationV2 {
       <div class="spt-new spt-dialer">
         ${skinOf(p.phone) === "modern" ? "" : rotaryDial(p.phone.number)}
         <div class="spt-dial-strip">
-          <input type="text" name="to" value="${esc(this._state.to)}" placeholder="${t("Number")}" autocomplete="off">
+          <input type="text" name="to" list="spt-yellow" value="${esc(this._state.to)}" placeholder="${t("Number")}" autocomplete="off">
+          <datalist id="spt-yellow">${publicOptions()}</datalist>
           <button type="button" data-action="dialBack" title="${t("Delete")}"><i class="fas fa-delete-left"></i></button>
         </div>
         ${skinOf(p.phone) === "modern" ? keypad() : ""}
@@ -364,10 +365,10 @@ export class PlayerPhone extends ApplicationV2 {
     const known = conversations(p.phone)
       .filter((c) => !isMasked(c.key))
       .map((c) => `<option value="${esc(displayName(p.phone, c.key))}">`)
-      .join("");
+      .join("") + publicOptions();
     return `<header class="spt-phone-top conv">
         <a data-action="back" title="${t("Back")}"><i class="fas fa-chevron-left"></i></a>
-        <strong>${this.gm ? t("NewConversation") : isComputer(p.phone) ? t("NewMail") : t("NewMessage")}</strong><span></span>
+        <strong>${this.gm ? t("NewConversation") : isComputer(p.phone) ? t("NewMail") : msgOn(p.phone) && !modelOf(p.phone).noCalls ? t("CallOrMessage") : msgOn(p.phone) ? t("NewMessage") : t("Dial")}</strong><span></span>
       </header>
       <div class="spt-new">
         <input type="text" name="to" list="spt-known" value="${esc(this._state.to)}" placeholder="${this.gm ? t("Gm.CorrespondentPlaceholder") : t("ToPlaceholder")}">
@@ -519,3 +520,22 @@ export function callLabel(e) {
   return t(`CallLog.in.${["answer", "decline"].includes(e.result) ? e.result : "missed"}`);
 }
 
+
+/** Public directory numbers (yellow pages): any agent can find them by name. */
+function publicOptions() {
+  return npcDirectory()
+    .filter((e) => e.pub && e.number)
+    .map((e) => `<option value="${esc(e.name)}" label="${esc(e.number)}"></option>`)
+    .join("");
+}
+
+/** "New" button of the conversation list: call and/or message, depending on what the device can do. */
+function composeLabel(phone, gm) {
+  if (gm) return `<i class="fas fa-pen-to-square"></i> ${t("NewConversation")}`;
+  if (isComputer(phone)) return `<i class="fas fa-pen-to-square"></i> ${t("NewMail")}`;
+  const sms = msgOn(phone);
+  const calls = !modelOf(phone).noCalls;
+  if (sms && calls) return `<i class="fas fa-phone"></i><i class="fas fa-comment-sms"></i> ${t("CallOrMessage")}`;
+  if (sms) return `<i class="fas fa-comment-sms"></i> ${t("NewMessage")}`;
+  return `<i class="fas fa-phone"></i> ${t("Dial")}`;
+}

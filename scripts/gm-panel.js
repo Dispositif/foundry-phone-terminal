@@ -1,7 +1,7 @@
 import { attChipHtml, attFromDrop, pickImage } from "./attachments.js";
 import { ApplicationV2, DialogV2, HandlebarsApplicationMixin, MASKED, MODES, MODULE_ID } from "./constants.js";
-import { allPhones, anyMessaging, holders, sharedUsers, displayName, getLog, getPhoneData, holderName, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf } from "./devices.js";
-import { contactsDialog, editPhoneDialog, giveDialog, newPhoneDialog } from "./dialogs.js";
+import { allPhones, anyMessaging, holders, sharedUsers, displayName, getLog, getPhoneData, holderName, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc } from "./devices.js";
+import { contactsDialog, directoryDialog, editPhoneDialog, giveDialog, newPhoneDialog } from "./dialogs.js";
 import { copyJournalLink } from "./journal-links.js";
 import { openPhone } from "./main.js";
 import { sendSms } from "./messages.js";
@@ -93,6 +93,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       hangup: function () { hangUpAll(); },
       sms: function () { this._doSms(); },
       newPhone: function () { newPhoneDialog(); },
+      directory: function () { directoryDialog(); },
       editPhone: async function (event, target) { editPhoneDialog(await fromUuid(target.dataset.uuid)); },
       contacts: async function (event, target) { contactsDialog(await fromUuid(target.dataset.uuid)); },
       give: async function (event, target) { giveDialog(await fromUuid(target.dataset.uuid)); },
@@ -232,7 +233,8 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
         uuid: th.item.uuid,
         key: th.key,
         who: holderName(th.item, th.phone),
-        to: displayName(th.phone, th.key),
+        to: gmName(th.phone, th.key),
+        unknown: isUnknownNumber(th.phone, th.key),
         unread: th.unread,
         canCall: !modelOf(th.phone).noCalls,
         draft: this._state.drafts[th.id] ?? "",
@@ -373,6 +375,8 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       if (value && !opts.has(norm(value))) opts.set(norm(value), { value, label });
     };
     add(t("Masked"));
+    // NPC directory first: the value is the number, so a secret NPC shows as a number on the agent's side.
+    for (const e of npcDirectory()) add(e.number || e.name, e.number ? `${e.name} · ${t("Directory.Title")}` : t("Directory.Title"));
     for (const p of recipient) for (const c of p.phone.contacts ?? []) add(c.name, c.number ? `${c.number} · ${t("Gm.InContacts")}` : t("Gm.InContacts"));
     for (const s of PhonePanel.recentSenders) add(s, t("Gm.Recent"));
     const mine = new Set(recipient.map((p) => p.item.uuid));
@@ -390,7 +394,10 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
   /** Typed sender; "Hidden number" (in any language) is stored in its internal form. */
   _normSender() {
     const s = this._state.sender.trim();
-    return !s || isMasked(s) ? MASKED : s;
+    if (!s || isMasked(s)) return MASKED;
+    // A directory NPC typed by name is sent from its number (the agent sees the number unless they know it).
+    const npc = findNpc(s, { all: true });
+    return npc?.number || s;
   }
 
   async _doSms() {

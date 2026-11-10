@@ -434,3 +434,12 @@ a.spt-link:hover { filter: brightness(1.15); }
 .dg-sms.dg-mail .dg-sms-body { background: #eef2f8; font-family: inherit; }
 .dg-sms.dg-mail .dg-sms-body::first-line { font-weight: bold; }
 .dg-att-img { display: block; max-width: 100%; max-height: 140px; border-radius: 8px; }
+
+/* Text list dialogs (directory, contacts): resizable, the text area fills the window. */
+.spt-text-dialog .window-content { display: flex; flex-direction: column; }
+.spt-text-dialog .window-content > form, .spt-text-dialog .dialog-content { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.spt-text-dialog .spt-phone-form { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.spt-text-dialog textarea { flex: 1; min-height: 8rem; resize: none; font-family: var(--font-mono, monospace); }
+
+/* "Call / Message" button: two icons side by side. */
+.spt-phone-foot button i + i { margin-left: 0.3em; }

@@ -54,8 +54,15 @@ export function gmWhisper(content, alias = `📱 ${t("PhoneAlias")}`) {
   });
 }
 
+/** Random number <prefix>0xxx for a new device (555-0xxx by default); <prefix>02xx is kept for the NPC directory. */
 export function randomNumber() {
-  return `555-0${String(Math.floor(Math.random() * 1000)).padStart(3, "0")}`;
+  let n = Math.floor(Math.random() * 900);
+  if (n >= 200) n += 100;
+  let prefix = "555-";
+  try {
+    prefix = game.settings.get(MODULE_ID, "numberPrefix") ?? prefix;
+  } catch {}
+  return `${prefix}0${String(n).padStart(3, "0")}`;
 }
 
 /** Random email address for a laptop or a terminal: user33@mail.net */

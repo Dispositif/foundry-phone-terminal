@@ -1,5 +1,5 @@
 import { MODULE_ID, RING_SRC, SMS_SRC } from "./constants.js";
-import { addLog, displayName, getPhoneData, holderName, holders, isLandline, keyFor, modelOf, phonesByNumber } from "./devices.js";
+import { addLog, displayName, getPhoneData, holderName, holders, isLandline, keyFor, modelOf, phonesByNumber, gmName, isUnknownNumber } from "./devices.js";
 import { deliverToPhone, smsHtml } from "./messages.js";
 import { RingDialog } from "./player-calls.js";
 import { finishOrigin, hangUp, pendingCalls, ring } from "./ring.js";
@@ -94,7 +94,7 @@ export async function onPlayerCall({ fromItemUuid, to, callId, userId }) {
     window: { title: emptyRooms ? t("Gm.EmptyLandlineCall") : t("Gm.AgentCalling"), icon: emptyRooms ? "fas fa-phone" : "fas fa-mobile-screen" },
     classes: ["spt-phone-ring-dialog"],
     position: { width: 520 },
-    content: `<div class="spt-phone-ring"><i class="fas fa-phone-volume"></i><p class="spt-caller">${esc(origin.name)}</p>${place ? `<p><strong>${esc(place)}</strong><br><em>${t("Gm.NobodyThere")}</em></p>` : ""}<p>${t("Gm.CalledBy", { who: `<strong>${esc(who)}</strong>` })}</p></div>`,
+    content: `<div class="spt-phone-ring"><i class="fas fa-phone-volume"></i><p class="spt-caller">${esc(gmName(fromPhone, key))}${isUnknownNumber(fromPhone, key) ? ` <small>(${t("Directory.Unknown")})</small>` : ""}</p>${place ? `<p><strong>${esc(place)}</strong><br><em>${t("Gm.NobodyThere")}</em></p>` : ""}<p>${t("Gm.CalledBy", { who: `<strong>${esc(who)}</strong>` })}</p></div>`,
     buttons: Object.entries(NPC_OUTCOMES).map(([action, o]) => ({ action, label: o.label, icon: o.icon, default: action === "answer", callback: () => action })),
     submit: (result) => {
       call.dialog = null;
