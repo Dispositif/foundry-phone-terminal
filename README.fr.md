@@ -35,7 +35,7 @@ Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateur
 - **Un terminal dans une pièce.** Quiconque s'y trouve lit son courrier. Joignez des pages de journal pour simuler des fichiers : archives, journaux système, rapports d'enquête.
 - **Un piratage, un téléphone volé.** Verrouillez un appareil, déverrouillez-le quand le jet réussit. Remettez-le à un autre personnage avec tout son historique.
 - **Un scénario prêt à jouer.** Les liens `@SMS` et `@Call` dans un journal envoient un message ou font sonner un téléphone d'un clic.
-- **Un dossier à distance.** Un terminal dans la barre latérale Objets, donné à un ou plusieurs joueurs : ils consultent son courrier de n'importe où, comme une base de données sécurisée du FBI. Joignez des pages de journal en guise de fichiers.
+- **Un dossier à distance.** Un terminal dans la barre latérale Objets, avec le droit de lecture « Observateur » à plusieurs joueurs : ils consultent son courrier de n'importe où, comme une base de données sécurisée du FBI. Joignez des pages de journal en guise de fichiers.
 - **Un indice préparé.** Écrivez à l'avance l'historique d'un appareil : messages, photos, appels manqués.
 - **Montrer plutôt que raconter.** Un joueur montre son écran aux agents dans la même pièce, ou transfère la photo.
 
@@ -72,7 +72,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 ### Un appareil, c'est un objet
 
 - Un **appareil porté** est un objet de l'inventaire d'un personnage. Un **appareil installé** (fixe, terminal) est rattaché à une scène Foundry.
-- N'importe quel objet peut devenir un appareil : on le crée depuis le panneau MJ (« Nouvel appareil ») ou on transforme un objet existant.
+- On crée un appareil depuis le panneau MJ (« Nouvel appareil »).
 - Chaque appareil a un **modèle**, un **nom** (« perso », « jetable », « bureau »… ; par défaut le nom du modèle ; c'est aussi le nom de l'objet) et un **numéro** (ou une adresse mail pour les ordinateurs).
 - Un personnage peut avoir plusieurs appareils.
 - Un clic sur un objet-appareil ouvre l'appareil lui-même. Le MJ retrouve la fiche d'objet du système depuis la vue de l'appareil.
@@ -89,7 +89,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 | **Téléphone fixe** | installé dans une scène | oui | non | non | non |
 
 - **Mails** : la première ligne fait office d'objet. Les mails fonctionnent même si les SMS sont désactivés dans les réglages.
-- **Appareils installés** (fixe, terminal) : rattachés à une scène, ils ne dépendent pas du réseau mobile. Seule leur propre bascule « pas de réseau » les coupe.
+- **Appareils installés** (fixe, terminal) : rattachés à une scène, ils ne dépendent pas du réseau mobile et ont toujours la ligne.
 
 ### Habillages
 
@@ -195,12 +195,12 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 ### Le panneau MJ : Réseau (Ctrl+Shift+P)
 
 - Barre du haut : état du réseau, messages en attente, et bascule **Couper le réseau** mobile.
-- Onglet **Envoyer** : destinataire (avec l'icône du modèle), expéditeur affiché, puis **Message** ou **Appel**. Seul ce que le destinataire sait faire est proposé (pas de message vers une ligne fixe, pas d'appel vers un terminal). **Envoyer** ou **Faire sonner**, pièce jointe, et **Copier en lien** pour un journal.
+- Onglet **Envoyer** : destinataire (avec l'icône du modèle), expéditeur affiché (texte libre, numéro masqué si vide, avec suggestions : contacts du destinataire, expéditeurs récents, numéros des autres appareils), puis **Message** ou **Appel**. Seul ce que le destinataire sait faire est proposé (pas de message vers une ligne fixe, pas d'appel vers un terminal). **Envoyer** ou **Faire sonner**, pièce jointe, et **Copier en lien** pour un journal.
 - Onglet **Messages** : un fil par agent et par PNJ, en bulles. Réponse directement sous le fil (Entrée envoie), ou rappel de l'agent.
 - Onglet **Appareils**, groupés par porteur (portrait du personnage) ou par lieu (vignette de la scène). Un clic sur un appareil le choisit comme destinataire. Pour chacun :
   - icône du modèle, mode, nombre de messages non lus par le joueur ;
   - signalements : numéro partagé, verrouillé, pas de réseau ;
-  - actions au survol : ouvrir et préparer l'historique, contacts, verrouiller, pas de réseau, donner à…, modifier, retirer (supprime l'objet, ou le garde comme objet ordinaire).
+  - actions au survol : ouvrir et préparer l'historique, contacts, verrouiller, pas de réseau et donner à… (appareils portés), modifier, retirer (supprime l'objet, ou le garde comme objet ordinaire).
 
 ### Préparer un appareil
 

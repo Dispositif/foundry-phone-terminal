@@ -250,7 +250,9 @@ export class PlayerPhone extends ApplicationV2 {
     const gmOffline = !this.gm && !game.users.activeGM;
     const signal = gmOffline
       ? `<span class="spt-signal off" title="${t("Net.GmAbsent")}">📵 <small>[${t("Net.GmAway")}]</small></span>`
-      : hasSignal(p.phone)
+      : isFixed(p.phone)
+        ? "" // Installed devices always have a line: no signal icon.
+        : hasSignal(p.phone)
         ? `<i class="fas fa-signal spt-signal" title="${t("Net.Signal")}"></i>`
         : `<span class="spt-signal off" title="${t("Net.NoSignalShort")}">📵</span>`;
     const contactsBtn = this._canEditContacts(p)

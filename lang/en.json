@@ -51,7 +51,6 @@
       "AlreadyCalling": "A call is already in progress.",
       "SceneNotFound": "Scene \"{name}\" not found.",
       "ActorNotFound": "Character \"{name}\" not found.",
-      "NoItems": "No item available.",
       "ChooseRecipient": "Choose a recipient first.",
       "RecipientNotFound": "Recipient \"{to}\" not found (number, character or player).",
       "DropHint": "Drop an image or a journal page.",
@@ -98,6 +97,8 @@
       "MarkAllSeen": "Mark all as read",
       "Recipient": "Recipient",
       "PlayersDirect": "Players (direct)",
+      "InContacts": "In contacts",
+      "Recent": "Recent",
       "Sender": "Displayed sender",
       "SmsMail": "Text / email",
       "Mail": "Email",
@@ -107,7 +108,6 @@
       "CopyLink": "Copy as a link, to paste into a journal",
       "RingingAt": "Ringing at: {who}",
       "NoDevices": "No device yet.",
-      "MarkItem": "Mark an item",
       "CorrespondentPlaceholder": "Contact: name or number",
       "TabSend": "Send",
       "ReplyAs": "Reply as {name}…",
@@ -223,12 +223,6 @@
       "Give": "Give",
       "NowHeld": "\"{label}\" is now held by {name}.",
       "NowWorld": "\"{label}\" is now among the world items."
-    },
-    "WorldItems": "World items",
-    "Mark": {
-      "Title": "Turn an item into a device",
-      "Item": "Item",
-      "Done": "\"{name}\" is now a device ({number})."
     },
     "EditDevice": "Edit device",
     "Contacts": {

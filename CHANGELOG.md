@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.26.0
+- GM panel: installed devices (landline, terminal) no longer have a "no signal" toggle, and players no longer see a signal icon on them; they always have a line.
+- GM panel, Send tab: the displayed sender suggests a hidden number, the recipient's contacts, recent senders and other devices' numbers. Still free text; empty means hidden number.
+- GM panel: the "Mark an item" button is gone. Create devices with **New device**.
+
 ## 0.25.0
 - Players edit the address book of a personal device they hold, and name an unknown correspondent from the conversation ("Add to contacts"). Landlines, terminals and shared devices stay GM-only.
 - Floating button: a room button only shows for an installed device on the agent's current scene. A shared terminal used from afar opens with Ctrl+Shift+P or from the Items sidebar.

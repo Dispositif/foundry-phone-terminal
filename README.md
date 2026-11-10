@@ -35,7 +35,7 @@ A Foundry VTT module that gives your characters phones, laptops and room termina
 - **A terminal in a room.** Anyone standing there reads its mail. Attach journal pages to simulate files: archives, logs, case reports.
 - **A hack, a stolen phone.** Lock a device, unlock it when the roll succeeds. Hand it to another character with its whole history.
 - **A ready-to-play scenario.** `@SMS` and `@Call` links in a journal send a message or ring a phone in one click.
-- **A remote case file.** A terminal in the Items sidebar, given to one or more players: they reach its mail from anywhere, like a secure FBI database. Attach journal pages as files.
+- **A remote case file.** A terminal in the Items sidebar, with "Observer" permission for several players: they reach its mail from anywhere, like a secure FBI database. Attach journal pages as files.
 - **A prepared clue.** Write a device's history in advance: messages, photos, missed calls.
 - **Show, don't tell.** A player shows their screen to the agents in the same room, or forwards the photo.
 
@@ -72,7 +72,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 ### A device is an item
 
 - A **carried device** is an item in a character's inventory. An **installed device** (landline, terminal) is tied to a Foundry scene.
-- Any item can become a device: create one from the GM panel (**New device**) or turn an existing item into one (**Mark an item**).
+- Create a device from the GM panel (**New device**).
 - Each device has a **model**, a **name** ("personal", "burner", "office"…; defaults to the model name; it is also the item's name) and a **number** (or an email address for computers).
 - A character can carry several devices.
 - Clicking a device item opens the device itself. The GM reaches the system's item sheet from the device view.
@@ -89,7 +89,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 | **Landline** | installed in a scene | yes | no | no | no |
 
 - **Emails:** the first line acts as the subject. Emails work even when text messages are disabled.
-- **Installed devices** (landline, terminal) are bound to a scene and don't depend on the mobile network. Only their own "no signal" toggle cuts them off.
+- **Installed devices** (landline, terminal) are bound to a scene and don't depend on the mobile network: they always have a line.
 
 ### Looks
 
@@ -195,12 +195,12 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 ### The GM panel: Network (Ctrl+Shift+P)
 
 - Top bar: network status, pending messages, and a **Cut network** toggle for the whole mobile network.
-- **Send** tab: recipient (with the model's icon), displayed sender, then **Message** or **Call**. Only what the recipient can do is offered (no message to a landline, no call to a terminal). **Send** or **Ring**, attachment, and **Copy as a link** to paste into a journal.
+- **Send** tab: recipient (with the model's icon), displayed sender (free text, hidden number when empty, with suggestions: the recipient's contacts, recent senders, other devices' numbers), then **Message** or **Call**. Only what the recipient can do is offered (no message to a landline, no call to a terminal). **Send** or **Ring**, attachment, and **Copy as a link** to paste into a journal.
 - **Messages** tab: one thread per agent and NPC, as chat bubbles. Reply right under the thread (Enter sends), or call the agent back.
 - **Devices** tab, grouped by holder (character portrait) or place (scene thumbnail). Click a device to make it the recipient. For each one:
   - model icon, mode, number of messages the player hasn't read;
   - flags: shared number, locked, no signal;
-  - actions on hover: open and prepare history, contacts, lock, no signal, give to…, edit, remove (deletes the item, or keeps it as an ordinary item).
+  - actions on hover: open and prepare history, contacts, lock, no signal and give to… (carried devices), edit, remove (deletes the item, or keeps it as an ordinary item).
 
 ### Preparing a device
 

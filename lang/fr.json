@@ -51,7 +51,6 @@
       "AlreadyCalling": "Un appel est déjà en cours.",
       "SceneNotFound": "Scène « {name} » introuvable.",
       "ActorNotFound": "Personnage « {name} » introuvable.",
-      "NoItems": "Aucun objet disponible.",
       "ChooseRecipient": "Choisissez d'abord un destinataire.",
       "RecipientNotFound": "Destinataire « {to} » introuvable (numéro, personnage ou joueur).",
       "DropHint": "Déposez une image ou une page de journal.",
@@ -98,6 +97,8 @@
       "MarkAllSeen": "Tout marquer comme lu",
       "Recipient": "Destinataire",
       "PlayersDirect": "Joueurs (direct)",
+      "InContacts": "Dans ses contacts",
+      "Recent": "Récent",
       "Sender": "Expéditeur affiché",
       "SmsMail": "SMS / mail",
       "Mail": "Mail",
@@ -107,7 +108,6 @@
       "CopyLink": "Copier en lien, à coller dans un journal",
       "RingingAt": "Sonne chez : {who}",
       "NoDevices": "Aucun appareil pour l'instant.",
-      "MarkItem": "Marquer un objet",
       "CorrespondentPlaceholder": "Correspondant : nom ou numéro",
       "TabSend": "Envoyer",
       "ReplyAs": "Répondre en tant que {name}…",
@@ -223,12 +223,6 @@
       "Give": "Donner",
       "NowHeld": "« {label} » est maintenant porté par {name}.",
       "NowWorld": "« {label} » est maintenant dans les objets du monde."
-    },
-    "WorldItems": "Objets du monde",
-    "Mark": {
-      "Title": "Marquer un objet comme appareil",
-      "Item": "Objet",
-      "Done": "« {name} » est maintenant un appareil ({number})."
     },
     "EditDevice": "Modifier l'appareil",
     "Contacts": {

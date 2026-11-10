@@ -33,7 +33,8 @@
       </div>
       <div class="form-group">
         <label>{{spt "Gm.Sender"}}</label>
-        <input type="text" name="sender" value="{{sender}}" placeholder="{{spt "Masked"}}">
+        <input type="text" name="sender" value="{{sender}}" placeholder="{{spt "Masked"}}" list="spt-senders" autocomplete="off">
+        <datalist id="spt-senders">{{#each senderOptions}}<option value="{{value}}" label="{{label}}"></option>{{/each}}</datalist>
       </div>
 
       {{#if messaging}}
@@ -111,7 +112,7 @@
             <span class="spt-dev-actions" aria-label="{{spt "Gm.Actions"}}">
               <a data-action="openPhone" data-uuid="{{uuid}}" title="{{spt "Gm.OpenPrepare"}}" aria-label="{{spt "Gm.OpenPrepare"}}"><i class="fas fa-pen-to-square"></i></a>
               <a data-action="toggleLock" data-uuid="{{uuid}}" class="{{#if locked}}spt-locked{{/if}}" title="{{#if locked}}{{spt "Gm.Locked"}}{{else}}{{spt "Gm.Unlocked"}}{{/if}}" aria-label="{{#if locked}}{{spt "Gm.Locked"}}{{else}}{{spt "Gm.Unlocked"}}{{/if}}"><i class="fas {{#if locked}}fa-lock{{else}}fa-lock-open{{/if}}"></i></a>
-              <a data-action="toggleSignal" data-uuid="{{uuid}}" class="{{#if noSignal}}spt-nosignal{{/if}}" title="{{#if noSignal}}{{spt "Gm.NoSignal"}}{{else}}{{spt "Gm.SignalOk"}}{{/if}}" aria-label="{{#if noSignal}}{{spt "Gm.NoSignal"}}{{else}}{{spt "Gm.SignalOk"}}{{/if}}"><i class="fas fa-signal"></i></a>
+              {{#unless fixed}}<a data-action="toggleSignal" data-uuid="{{uuid}}" class="{{#if noSignal}}spt-nosignal{{/if}}" title="{{#if noSignal}}{{spt "Gm.NoSignal"}}{{else}}{{spt "Gm.SignalOk"}}{{/if}}" aria-label="{{#if noSignal}}{{spt "Gm.NoSignal"}}{{else}}{{spt "Gm.SignalOk"}}{{/if}}"><i class="fas fa-signal"></i></a>{{/unless}}
               <a data-action="contacts" data-uuid="{{uuid}}" title="{{spt "Contacts.Title"}}" aria-label="{{spt "Contacts.Title"}}"><i class="fas fa-address-book"></i></a>
               {{#unless fixed}}<a data-action="give" data-uuid="{{uuid}}" title="{{spt "Gm.GiveTo"}}" aria-label="{{spt "Gm.GiveTo"}}"><i class="fas fa-hand-holding"></i></a>{{/unless}}
               <a data-action="editPhone" data-uuid="{{uuid}}" title="{{spt "Gm.Edit"}}" aria-label="{{spt "Gm.Edit"}}"><i class="fas fa-gear"></i></a>
@@ -131,7 +132,6 @@
   {{#if (eq tab "devices")}}
   <footer class="spt-phone-row spt-gm-foot">
     <button type="button" data-action="newPhone"><i class="fas fa-plus"></i> {{spt "NewDevice"}}</button>
-    <button type="button" data-action="markItem"><i class="fas fa-tag"></i> {{spt "Gm.MarkItem"}}</button>
   </footer>
   {{/if}}
 </div>

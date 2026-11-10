@@ -1,7 +1,7 @@
 import { attChipHtml, attFromDrop, pickImage } from "./attachments.js";
 import { ApplicationV2, DialogV2, HandlebarsApplicationMixin, MASKED, MODES, MODULE_ID } from "./constants.js";
-import { allPhones, anyMessaging, sharedUsers, displayName, getLog, getPhoneData, holderName, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount } from "./devices.js";
-import { contactsDialog, editPhoneDialog, giveDialog, markItemDialog, newPhoneDialog } from "./dialogs.js";
+import { allPhones, anyMessaging, holders, sharedUsers, displayName, getLog, getPhoneData, holderName, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount } from "./devices.js";
+import { contactsDialog, editPhoneDialog, giveDialog, newPhoneDialog } from "./dialogs.js";
 import { copyJournalLink } from "./journal-links.js";
 import { openPhone } from "./main.js";
 import { sendSms } from "./messages.js";
@@ -93,7 +93,6 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       hangup: function () { hangUpAll(); },
       sms: function () { this._doSms(); },
       newPhone: function () { newPhoneDialog(); },
-      markItem: function () { markItemDialog(); },
       editPhone: async function (event, target) { editPhoneDialog(await fromUuid(target.dataset.uuid)); },
       contacts: async function (event, target) { contactsDialog(await fromUuid(target.dataset.uuid)); },
       give: async function (event, target) { giveDialog(await fromUuid(target.dataset.uuid)); },
@@ -165,7 +164,9 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     body: { template: `modules/${MODULE_ID}/templates/gm-panel.hbs`, scrollable: [".spt-tab-body"] }
   };
 
-  _state = { target: null, sender: t("Masked"), text: "", att: null, tab: "send", mode: "message", drafts: {} };
+  static recentSenders = [];
+
+  _state = { target: null, sender: "", text: "", att: null, tab: "send", mode: "message", drafts: {} };
 
   /** Changes the state (tab, mode, recipient…) while keeping the current input. */
   _setState(patch) {
@@ -275,7 +276,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
         modeLabel: mode.label,
         fixed,
         locked: !!p.phone.locked,
-        noSignal: !!p.phone.noSignal,
+        noSignal: !fixed && !!p.phone.noSignal,
         cloned: countByNumber.get(norm(p.phone.number)) > 1,
         unread,
         unreadTitle: unread ? tn("Gm.UnreadByPlayer", unread) : ""
@@ -301,6 +302,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       targetDevices,
       targetPlayers,
       sender: this._state.sender,
+      senderOptions: this._senderOptions(phones, kind, id),
       text: this._state.text,
       attChip: attChipHtml(this._state.att),
       inbox,
@@ -354,7 +356,35 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
   _doRing() {
     this._readForm();
     if (!this._state.target) return ui.notifications.warn(t("Warn.NoRecipient"));
+    this._rememberSender();
     ring(this._state.target, { caller: this._normSender() });
+  }
+
+  /**
+   * Sender suggestions: hidden number, the recipient's contacts, recent senders, other devices.
+   * The field stays free text; a contact name is turned into its number on the recipient's side.
+   */
+  _senderOptions(phones, kind, id) {
+    const recipient = kind === "phone"
+      ? phones.filter((p) => norm(p.phone.number) === norm(id))
+      : phones.filter((p) => !isFixed(p.phone) && holders(p).some((u) => u.id === id));
+    const opts = new Map();
+    const add = (value, label = "") => {
+      if (value && !opts.has(norm(value))) opts.set(norm(value), { value, label });
+    };
+    add(t("Masked"));
+    for (const p of recipient) for (const c of p.phone.contacts ?? []) add(c.name, c.number ? `${c.number} · ${t("Gm.InContacts")}` : t("Gm.InContacts"));
+    for (const s of PhonePanel.recentSenders) add(s, t("Gm.Recent"));
+    const mine = new Set(recipient.map((p) => p.item.uuid));
+    for (const p of phones) if (!mine.has(p.item.uuid)) add(p.phone.number, phoneLabel(p));
+    return [...opts.values()];
+  }
+
+  /** Remembers the last senders used (this session only). */
+  _rememberSender() {
+    const s = this._state.sender.trim();
+    if (!s || isMasked(s)) return;
+    PhonePanel.recentSenders = [s, ...PhonePanel.recentSenders.filter((x) => norm(x) !== norm(s))].slice(0, 5);
   }
 
   /** Typed sender; "Hidden number" (in any language) is stored in its internal form. */
@@ -366,6 +396,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
   async _doSms() {
     this._readForm();
     if (!this._state.target) return ui.notifications.warn(t("Warn.NoRecipient"));
+    this._rememberSender();
     await sendSms(this._state.target, this._state.text, { sender: this._normSender(), att: this._state.att });
     this._state.text = "";
     this._state.att = null;

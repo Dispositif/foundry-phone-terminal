@@ -177,31 +177,6 @@ export async function giveDialog(item) {
   ui.notifications.info(`📱 ${actor ? t("Give.NowHeld", { label: phone.label, name: actor.name }) : t("Give.NowWorld", { label: phone.label })}`);
 }
 
-export async function markItemDialog() {
-  const worldItems = game.items.filter((i) => !getPhoneData(i));
-  const worldGroup = worldItems.length
-    ? `<optgroup label="${t("WorldItems")}">${worldItems.map((i) => `<option value="${i.uuid}">${esc(i.name)}</option>`).join("")}</optgroup>`
-    : "";
-  const groups = worldGroup + playerActors()
-    .map((a) => {
-      const items = a.items.filter((i) => !getPhoneData(i));
-      if (!items.length) return "";
-      return `<optgroup label="${esc(a.name)}">${items.map((i) => `<option value="${i.uuid}">${esc(i.name)}</option>`).join("")}</optgroup>`;
-    })
-    .join("");
-  if (!groups) return ui.notifications.warn(t("Warn.NoItems"));
-  const res = await phoneFormDialog({
-    title: t("Mark.Title"),
-    selectHtml: `<div class="form-group"><label>${t("Mark.Item")}</label><select name="target">${groups}</select></div>`
-  });
-  if (!res) return;
-  const item = await fromUuid(res.target);
-  // Name left at the model label: the device takes the item's name (they share one name).
-  if (res.label === MODELS[res.model]?.label) res.label = item.name;
-  await markPhone(item, res);
-  ui.notifications.info(`📱 ${t("Mark.Done", { name: item.name, number: res.number })}`);
-}
-
 export async function editPhoneDialog(item) {
   const phone = getPhoneData(item);
   const res = await phoneFormDialog({

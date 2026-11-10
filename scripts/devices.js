@@ -126,8 +126,8 @@ export function smsOn() {
 
 /** Does the device have signal? (network cut, or no signal for this device) */
 export function hasSignal(phone) {
-  // An installed device does not depend on the mobile network: only its own cut line stops it.
-  if (isFixed(phone)) return !phone.noSignal;
+  // An installed device does not depend on the mobile network: it always has a line.
+  if (isFixed(phone)) return true;
   return !game.settings.get(MODULE_ID, "networkDown") && !phone?.noSignal;
 }
 
