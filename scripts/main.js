@@ -1,33 +1,34 @@
 /**
  * Phone & Terminal (soren-phone-terminal)
- * Outil narratif : le MJ est le réseau.
- * - Téléphones = objets marqués par le module (numéro, nom, mode, contacts, historique).
- * - Le MJ appelle / écrit à un téléphone ; les joueurs répondent, écrivent et appellent.
- * - Conversations par correspondant ; le carnet se construit en jouant (+ contacts donnés par le MJ).
- * - Messages vers un autre PJ : livrés directement (copie MJ). Vers un PNJ : arrivent chez le MJ.
- * Cible : Foundry VTT v13-v14 (ApplicationV2 / DialogV2 uniquement).
+ * Storytelling tool: the GM is the network.
+ * - Devices = items flagged by the module (number, name, mode, contacts, history).
+ * - The GM calls / texts a device; players reply, write and call.
+ * - Conversations per correspondent; the address book builds up in play (+ contacts given by the GM).
+ * - Messages to another PC: delivered directly (copy to GM). To an NPC: land with the GM.
+ * Target: Foundry VTT v13-v14 (ApplicationV2 / DialogV2 only).
  */
 
 import { LEGACY_IDS, MODULE_ID, SOCKET } from "./constants.js";
-import { allPhones, createPhone, getPhoneData, markPhone } from "./devices.js";
+import { ensureDeviceItems, registerPhoneSheet } from "./item-sheet.js";
+import { allPhones, createPhone, getLog, getPhoneData, isFixed, markPhone, phoneUsers, randomAddress } from "./devices.js";
 import { transferPhone } from "./dialogs.js";
 import { updateFab } from "./fab.js";
 import { PhonePanel } from "./gm-panel.js";
 import { registerEnrichers, runJournalLink } from "./journal-links.js";
-import { flushAll, flushPending, sendSms } from "./messages.js";
+import { flushAll, flushPending, grantAttachments, sendSms } from "./messages.js";
 import { PlayerPhone } from "./player-phone.js";
 import { hangUp, ring } from "./ring.js";
 import { onSocket } from "./socket.js";
 import { createDemo, removeDemo } from "./demo.js";
-import { isActiveGM, rerenderAll } from "./util.js";
+import { isActiveGM, norm, rerenderAll } from "./util.js";
 import { loadLanguages, t, tn } from "./i18n.js";
 
-// Les deux langues sont chargées dès le démarrage (réglage « Langue du module »).
+// Both languages are loaded at startup ("Module language" setting).
 loadLanguages();
 
 
 /* -------------------------------------------- */
-/*  Ouverture                                   */
+/*  Opening                                     */
 /* -------------------------------------------- */
 
 export function openPanel() {
@@ -49,15 +50,16 @@ export function openPhone(phoneUuid = null) {
 }
 
 /* -------------------------------------------- */
-/*  Initialisation                              */
+/*  Initialization                              */
 /* -------------------------------------------- */
 
 Hooks.once("init", () => {
   registerEnrichers();
-  // Templates : {{spt "Clé" var=valeur}} et {{sptn "Clé" n}} utilisent les textes du module (langue du module).
+  registerPhoneSheet();
+  // Templates: {{spt "Key" var=value}} and {{sptn "Key" n}} use the module's texts (module language).
   Handlebars.registerHelper("spt", (key, options) => t(key, options?.hash ?? {}));
   Handlebars.registerHelper("sptn", (key, n) => tn(key, n));
-  // Les libellés des réglages suivent la langue de Foundry (traduits par Foundry depuis lang/*.json).
+  // Setting labels follow Foundry's language (translated by Foundry from lang/*.json).
   game.settings.register(MODULE_ID, "language", {
     name: "SPT.Settings.language.name",
     hint: "SPT.Settings.language.hint",
@@ -125,7 +127,7 @@ Hooks.once("init", () => {
   });
 });
 
-// Bouton dans la barre d'outils « Jetons » (structure objet des contrôles, v13+).
+// Button in the "Tokens" toolbar (object structure of controls, v13+).
 Hooks.on("getSceneControlButtons", (controls) => {
   const tokens = controls.tokens ?? controls.token;
   if (!tokens?.tools) return;
@@ -140,7 +142,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
   };
 });
 
-/** Reprend les données des anciennes versions (appareils et réglages du monde). */
+/** Migrates data from former versions (devices and world settings). */
 export async function migrateLegacy() {
   if (!isActiveGM()) return;
   const items = [...game.items, ...game.actors.contents.flatMap((a) => a.items.contents)];
@@ -152,7 +154,7 @@ export async function migrateLegacy() {
     await item.update({ [`flags.${MODULE_ID}.phone`]: item._source.flags[oldId].phone, [`flags.-=${oldId}`]: null });
     n++;
   }
-  // Réglages du monde : repris une seule fois, si le nouveau module n'en a pas encore.
+  // World settings: migrated once, if the new module has none yet.
   try {
     const world = game.settings.storage.get("world");
     for (const key of ["smsEnabled", "floatingButton", "ringTimeout", "networkDown"]) {
@@ -186,23 +188,50 @@ Hooks.once("ready", async () => {
     ev.stopPropagation();
     runJournalLink(link.dataset);
   });
-  migrateLegacy();
+  await migrateLegacy();
+  if (game.user === game.users.activeGM) ensureDeviceItems();
   updateFab();
   game.modules.get(MODULE_ID).api = { openPanel, openPhone, ring, hangUp, sendSms, allPhones, createPhone, markPhone, transferPhone, demo: createDemo, removeDemo };
 });
 
 Hooks.on("userConnected", rerenderAll);
-// Présence sur une scène : qui voit les appareils fixes (terminal).
+// Renaming the item also renames the device, if it still had the item's old name.
+Hooks.on("preUpdateItem", (item, changes) => {
+  const phone = getPhoneData(item);
+  if (!phone || typeof changes.name !== "string" || phone.label !== item.name) return;
+  foundry.utils.setProperty(changes, `flags.${MODULE_ID}.phone.label`, changes.name);
+});
+// Presence on a scene: who sees installed devices (terminal).
 for (const hook of ["createToken", "deleteToken", "canvasReady"]) Hooks.on(hook, () => rerenderAll());
 Hooks.on("updateUser", (user, changes) => {
   if (user.isSelf && "character" in changes) updateFab();
   if ("viewedScene" in changes) rerenderAll();
 });
+/**
+ * A carried device exists only once. Dragged onto another character (Foundry copies it),
+ * it changes hands with its history: the old copy is removed. Duplicated in place,
+ * the copy becomes a new device with its own number. Installed devices are not affected.
+ */
+Hooks.on("createItem", async (item, options) => {
+  if (options?.spt || !isActiveGM()) return;
+  const phone = getPhoneData(item);
+  if (!phone || isFixed(phone)) return;
+  const twins = allPhones().filter((p) => p.item !== item && !isFixed(p.phone) && norm(p.phone.number) === norm(phone.number));
+  if (!twins.length) return;
+  if (twins.some((p) => p.item.parent === item.parent)) {
+    await item.update({ [`flags.${MODULE_ID}.phone`]: { ...phone, number: randomAddress(phone.model), log: [], contacts: [] } });
+    return;
+  }
+  for (const p of twins) await p.item.delete();
+  const atts = getLog(phone, { includePending: true }).map((e) => e.att).filter(Boolean);
+  if (item.parent instanceof Actor && atts.length) await grantAttachments(atts, phoneUsers(item.parent));
+});
+
 for (const hook of ["createItem", "updateItem", "deleteItem"]) {
   Hooks.on(hook, (item, changes) => {
     const touched = hook === "updateItem" ? changes?.flags?.[MODULE_ID] !== undefined : !!getPhoneData(item);
     if (touched) rerenderAll();
-    // Réseau rétabli pour ce téléphone : on livre ce qui attendait.
+    // Signal back for this device: deliver what was waiting.
     if (hook === "updateItem" && changes?.flags?.[MODULE_ID]?.phone?.noSignal === false && isActiveGM()) flushPending(item);
   });
 }

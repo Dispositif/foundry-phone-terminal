@@ -5,17 +5,17 @@ import { ring } from "./ring.js";
 import { esc, isMasked, maskedLabel, norm } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
-/*  Liens @SMS / @Call dans les journaux        */
+/*  @SMS / @Call links in journals              */
 /* -------------------------------------------- */
 
-/** Texte brut à partir du HTML capturé dans un journal. */
+/** Plain text from the HTML captured in a journal. */
 export function plainText(html) {
   const div = document.createElement("div");
   div.innerHTML = html ?? "";
   return div.textContent.trim();
 }
 
-/** Destinataire d'un lien : numéro, nom d'un personnage (son téléphone) ou nom d'un joueur. */
+/** Link recipient: number, character name (their phone) or player name. */
 export function resolveTarget(to) {
   to = to?.trim();
   if (!to) return null;
@@ -40,7 +40,7 @@ export function parseAtt(str) {
   return null;
 }
 
-/** Construit le lien à partir de l'état du panneau MJ et le copie. */
+/** Builds the link from the GM panel state and copies it. */
 export async function copyJournalLink({ target, sender, text, att }) {
   const [kind, value] = String(target ?? "").split(/:(.*)/s);
   let to = value;
@@ -74,7 +74,7 @@ export function registerEnrichers() {
       const [to = "", from = "", attStr = ""] = plainText(rawArgs).split("|").map((x) => x.trim());
       const text = plainText(rawText);
       if (!game.user.isGM) {
-        // Les joueurs ne voient jamais de bouton : seulement le texte du SMS.
+        // Players never see a button: only the message text.
         const span = document.createElement("span");
         span.textContent = kind === "SMS" ? text : "";
         return span;

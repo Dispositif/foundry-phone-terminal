@@ -4,7 +4,7 @@ import { t } from "./i18n.js";
 import { PhonePanel } from "./gm-panel.js";
 import { PlayerPhone } from "./player-phone.js";
 /* -------------------------------------------- */
-/*  Utilitaires                                 */
+/*  Utilities                                   */
 /* -------------------------------------------- */
 
 export function esc(str) {
@@ -17,30 +17,31 @@ export function nl2br(str) {
   return esc(str).replace(/\n/g, "<br>");
 }
 
-/** Normalise un nom ou un numéro pour comparaison ("555 0142" == "555-0142"). */
+/** Normalizes a name or number for comparison ("555 0142" == "555-0142"). */
 export function norm(str) {
-  const s = String(str ?? "").trim().toLowerCase();
-  return /^[\d\s\-+.()]+$/.test(s) ? s.replace(/\D/g, "") : s;
+  // Numbers: dashes (typographic ones too), spaces, dots, brackets and slashes are ignored.
+  const s = String(str ?? "").normalize("NFKC").trim().toLowerCase().replace(/[\u2010-\u2015\u2212]/g, "-");
+  return /^[\d\s\-+.()/]+$/.test(s) ? s.replace(/\D/g, "") : s;
 }
 
-/** Numéro masqué : la valeur stockée, ou son libellé dans l'une des langues. */
+/** Hidden number: the stored value, or its label in either language. */
 export function isMasked(key) {
   const k = norm(key);
   return k === norm(MASKED) || k === norm(t("Masked")) || k === "hidden number" || k === "numéro masqué";
 }
 
-/** Affichage d'un correspondant masqué dans la langue courante. */
+/** Display of a hidden correspondent in the current language. */
 export function maskedLabel(key) {
   return isMasked(key) ? t("Masked") : key;
 }
 
 export function playLocal(src, { loop = false } = {}) {
   const volume = game.settings.get(MODULE_ID, "volume");
-  // 2e argument false = son joué uniquement sur ce client, jamais diffusé.
+  // 2nd argument false = sound played on this client only, never broadcast.
   return AudioHelper.play({ src, volume, loop, autoplay: true }, false);
 }
 
-/** Le MJ qui traite les messages des joueurs (un seul, même avec plusieurs MJ). */
+/** The GM who handles player messages (only one, even with several GMs). */
 export function isActiveGM() {
   return game.user.isGM && game.users.activeGM?.id === game.user.id;
 }
@@ -57,7 +58,12 @@ export function randomNumber() {
   return `555-0${String(Math.floor(Math.random() * 1000)).padStart(3, "0")}`;
 }
 
-/** Redessine les fenêtres ouvertes : les demandes rapprochées (jetons, messages en rafale) n'en font qu'une. */
+/** Random email address for a laptop or a terminal: user33@mail.net */
+export function randomEmail() {
+  return `user${Math.floor(Math.random() * 90) + 10}@mail.net`;
+}
+
+/** Redraws open windows: close requests (tokens, bursts of messages) are merged into one. */
 let rerenderTimer = null;
 export function rerenderAll() {
   if (rerenderTimer) return;

@@ -4,17 +4,17 @@ import { allPhones, holders, isFixed, modelOf, unreadCount } from "./devices.js"
 import { openPhone } from "./main.js";
 import { activeCall } from "./player-calls.js";
 /* -------------------------------------------- */
-/*  Bouton flottant (joueurs)                   */
+/*  Floating button (players)                   */
 /* -------------------------------------------- */
 
-/** Appareils du joueur courant (même règle que pour la sonnerie). */
+/** Current player's devices (same rule as for ringing). */
 export function myPhones() {
   return allPhones().filter((p) => holders(p).some((u) => u.id === game.user.id));
 }
 
 export const FAB_POS_KEY = `${MODULE_ID}.fabPos`;
 
-/** Dernier appareil choisi par ce joueur (retrouvé à la prochaine ouverture). */
+/** Last device chosen by this player (restored on next opening). */
 export function lastDeviceKey() {
   return `${MODULE_ID}.lastDevice.${game.world?.id}.${game.user?.id}`;
 }
@@ -45,8 +45,8 @@ export function setFabBadge(btn, n) {
 }
 
 /**
- * Bouton flottant : le téléphone de l'agent, et sous lui un petit bouton par appareil
- * installé dans la pièce où il se trouve (fixe, terminal), visible tant qu'il y est.
+ * Floating button: the agent's phone, and below it a small button per device
+ * installed in the room where the agent stands (landline, terminal), shown while they are there.
  */
 export function updateFab() {
   if (!game.ready) return;
@@ -60,7 +60,7 @@ export function updateFab() {
   const ringingUuid = activeCall?.itemUuid ?? null;
   const ringsHere = (p) => !!activeCall && p.item.uuid === ringingUuid;
 
-  // Bouton principal : appareils personnels.
+  // Main button: personal devices.
   let main = fab.querySelector(".spt-fab-main");
   if (!main) fab.prepend((main = fabButton("spt-fab-main")));
   main.hidden = !personal.length;
@@ -71,7 +71,7 @@ export function updateFab() {
   main.classList.toggle("ringing", !!activeCall && !rooms.some(ringsHere));
   main.title = n ? tn("Unread", n) : t("MyPhone");
 
-  // Boutons de lieu.
+  // Room buttons.
   const keep = new Set(rooms.map((p) => p.item.uuid));
   for (const b of fab.querySelectorAll(".spt-fab-room")) if (!keep.has(b.dataset.uuid)) b.remove();
   for (const p of rooms) {
@@ -96,7 +96,7 @@ export function createFab() {
     const pos = JSON.parse(localStorage.getItem(FAB_POS_KEY) ?? "null");
     if (pos) Object.assign(fab.style, { left: `${pos.left}px`, top: `${pos.top}px`, bottom: "auto" });
   } catch {}
-  // Clic = ouvrir l'appareil du bouton ; glisser = déplacer l'ensemble (position mémorisée).
+  // Click = open the button's device; drag = move the group (position remembered).
   let drag = null;
   fab.addEventListener("pointerdown", (ev) => {
     const r = fab.getBoundingClientRect();
@@ -120,7 +120,7 @@ export function createFab() {
     } else if (drag.btn) {
       let uuid = drag.btn.dataset.uuid;
       if (!uuid) {
-        // Téléphone principal : le dernier appareil personnel choisi.
+        // Main phone: the last personal device chosen.
         const personal = myPhones().filter((p) => !isFixed(p.phone));
         uuid = (personal.find((p) => p.item.uuid === loadLastDevice()) ?? personal[0])?.item.uuid;
       }

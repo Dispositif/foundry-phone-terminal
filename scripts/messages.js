@@ -14,7 +14,7 @@ export function smsHtml(sender, text, phoneName, att = null, mail = false, icon 
 }
 
 
-/** Copie d'un message reçu dans le chat, en privé pour ceux qui ont l'appareil en main (texte masqué s'il est verrouillé). */
+/** Copy of a received message in the chat, whispered to those holding the device (text hidden if locked). */
 export function whisperMessage(phone, users, shown, text, att = null) {
   return ChatMessage.create({
     content: phone.locked
@@ -26,7 +26,7 @@ export function whisperMessage(phone, users, shown, text, att = null) {
   });
 }
 
-/** Le MJ donne aux destinataires le droit de lire les pages/journaux joints. */
+/** The GM grants recipients permission to read attached pages/journals. */
 export async function grantAttachments(atts, users) {
   if (!game.user.isGM || !users.length) return;
   const { LIMITED, OBSERVER } = CONST.DOCUMENT_OWNERSHIP_LEVELS;
@@ -46,7 +46,7 @@ export async function grantAttachments(atts, users) {
   }
 }
 
-/** Remet un SMS à un téléphone de PJ : historique, chat privé, bip. */
+/** Delivers a message to a PC's device: history, whispered chat, beep. */
 export async function deliverToPhone(p, senderKeyOrName, text, att = null, { fwd = false } = {}) {
   const model = modelOf(p.phone);
   if (!msgOn(p.phone)) {
@@ -63,7 +63,7 @@ export async function deliverToPhone(p, senderKeyOrName, text, att = null, { fwd
   const extra = { ...(att ? { att } : {}), ...(fwd ? { fwd: true } : {}) };
   if (att) await grantAttachments([att], holders(p));
   if (!hasSignal(p.phone)) {
-    // En attente : livré au retour du réseau.
+    // Pending: delivered when signal returns.
     await addLog(p.item, { kind: "sms", dir: "in", with: key, text, read: false, pending: true, ...extra });
     ui.notifications.info(`📵 ${phoneLabel(p)} : ${t("Info.SmsPending")}`);
     return true;
@@ -78,9 +78,9 @@ export async function deliverToPhone(p, senderKeyOrName, text, att = null, { fwd
   return true;
 }
 
-/** Retour du réseau : livre les SMS en attente et signale les appels manqués. */
+/** Signal back: delivers pending messages and reports missed calls. */
 export function flushPending(item) {
-  // Dans la file : deux retours de réseau rapprochés ne livrent pas deux fois.
+  // In the queue: two close signal returns do not deliver twice.
   return withItemLock(item, () => flushPendingNow(item));
 }
 
@@ -94,7 +94,7 @@ export async function flushPendingNow(item) {
   const actor = item.parent instanceof Actor ? item.parent : null;
   const users = holders({ item, phone, actor });
   if (!users.length) return;
-  const sms = pending.filter((e) => e.kind === "sms").reverse(); // ordre chronologique
+  const sms = pending.filter((e) => e.kind === "sms").reverse(); // chronological order
   for (const e of sms) {
     const shown = displayName(phone, e.with);
     await whisperMessage(phone, users, shown, e.text, e.att);
@@ -109,7 +109,7 @@ export async function flushAll() {
   for (const p of allPhones()) await flushPending(p.item);
 }
 
-/** SMS envoyé par le MJ. target = "phone:<numéro>" ou "user:<id>" */
+/** Message sent by the GM. target = "phone:<number>" or "user:<id>" */
 export async function sendSms(target, text, { sender = MASKED, att = null } = {}) {
   if (!game.user.isGM) return ui.notifications.warn(t("Warn.GmOnlySms"));
   text = text?.trim() ?? "";

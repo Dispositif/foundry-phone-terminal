@@ -244,7 +244,9 @@
     },
     "Unmark": {
       "Title": "Retirer l'appareil",
-      "Confirm": "« {name} » ne sera plus un appareil (l'objet est conservé, l'historique est perdu)."
+      "Confirm": "« {name} » et son historique seront supprimés.",
+      "Delete": "Supprimer",
+      "Keep": "Garder l'objet"
     },
     "Image": "Image",
     "Devices": "Appareils",
@@ -347,6 +349,10 @@
       "AgentId": "Identifiant agent",
       "Ref": "Réf.",
       "Confidential": "Confidentiel"
+    },
+    "Sheet": {
+      "Label": "Appareil Phone & Terminal",
+      "ItemSheet": "Fiche de l'objet"
     }
   }
 }

@@ -74,6 +74,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 - Any item can become a device: create one from the GM panel (**New device**) or turn an existing item into one (**Mark an item**).
 - Each device has a **model**, a **name** ("personal", "burner", "office"…; defaults to the model name) and a **number** (or an email address for computers).
 - A character can carry several devices.
+- Clicking a device item opens the device itself. The GM reaches the system's item sheet from the device view.
 
 ### Models
 
@@ -109,7 +110,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 ### Changing hands
 
 - **Give to…** passes the device to another character, an NPC or nobody, with its number, contacts and history (a seized phone, a phone handed over by a contact…).
-- **Duplicating the item** gives a **cloned SIM**: both devices share the number and both ring. The GM panel flags it with an icon.
+- **Dragging the item** onto another character does the same: a carried device exists only once. Duplicating it where it is gives a new device with its own number.
 
 ---
 
@@ -194,7 +195,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 - **Messages** tab: one thread per agent and NPC, as chat bubbles. Reply right under the thread (Enter sends), or call the agent back.
 - **Devices** tab, grouped by holder (character portrait) or place (scene thumbnail). Click a device to make it the recipient. For each one:
   - model icon, mode, number of messages the player hasn't read;
-  - flags: cloned number, locked, no signal;
+  - flags: shared number, locked, no signal;
   - actions on hover: open and prepare history, contacts, lock, no signal, give to…, edit, remove.
 
 ### Preparing a device

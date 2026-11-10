@@ -6,10 +6,10 @@ import { finishOrigin, hangUp, pendingCalls, ring } from "./ring.js";
 import { esc, gmWhisper, playLocal, rerenderAll } from "./util.js";
 import { labels, t } from "./i18n.js";
 /* -------------------------------------------- */
-/*  MJ : traitement des actions des joueurs     */
+/*  GM: handling player actions                 */
 /* -------------------------------------------- */
 
-/** MJ : l'agent qui agit a-t-il bien cet appareil en main ? */
+/** GM: does the acting agent actually hold this device? */
 export function senderHolds(item, userId) {
   const phone = getPhoneData(item);
   if (!phone || !userId) return false;
@@ -33,12 +33,12 @@ export async function onPlayerSms({ fromItemUuid, to, text, att = null, fwd = fa
   const who = `${holderName(from, fromPhone)} (${fromPhone.label})`;
 
   if (targets.length) {
-    // Entre PJ : livré directement, copie au MJ.
+    // Between PCs: delivered directly, copy to the GM.
     await addLog(from, { kind: "sms", dir: "out", with: key, text, pj: true, ...extra });
     for (const p of targets) await deliverToPhone(p, fromPhone.number, text, att, { fwd });
     gmWhisper(`<p class="spt-gm-copy">📱 <strong>${esc(who)}</strong>${fwd ? ` ${t("Fwd.Verb")}` : ""} → ${esc(targets.map((p) => holderName(p.item, p.phone)).join(", "))}</p>${smsHtml(who, text, null, att)}`);
   } else {
-    // Vers un PNJ : arrive chez le MJ.
+    // To an NPC: lands with the GM.
     await addLog(from, { kind: "sms", dir: "out", with: key, text, seen: false, ...extra });
     const toName = displayName(fromPhone, key);
     gmWhisper(`<p class="spt-gm-copy">📱 <strong>${esc(who)}</strong>${fwd ? ` ${t("Fwd.Verb")}` : ""} → <strong>${esc(toName)}</strong></p>${smsHtml(who, text, null, att)}`);
@@ -74,7 +74,7 @@ export async function onPlayerCall({ fromItemUuid, to, callId, userId }) {
     return;
   }
 
-  // Vers un PNJ : le MJ choisit l'issue.
+  // To an NPC: the GM picks the outcome.
   const who = `${holderName(from, fromPhone)} (${fromPhone.label})`;
   const call = { done: false, sound: null, dialog: null, origin };
   gmIncoming.set(callId, call);

@@ -1,4 +1,5 @@
 import { attChipHtml, attHtml, openAttachment, pickImage } from "./attachments.js";
+import { openSystemSheet } from "./item-sheet.js";
 import { ApplicationV2, MODES, MODULE_ID, SOCKET } from "./constants.js";
 import { SKINS, addLog, allPhones, conversations, displayName, getLog, getPhoneData, hasSignal, holders, isComputer, isFixed, isLandline, keyFor, markRead, modelOf, msgOn, mutateLog, phoneLabel, sameConv, isUnread, skinOf, unreadCount } from "./devices.js";
 import { contactsDialog } from "./dialogs.js";
@@ -10,7 +11,7 @@ import { attShowHtml, findEntry, forwardEntry, showScreen } from "./share.js";
 import { esc, isMasked, nl2br } from "./util.js";
 import { t, tn } from "./i18n.js";
 /* -------------------------------------------- */
-/*  Fenêtre joueur : Mon téléphone              */
+/*  Player window: My phone                      */
 /* -------------------------------------------- */
 
 export class PlayerPhone extends ApplicationV2 {
@@ -45,6 +46,7 @@ export class PlayerPhone extends ApplicationV2 {
         this._rerender();
       },
       gmContacts: function () { const p = this._current(); if (p) contactsDialog(p.item); },
+      gmItemSheet: function () { const p = this._current(); if (p) openSystemSheet(p.item); },
       showEntry: async function (event, target) {
         const p = this._current();
         const e = p && findEntry(p.phone, target.dataset.id);
@@ -89,22 +91,22 @@ export class PlayerPhone extends ApplicationV2 {
     return p ? `${t("Device")} — ${phoneLabel(p)}` : t("Devices");
   }
 
-  /** Le MJ voit et prépare tous les téléphones (y compris ceux des PNJ et du monde). */
+  /** The GM sees and prepares every device (including NPC and world ones). */
   get gm() {
     return game.user.isGM;
   }
 
   _mine() {
     if (this.gm) return allPhones().sort((a, b) => phoneLabel(a).localeCompare(phoneLabel(b)));
-    // Mêmes règles que pour la sonnerie : le joueur assigné au personnage, à défaut ses propriétaires.
-    // (Évite qu'un joueur voie les appareils d'un autre PJ dont il serait aussi propriétaire.)
+    // Same rules as for ringing: the player assigned to the character, otherwise its owners.
+    // (Keeps a player from seeing another PC's devices they also own.)
     return myPhones();
   }
 
   _current() {
     const mine = this._mine();
     const want = this._state.phoneUuid ?? loadLastDevice();
-    // Appareil voulu absent (terminal ou fixe hors de portée) : on revient à un appareil personnel.
+    // Wanted device missing (terminal or landline out of reach): fall back to a personal device.
     return mine.find((p) => p.item.uuid === want) ?? mine.find((p) => !isFixed(p.phone)) ?? mine[0] ?? null;
   }
 
@@ -117,13 +119,13 @@ export class PlayerPhone extends ApplicationV2 {
   }
 
   async render(...args) {
-    // Conserve la saisie en cours lors des re-rendus automatiques (message reçu, etc.).
+    // Keep the current input on automatic re-renders (message received, etc.).
     if (this.rendered && !this._skipRead) this._readForm();
     this._skipRead = false;
     return super.render(...args);
   }
 
-  /** Re-rendu après un changement volontaire de _state (ne relit pas le formulaire). */
+  /** Re-render after a deliberate _state change (does not re-read the form). */
   _rerender() {
     this._skipRead = true;
     return this.render();
@@ -153,7 +155,7 @@ export class PlayerPhone extends ApplicationV2 {
     this._rerender();
   }
 
-  /** MJ : ajoute une entrée à l'historique sans rien envoyer (préparation). */
+  /** GM: adds an entry to the history without sending anything (preparation). */
   async _gmAdd(p, to) {
     to = to?.trim();
     if (!to) return ui.notifications.warn(t("Warn.NoCorrespondent")), false;
@@ -177,7 +179,7 @@ export class PlayerPhone extends ApplicationV2 {
     playerCall(p.item, to);
   }
 
-  /** Cadran rotatif : le chiffre s'ajoute au numéro, le disque tourne jusqu'à la butée et revient. */
+  /** Rotary dial: the digit is added to the number, the dial turns to the stop and back. */
   _dial(digit) {
     const input = this.element.querySelector("[name=to]");
     if (!input || digit === undefined) return;
@@ -196,7 +198,7 @@ export class PlayerPhone extends ApplicationV2 {
     const p = this._current();
     const prev = this._state.phoneUuid;
     if (prev && prev !== p.item.uuid) {
-      // L'appareil affiché n'est plus accessible (l'agent a quitté la pièce, ou il a été retiré).
+      // The displayed device is no longer reachable (the agent left the room, or it was removed).
       this._state.view = "list";
       this._state.key = null;
       const lost = fromUuidSync(prev);
@@ -237,7 +239,9 @@ export class PlayerPhone extends ApplicationV2 {
       : hasSignal(p.phone)
         ? `<i class="fas fa-signal spt-signal" title="${t("Net.Signal")}"></i>`
         : `<span class="spt-signal off" title="${t("Net.NoSignalShort")}">📵</span>`;
-    const gmTools = this.gm ? `<a data-action="gmContacts" title="${t("Contacts.Title")}"><i class="fas fa-address-book"></i></a>` : "";
+    const gmTools = this.gm
+      ? `<a data-action="gmContacts" title="${t("Contacts.Title")}" aria-label="${t("Contacts.Title")}"><i class="fas fa-address-book"></i></a><a data-action="gmItemSheet" title="${t("Sheet.ItemSheet")}" aria-label="${t("Sheet.ItemSheet")}"><i class="fas fa-file-lines"></i></a>`
+      : "";
     return `<header class="spt-phone-top">${phoneSel}${signal}${gmTools}<div class="spt-modes">${modeBtns}</div></header>`;
   }
 
@@ -269,14 +273,14 @@ export class PlayerPhone extends ApplicationV2 {
       .filter((e) => sameConv(p.phone, e.with, key))
       .reverse();
     const del = (e) => (this.gm ? `<a class="spt-del" data-action="gmDelete" data-id="${e.id ?? ""}" data-t="${e.t}" title="${t("Delete")}"><i class="fas fa-xmark"></i></a>` : "");
-    // Joueur : montrer l'écran / transférer, sur chaque message.
+    // Player: show screen / forward, on each message.
     const share = (e) => {
       if (this.gm || e.pending) return "";
       const id = esc(e.id ?? String(e.t));
       return `<span class="spt-share"><a data-action="showEntry" data-id="${id}" title="${t("Share.ShowScreen")}"><i class="fas fa-eye"></i></a><a data-action="fwdEntry" data-id="${id}" title="${t("Fwd.Forward")}"><i class="fas fa-share"></i></a></span>`;
     };
     const fwdTag = (e) => (e.fwd ? `<span class="spt-fwd"><i class="fas fa-share"></i> ${t("Fwd.Forwarded")}</span>` : "");
-    // Habillage fédéral : chaque mail devient une fiche, avec une référence stable et un tampon à la réception.
+    // Federal look: each email becomes a case file, with a stable reference and a stamp on received ones.
     const federal = skinOf(p.phone) === "federal";
     const fileTag = (e) => (federal ? `<span class="spt-ref">${t("Theme.Ref")} ${caseRef(e)}</span>${e.dir === "in" ? `<span class="spt-stamp">${t("Theme.Confidential")}</span>` : ""}` : "");
     const bubbles = entries
@@ -304,7 +308,7 @@ export class PlayerPhone extends ApplicationV2 {
       ${composer}`;
   }
 
-  /** Téléphone fixe côté joueur : un simple cadran, sans historique ni contacts. */
+  /** Landline on the player side: a plain dial, no history or contacts. */
   _renderDialer(p, mine) {
     this._state.view = "new";
     return `${this._renderHeader(p, mine)}
@@ -341,7 +345,7 @@ export class PlayerPhone extends ApplicationV2 {
       </div>`;
   }
 
-  /** MJ : écrit dans l'historique (rien n'est envoyé, aucune notification). */
+  /** GM: writes into the history (nothing is sent, no notification). */
   _gmComposer(rows) {
     const cur = this._current()?.phone;
     const types = Object.entries(GM_ENTRY_TYPES).filter(([, ty]) => (ty.kind === "call" ? !modelOf(cur).noCalls : msgOn(cur)));
@@ -372,7 +376,7 @@ export class PlayerPhone extends ApplicationV2 {
     for (const k of SKINS) this.element.classList.toggle(`spt-skin-${k}`, k === skin);
     this.element.classList.toggle("spt-gm-view", this.gm);
     const el = this.element;
-    // Bandeaux : préparation MJ, appareil sécurisé.
+    // Banners: GM preparation, secure device.
     const content = el.querySelector(".window-content");
     const banner = { military: "Theme.Classified", federal: "Theme.GovSystem" }[skin];
     if (content && banner) content.insertAdjacentHTML("afterbegin", `<div class="spt-banner">${t(banner)}</div>`);
@@ -401,7 +405,7 @@ export class PlayerPhone extends ApplicationV2 {
     for (const btn of el.querySelectorAll("[data-mode]")) {
       btn.addEventListener("click", () => p?.item.update({ [`flags.${MODULE_ID}.phone.mode`]: btn.dataset.mode }));
     }
-    // Entrée = envoyer, Maj+Entrée = retour à la ligne
+    // Enter = send, Shift+Enter = new line
     el.querySelector("[name=draft]")?.addEventListener("keydown", (ev) => {
       if (ev.key === "Enter" && !ev.shiftKey) {
         ev.preventDefault();
@@ -413,12 +417,12 @@ export class PlayerPhone extends ApplicationV2 {
     if (this._state.view === "new" && !this._state.to) el.querySelector("[name=to]")?.focus();
     else if (this._state.view !== "list") el.querySelector("[name=draft]")?.focus();
 
-    // Ouvrir une conversation la marque comme lue.
+    // Opening a conversation marks it as read.
     if (p && !this.gm && this._state.view === "conv") {
       const key = this._state.key;
       const hasUnread = getLog(p.phone).some((e) => isUnread(e) && sameConv(p.phone, e.with, key));
       if (hasUnread) {
-        // Toutes les écritures d'historique passent par le navigateur du MJ (aucune collision).
+        // All history writes go through the GM's browser (no collision).
         if (game.users.activeGM) game.socket.emit(SOCKET, { type: "playerRead", itemUuid: p.item.uuid, key, userId: game.user.id });
         else if (p.item.isOwner) markRead(p.item, key);
       }
@@ -426,19 +430,19 @@ export class PlayerPhone extends ApplicationV2 {
   }
 }
 
-/* Cadran rotatif (fixe) : 1 en haut à droite, puis dans le sens inverse des aiguilles ; butée entre 0 et 1. */
+/* Rotary dial (landline): 1 at the top right, then counter-clockwise; finger stop between 0 and 1. */
 const DIAL_DIGITS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 const DIAL_STOP = 15;
 const DIAL_ANGLE = (d) => 60 + 30 * DIAL_DIGITS.indexOf(d);
 
-/** Référence de dossier stable, tirée de l'identifiant du message (ex. 27-B-4417). */
+/** Stable case reference, derived from the message id (e.g. 27-B-4417). */
 function caseRef(e) {
   let h = 0;
   for (const c of String(e.id ?? e.t)) h = (h * 31 + c.charCodeAt(0)) >>> 0;
   return `${10 + (h % 90)}-${"ABCDFGHKMNPRST"[(h >>> 7) % 14]}-${String((h >>> 11) % 10000).padStart(4, "0")}`;
 }
 
-/** Clavier à touches (fixe moderne, 1980-2020). */
+/** Push-button keypad (modern landline, 1980-2020). */
 export function keypad() {
   const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "0", "#"];
   return `<div class="spt-keypad">${keys.map((k) => `<button type="button" data-action="dial" data-digit="${k}">${k}</button>`).join("")}</div>`;
@@ -461,7 +465,7 @@ export function rotaryDial(number) {
     </svg>`;
 }
 
-/** Types d'entrées que le MJ peut écrire dans un historique (préparation). */
+/** Entry types the GM can write into a history (preparation). */
 export const GM_ENTRY_TYPES = {
   smsIn: { get label() { return t("Prep.smsIn"); }, kind: "sms", entry: { kind: "sms", dir: "in" } },
   smsOut: { get label() { return t("Prep.smsOut"); }, kind: "sms", entry: { kind: "sms", dir: "out" } },

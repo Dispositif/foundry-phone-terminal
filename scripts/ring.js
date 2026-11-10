@@ -3,15 +3,15 @@ import { addLog, displayName, getPhoneData, hasSignal, holders, isLandline, keyF
 import { esc, gmWhisper, maskedLabel, rerenderAll } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
-/*  Appels sonnant chez des joueurs             */
+/*  Calls ringing at players                    */
 /* -------------------------------------------- */
 
 // callId -> { caller, label, open: Map<userId, itemUuid|null>, origin, lastResult }
 export const pendingCalls = new Map();
 
 /**
- * Fait sonner un téléphone (target = "phone:<numéro>") ou un joueur ("user:<id>").
- * origin = { userId, itemUuid, callId, key, name } quand l'appel vient d'un autre PJ.
+ * Rings a device (target = "phone:<number>") or a player ("user:<id>").
+ * origin = { userId, itemUuid, callId, key, name } when the call comes from another PC.
  */
 export function ring(target, { caller = MASKED, origin = null, callId = foundry.utils.randomID() } = {}) {
   if (!game.user.isGM) return ui.notifications.warn(t("Warn.GmOnlyCall"));
@@ -51,7 +51,7 @@ export function ring(target, { caller = MASKED, origin = null, callId = foundry.
           ui.notifications.warn(`📱 ${phoneLabel(p)} : ${RESULT_LABELS[result]}.`);
           gmWhisper(`<p><strong>📞 ${esc(phoneLabel(p))}</strong> : ${RESULT_LABELS[result]}</p><p><em>${t("Caller")} : ${esc(maskedLabel(caller))}</em></p>`);
         }
-        // Sans réseau, l'appel manqué n'apparaîtra qu'au retour du réseau.
+        // Without signal, the missed call only shows when signal returns.
         addLog(p.item, { kind: "call", dir: "in", with: keyFor(p.phone, caller), result: "missed", pending: result === "nosignal" });
         continue;
       }
@@ -102,7 +102,7 @@ export function hangUpAll() {
 
 export function onResponse({ callId, result, userId }) {
   const call = pendingCalls.get(callId);
-  if (!call) return; // appel passé par un autre MJ
+  if (!call) return; // call placed by another GM
   const itemUuid = call.open.get(userId);
   call.open.delete(userId);
   call.lastResult = result;
@@ -119,7 +119,7 @@ export function onResponse({ callId, result, userId }) {
   }
 
   if (result === "answer") {
-    // Quelqu'un a décroché : on coupe la sonnerie chez les autres (clones, co-propriétaires).
+    // Someone picked up: stop ringing for the others (shared number, co-owners).
     for (const otherId of call.open.keys()) game.socket.emit(SOCKET, { type: "cancel", targetUserId: otherId, callId });
     call.open.clear();
   }
@@ -130,7 +130,7 @@ export function onResponse({ callId, result, userId }) {
   rerenderAll();
 }
 
-/** Clôt un appel passé par un joueur : historique + résultat affiché chez lui. */
+/** Closes a call placed by a player: history + outcome shown to them. */
 export function finishOrigin(origin, result) {
   const item = fromUuidSync(origin.itemUuid);
   if (item) addLog(item, { kind: "call", dir: "out", with: origin.key, result });

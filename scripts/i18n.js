@@ -1,7 +1,7 @@
 import { MODULE_ID } from "./constants.js";
 
 /* -------------------------------------------- */
-/*  Langue du module (FR / EN)                  */
+/*  Module language (FR / EN)                   */
 /* -------------------------------------------- */
 
 const dicts = {};
@@ -16,7 +16,7 @@ function flatten(obj, prefix = "", out = {}) {
   return out;
 }
 
-/** Charge les deux fichiers de langue (une seule fois). */
+/** Loads both language files (once). */
 export function loadLanguages() {
   loading ??= Promise.all(
     ["fr", "en"].map(async (l) => {
@@ -32,7 +32,7 @@ export function loadLanguages() {
   return loading;
 }
 
-/** Langue choisie dans les réglages du module ; « auto » suit la langue de Foundry. */
+/** Language chosen in the module settings; "auto" follows Foundry's language. */
 export function currentLang() {
   let l = "auto";
   try {
@@ -42,7 +42,7 @@ export function currentLang() {
   return l.startsWith("fr") ? "fr" : "en";
 }
 
-/** Traduit une clé (préfixe SPT. facultatif), avec des variables {nom}. */
+/** Translates a key (SPT. prefix optional), with {name} variables. */
 export function t(key, data = {}) {
   const k = key.startsWith("SPT.") ? key : `SPT.${key}`;
   const l = currentLang();
@@ -51,13 +51,13 @@ export function t(key, data = {}) {
   return String(s).replace(/\{(\w+)\}/g, (m, n) => (n in data ? String(data[n]) : m));
 }
 
-/** Pluriel : clés « .one » et « .other » ; {n} = le nombre. */
+/** Plural: ".one" and ".other" keys; {n} = the count. */
 export function tn(key, n, data = {}) {
   const one = currentLang() === "fr" ? n <= 1 : n === 1;
   return t(`${key}.${one ? "one" : "other"}`, { n, ...data });
 }
 
-/** Objet dont chaque propriété est traduite à la lecture. */
+/** Object whose properties are translated when read. */
 export function labels(prefix, keys) {
   const o = {};
   for (const k of keys) Object.defineProperty(o, k, { get: () => t(`${prefix}.${k}`), enumerable: true });

@@ -1,5 +1,5 @@
 <div class="spt-gm">
-  {{!-- Bandeau d'état : réseau, messages en attente, appel en cours --}}
+  {{!-- Status bar: network, pending messages, ongoing call --}}
   <header class="spt-gm-status {{#if down}}down{{/if}}" aria-label="{{spt "Gm.Status"}}">
     <span class="spt-pill"><i class="fas {{#if down}}fa-ban{{else}}fa-tower-cell{{/if}}"></i> {{#if down}}{{spt "Net.DownAll"}}{{else}}{{spt "Net.Ok"}}{{/if}}</span>
     {{#if pending}}<span class="spt-gm-pending">{{spt "Net.Pending" n=pending}}</span>{{/if}}
@@ -12,7 +12,7 @@
   </div>
   {{/if}}
 
-  {{!-- Onglets --}}
+  {{!-- Tabs --}}
   <nav class="spt-tabs" role="tablist">
     <a class="spt-tab {{#if (eq tab "send")}}active{{/if}}" data-action="switchTab" data-tab="send" role="tab"><i class="fas fa-paper-plane"></i> {{spt "Gm.TabSend"}}</a>
     <a class="spt-tab {{#if (eq tab "inbox")}}active{{/if}}" data-action="switchTab" data-tab="inbox" role="tab"><i class="fas fa-inbox"></i> {{spt "Gm.TabInbox"}}{{#if inboxUnread}} <span class="spt-badge">{{inboxUnread}}</span>{{/if}}</a>
@@ -65,15 +65,15 @@
   {{#if (eq tab "inbox")}}
     <section class="spt-gm-inbox">
       {{#if inbox.length}}
-      <div class="spt-threads">
+      <div class="spt-gthreads">
         {{#each inbox}}
-        <div class="spt-thread {{#if unread}}unread{{/if}}" data-thread="{{id}}" data-uuid="{{uuid}}" data-key="{{key}}">
-          <div class="spt-thread-head"><strong>{{who}}</strong> <i class="fas fa-arrow-right" aria-hidden="true"></i> {{to}}{{#if unread}} <span class="spt-badge">{{unread}}</span>{{/if}}</div>
-          {{#if more}}<div class="spt-thread-more">…</div>{{/if}}
+        <div class="spt-gthread {{#if unread}}unread{{/if}}" data-thread="{{id}}" data-uuid="{{uuid}}" data-key="{{key}}">
+          <div class="spt-gthread-head"><strong>{{who}}</strong> <i class="fas fa-arrow-right" aria-hidden="true"></i> {{to}}{{#if unread}} <span class="spt-badge">{{unread}}</span>{{/if}}</div>
+          {{#if more}}<div class="spt-gthread-more">…</div>{{/if}}
           {{#each bubbles}}
           <div class="spt-bb {{dir}} {{#if pending}}pending{{/if}}">{{#if fwd}}<span class="spt-bb-fwd"><i class="fas fa-share"></i> {{spt "Fwd.Forwarded"}}</span>{{/if}}{{{att}}}{{#if text}}<div>{{{text}}}</div>{{/if}}</div>
           {{/each}}
-          <div class="spt-thread-reply">
+          <div class="spt-gthread-reply">
             <input type="text" data-draft="{{id}}" value="{{draft}}" placeholder="{{spt "Gm.ReplyAs" name=to}}" aria-label="{{spt "Gm.ReplyAs" name=to}}">
             <button type="button" data-action="sendReply" aria-label="{{spt "Send"}}" data-tooltip="{{spt "Send"}}"><i class="fas fa-paper-plane"></i></button>
             {{#if canCall}}<button type="button" data-action="callBack" aria-label="{{spt "Gm.CallBack"}}" data-tooltip="{{spt "Gm.CallBack"}}"><i class="fas fa-phone"></i></button>{{/if}}

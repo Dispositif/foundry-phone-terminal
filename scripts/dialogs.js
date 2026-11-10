@@ -1,16 +1,18 @@
 import { DialogV2, MODULE_ID } from "./constants.js";
-import { DEFAULT_THEME, MODELS, THEMES, createPhone, getLog, getPhoneData, markPhone, phoneUsers } from "./devices.js";
+import { DEFAULT_THEME, MODELS, THEMES, createPhone, getLog, getPhoneData, markPhone, phoneUsers, randomAddress } from "./devices.js";
 import { grantAttachments } from "./messages.js";
-import { esc, norm, randomNumber } from "./util.js";
+import { esc, norm } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
-/*  Dialogues MJ                                */
+/*  GM dialogs                                  */
 /* -------------------------------------------- */
 
-export async function phoneFormDialog({ title, selectHtml = "", label = null, number = randomNumber(), model = "smartphone", sceneId = null, theme = null, withModel = true }) {
-  // Nom par défaut = intitulé du modèle, tant que le MJ ne l'a pas modifié.
+export async function phoneFormDialog({ title, selectHtml = "", label = null, number = null, model = "smartphone", sceneId = null, theme = null, withModel = true }) {
+  // Default name = model label, as long as the GM has not changed it.
   const autoLabel = label === null;
   label ??= MODELS[model]?.label ?? MODELS.smartphone.label;
+  const autoNumber = number === null;
+  number ??= randomAddress(model);
   const modelOpts = Object.entries(MODELS)
     .map(([k, m]) => `<option value="${k}" ${k === model ? "selected" : ""}>${m.label}</option>`)
     .join("");
@@ -33,7 +35,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
         <div class="form-group"><label>${t("Form.Theme")}</label><select name="theme">${themeOpts}</select></div>
       </div>`,
     render: (event, x) => {
-      // v13+ : (event, dialog) ; on accepte aussi un élément HTML.
+      // v13+: (event, dialog); an HTML element is accepted too.
       const root = x?.element ?? x;
       const select = root?.querySelector?.("[name=model]");
       const labelInput = root?.querySelector?.("[name=label]");
@@ -42,11 +44,19 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
         if (!labelInput || lastAuto === null || labelInput.value !== lastAuto) return;
         labelInput.value = lastAuto = MODELS[select.value]?.label ?? lastAuto;
       });
+      // Random number not edited yet: it follows the model (number or email address).
+      const numberInput = root?.querySelector?.("[name=number]");
+      let lastNumber = autoNumber ? numberInput?.value : null;
+      select?.addEventListener("change", () => {
+        if (!numberInput || lastNumber === null || numberInput.value !== lastNumber) return;
+        if (!!MODELS[select.value]?.mail === lastNumber.includes("@")) return;
+        numberInput.value = lastNumber = randomAddress(select.value);
+      });
       const sync = () => {
         const landline = !!MODELS[select?.value ?? model]?.fixed;
         root.querySelector(".spt-if-landline")?.classList.toggle("hidden", !landline);
         root.querySelector(".spt-if-mobile")?.classList.toggle("hidden", landline);
-        // Habillages : seulement ceux qui conviennent au modèle choisi.
+        // Looks: only those that fit the chosen model.
         const m = select?.value ?? model;
         const themeSel = root.querySelector("[name=theme]");
         for (const o of themeSel?.options ?? []) {
@@ -72,7 +82,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
           return {
             target: f.target?.value,
             label: f.label.value.trim() || (MODELS[model]?.label ?? MODELS.smartphone.label),
-            number: f.number.value.trim() || randomNumber(),
+            number: f.number.value.trim() || randomAddress(model),
             model,
             sceneName,
             theme: f.theme?.value ?? DEFAULT_THEME,
@@ -91,8 +101,8 @@ export function playerActors() {
 }
 
 /**
- * Champ « porteur » : saisie libre avec suggestions (agents d'abord, puis PNJ).
- * Vide = personne (objet du monde). Évite une longue liste déroulante de PNJ.
+ * "Holder" field: free input with suggestions (agents first, then NPCs).
+ * Empty = nobody (world item). Avoids a long dropdown of NPCs.
  */
 export function holderField(current = "") {
   const pcs = playerActors();
@@ -104,7 +114,7 @@ export function holderField(current = "") {
     <p class="hint">${t("Form.HeldByHint")}</p>`;
 }
 
-/** Retrouve l'acteur saisi (null = personne, undefined = introuvable). */
+/** Finds the typed actor (null = nobody, undefined = not found). */
 export function resolveHolder(name) {
   name = name?.trim();
   if (!name) return null;
@@ -131,12 +141,12 @@ export async function newPhoneDialog() {
   return item;
 }
 
-/** Donne le téléphone à un autre porteur (ou le remet dans les objets du monde), historique compris. */
+/** Gives the device to another holder (or back to world items), history included. */
 export async function transferPhone(item, actor) {
   if ((item.parent ?? null) === (actor ?? null)) return item;
   const data = item.toObject();
   delete data._id;
-  const created = await Item.create(data, actor ? { parent: actor } : {});
+  const created = await Item.create(data, actor ? { parent: actor, spt: true } : { spt: true });
   await item.delete();
   const atts = getLog(getPhoneData(created), { includePending: true }).map((e) => e.att).filter(Boolean);
   if (actor && atts.length) await grantAttachments(atts, phoneUsers(actor));
@@ -201,7 +211,7 @@ export async function editPhoneDialog(item) {
   await markPhone(item, res);
 }
 
-/** Contacts : une ligne par contact, « Nom | numéro » (numéro facultatif). */
+/** Contacts: one per line, "Name | number" (number optional). */
 export async function contactsDialog(item) {
   const phone = getPhoneData(item);
   const text = (phone.contacts ?? []).map((c) => (c.number ? `${c.name} | ${c.number}` : c.name)).join("\n");

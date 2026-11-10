@@ -4,13 +4,13 @@ import { t } from "./i18n.js";
 import { randomNumber } from "./util.js";
 
 /* -------------------------------------------- */
-/*  Démo : appareils de test (MJ)               */
+/*  Demo: test devices (GM)                      */
 /* -------------------------------------------- */
 
 /**
- * Crée de quoi tester vite : un smartphone par personnage assigné qui n'a pas d'appareil,
- * un fixe et un terminal sur la scène affichée, un mobile de PNJ avec un message préparé.
- * Tout est marqué « démo » et se retire avec removeDemo().
+ * Creates what is needed for a quick test: a smartphone for each assigned character without a device,
+ * a landline and a terminal on the viewed scene, an NPC mobile with a prepared message.
+ * Everything is flagged "demo" and removed with removeDemo().
  */
 export async function createDemo() {
   if (!game.user.isGM) return ui.notifications.warn(t("Warn.GmOnlyPanel"));

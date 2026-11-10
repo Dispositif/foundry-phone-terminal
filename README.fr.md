@@ -74,6 +74,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 - N'importe quel objet peut devenir un appareil : on le crée depuis le panneau MJ (« Nouvel appareil ») ou on transforme un objet existant.
 - Chaque appareil a un **modèle**, un **nom** (« perso », « jetable », « bureau »… ; par défaut le nom du modèle) et un **numéro** (ou une adresse mail pour les ordinateurs).
 - Un personnage peut avoir plusieurs appareils.
+- Un clic sur un objet-appareil ouvre l'appareil lui-même. Le MJ retrouve la fiche d'objet du système depuis la vue de l'appareil.
 
 ### Modèles
 
@@ -109,7 +110,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 ### Changer de main
 
 - **Donner à…** : l'appareil passe à un autre personnage, à un PNJ ou à personne, avec son numéro, ses contacts et son historique (téléphone saisi, téléphone remis par un contact…).
-- **Copier l'objet** donne une **SIM clonée** : les deux appareils ont le même numéro et sonnent tous les deux. Le panneau MJ le signale par une icône.
+- **Glisser l'objet** sur un autre personnage fait de même : un appareil porté n'existe qu'en un exemplaire. Le dupliquer sur place donne un nouvel appareil, avec son propre numéro.
 
 ---
 
@@ -194,7 +195,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 - Onglet **Messages** : un fil par agent et par PNJ, en bulles. Réponse directement sous le fil (Entrée envoie), ou rappel de l'agent.
 - Onglet **Appareils**, groupés par porteur (portrait du personnage) ou par lieu (vignette de la scène). Un clic sur un appareil le choisit comme destinataire. Pour chacun :
   - icône du modèle, mode, nombre de messages non lus par le joueur ;
-  - signalements : numéro cloné, verrouillé, pas de réseau ;
+  - signalements : numéro partagé, verrouillé, pas de réseau ;
   - actions au survol : ouvrir et préparer l'historique, contacts, verrouiller, pas de réseau, donner à…, modifier, retirer.
 
 ### Préparer un appareil

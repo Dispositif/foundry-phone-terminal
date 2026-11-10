@@ -4,7 +4,7 @@ import { updateFab } from "./fab.js";
 import { esc, isMasked, maskedLabel, playLocal } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
-/*  Joueur : appels entrants                    */
+/*  Player: incoming calls                      */
 /* -------------------------------------------- */
 
 export let activeCall = null; // { callId, caller, sound, dialog, timer, done }
@@ -17,7 +17,7 @@ export class RingDialog extends DialogV2 {
 }
 
 export async function receiveRing({ callId, caller, timeout, phoneLabel: label, silent, ringSrc, itemUuid }) {
-  if (activeCall) endCall("decline"); // déjà en ligne : on rejette l'ancien appel
+  if (activeCall) endCall("decline"); // already on a call: drop the old call
 
   const call = { callId, itemUuid, caller: caller ? maskedLabel(caller) : t("Call.Incoming"), done: false, sound: null, dialog: null, timer: null };
   activeCall = call;
@@ -38,22 +38,22 @@ export async function receiveRing({ callId, caller, timeout, phoneLabel: label, 
       { action: "decline", label: t("Call.Decline"), icon: "fas fa-phone-slash", callback: () => "decline" }
     ],
     submit: (result) => {
-      call.dialog = null; // DialogV2 se ferme d'elle-même après submit
+      call.dialog = null; // DialogV2 closes by itself after submit
       endCall(result, call);
     }
   });
-  dialog.onClosed = () => endCall("decline", call); // fermeture par la croix = refus
+  dialog.onClosed = () => endCall("decline", call); // closing with the cross = decline
   call.dialog = dialog;
   dialog.render({ force: true });
 
   if (!silent) {
     call.sound = await playLocal(ringSrc ? `modules/${MODULE_ID}/sounds/${ringSrc}` : RING_SRC, { loop: true });
-    if (call.done) call.sound?.stop(); // appel terminé pendant le chargement du son
+    if (call.done) call.sound?.stop(); // call ended while the sound was loading
   }
   if (timeout > 0 && !call.done) call.timer = setTimeout(() => endCall("missed", call), timeout * 1000);
 }
 
-/** Termine l'appel entrant côté joueur. result = answer|decline|missed|cancelled */
+/** Ends the incoming call on the player side. result = answer|decline|missed|cancelled */
 export function endCall(result, call = activeCall) {
   if (!call || call.done) return;
   call.done = true;
@@ -71,12 +71,12 @@ export function endCall(result, call = activeCall) {
 }
 
 /* -------------------------------------------- */
-/*  Joueur : actions sortantes                  */
+/*  Player: outgoing actions                    */
 /* -------------------------------------------- */
 
 export function networkUp(phone) {
   if (!game.users.activeGM) {
-    // Le client du MJ fait office de réseau : sans lui, pas de réseau.
+    // The GM's client acts as the network: without it, no network.
     ui.notifications.warn(`📱 ${t("Net.GmAbsent")}`);
     return false;
   }

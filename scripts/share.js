@@ -4,7 +4,7 @@ import { playerSendSms } from "./player-calls.js";
 import { esc, gmWhisper, isMasked } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
-/*  Partage : montrer l'écran, transférer       */
+/*  Sharing: show screen, forward               */
 /* -------------------------------------------- */
 
 export function findEntry(phone, id) {
@@ -15,7 +15,7 @@ export function userName(u) {
   return u.character?.name ?? u.name;
 }
 
-/** Agents à côté de soi : un jeton sur la même scène (à défaut, les joueurs qui la regardent). */
+/** Nearby agents: a token on the same scene (otherwise, players viewing it). */
 export function nearbyUsers() {
   const scene = canvas?.scene ?? game.scenes.get(game.user.viewedScene);
   if (!scene) return [];
@@ -25,7 +25,7 @@ export function nearbyUsers() {
   return present.length ? present : others.filter((u) => u.viewedScene === scene.id);
 }
 
-/** Contenu d'une pièce jointe, rendu chez celui qui montre (le spectateur n'a besoin d'aucun droit). */
+/** Attachment content, rendered on the sharer's side (the viewer needs no permission). */
 export async function attShowHtml(att) {
   if (!att) return "";
   if (att.type === "image") return `<img class="spt-show-img" src="${esc(att.src)}">`;
@@ -43,7 +43,7 @@ export async function attShowHtml(att) {
   return `<h3 class="spt-show-doc"><i class="fas fa-file-lines"></i> ${esc(att.name ?? doc.name)}</h3>${parts.join("")}`;
 }
 
-/** Montre son écran aux agents présents : ils voient, mais ne gardent rien. */
+/** Shows the screen to nearby agents: they see it but keep nothing. */
 export async function showScreen(p, title, html) {
   const users = nearbyUsers();
   if (!users.length) return ui.notifications.info(t("Share.NobodyNear"));
@@ -76,7 +76,7 @@ export function receiveShow({ from, title, html, skin }) {
   }).render({ force: true });
 }
 
-/** Transfère un message ou une pièce jointe, par le réseau, comme un vrai message. */
+/** Forwards a message or an attachment over the network, like a real message. */
 export async function forwardEntry(p, e) {
   let att = e.att ?? null;
   if (att && !modelOf(p.phone).attachments) {

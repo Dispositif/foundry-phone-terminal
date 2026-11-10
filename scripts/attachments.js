@@ -5,10 +5,10 @@ import { grantAttachments } from "./messages.js";
 import { esc } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
-/*  Pièces jointes (image ou journal)           */
+/*  Attachments (image or journal)           */
 /* -------------------------------------------- */
 
-/** Lit un glisser-déposer Foundry : page/journal, ou image (tuile, fichier, objet…). */
+/** Reads a Foundry drag-and-drop: page/journal, or image (tile, file, item…). */
 export function attFromDrop(event) {
   let data;
   try {
@@ -32,27 +32,27 @@ export function pickImage() {
   });
 }
 
-/** Aperçu dans une zone de saisie (MJ). */
+/** Preview in an input area (GM). */
 export function attChipHtml(att) {
   if (!att) return "";
   const what = att.type === "image" ? `<img src="${esc(att.src)}">` : `<i class="fas fa-file-lines"></i> ${esc(att.name)}`;
   return `<div class="spt-att-chip">${what}<a data-action="clearAtt" title="${t("RemoveAttachment")}"><i class="fas fa-xmark"></i></a></div>`;
 }
 
-/** Dans une bulle du téléphone. */
+/** Inside a phone bubble. */
 export function attHtml(att) {
   if (!att) return "";
   if (att.type === "image") return `<img class="spt-att-img" src="${esc(att.src)}" data-att-img="${esc(att.src)}" title="${t("Enlarge")}">`;
   return `<a class="spt-att-doc" data-att-doc="${esc(att.uuid)}"><i class="fas fa-file-lines"></i> ${esc(att.name)}</a>`;
 }
 
-/** Dans le chat (le lien @UUID est rendu cliquable par Foundry). */
+/** In the chat (Foundry makes the @UUID link clickable). */
 export function attChatHtml(att) {
   if (att.type === "image") return `<img class="spt-att-img" src="${esc(att.src)}">`;
   return `@UUID[${att.uuid}]{${att.name.replace(/[{}]/g, "")}}`;
 }
 
-/** Attend (brièvement) que le MJ ait donné le droit de lecture. */
+/** Waits (briefly) for the GM to grant read permission. */
 export async function waitForAccess(doc, ms = 4000) {
   const end = Date.now() + ms;
   while (Date.now() < end) {
@@ -62,7 +62,7 @@ export async function waitForAccess(doc, ms = 4000) {
   return doc.testUserPermission(game.user, "LIMITED");
 }
 
-/** MJ : un agent qui a l'appareil en main demande l'accès à un journal reçu dessus. */
+/** GM: an agent holding the device asks for access to a journal received on it. */
 export async function onPlayerAccess({ itemUuid, docUuid, userId }) {
   const item = fromUuidSync(itemUuid);
   const phone = getPhoneData(item);
@@ -81,7 +81,7 @@ export async function openAttachment(el, item = null) {
   const doc = await fromUuid(el.dataset.attDoc);
   if (!doc) return ui.notifications.warn(t("Warn.DocGone"));
   if (!doc.testUserPermission(game.user, "LIMITED")) {
-    // Appareil partagé (terminal) ou reçu plus tard : on demande l'accès au MJ, qui vérifie que l'agent a bien l'appareil en main.
+    // Shared device (terminal) or received later: ask the GM for access; the GM checks the agent holds the device.
     if (item && game.users.activeGM) game.socket.emit(SOCKET, { type: "playerAccess", itemUuid: item.uuid, docUuid: el.dataset.attDoc, userId: game.user.id });
     if (!item || !(await waitForAccess(doc))) return ui.notifications.warn(t("Warn.NoAccess"));
   }

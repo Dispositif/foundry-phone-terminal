@@ -1,15 +1,15 @@
-import { LOG_MAX, MASKED, MODULE_ID } from "./constants.js";
-import { maskedLabel, norm } from "./util.js";
+import { LOG_MAX, MASKED, MODULE_ID, SHEET_ID } from "./constants.js";
+import { esc, maskedLabel, norm, randomEmail, randomNumber } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
-/*  Modèle : téléphones, contacts, historique   */
+/*  Model: phones, contacts, history            */
 /* -------------------------------------------- */
 
 export function getPhoneData(item) {
   return item?.getFlag(MODULE_ID, "phone") ?? null;
 }
 
-/** Modèles de téléphone et ce qu'ils savent faire. */
+/** Device models and what they can do. */
 export const MODELS = {
   landline: { get label() { return t("Model.landline"); }, icon: "fa-phone", fixed: true, sms: false, callerId: false, attachments: false, ring: "ring-bell.wav" },
   mobile: { get label() { return t("Model.mobile"); }, icon: "fa-mobile-retro", sms: true, callerId: true, attachments: false, ring: "ring-mobile.wav" },
@@ -18,7 +18,7 @@ export const MODELS = {
   desktop: { get label() { return t("Model.desktop"); }, icon: "fa-desktop", fixed: true, sms: true, mail: true, noCalls: true, callerId: true, attachments: true, notif: "mail.wav" }
 };
 
-/** Messages possibles sur cet appareil ? (les mails ne dépendent pas du réglage SMS) */
+/** Can this device send messages? (emails do not depend on the texts setting) */
 export function msgOn(phone) {
   const model = modelOf(phone);
   return model.mail ? true : smsOn() && model.sms;
@@ -28,15 +28,15 @@ export function isComputer(phone) {
   return !!modelOf(phone).mail;
 }
 
-/** Y a-t-il au moins un appareil pouvant recevoir des messages ? (affichage du panneau MJ) */
+/** Is there at least one device able to receive messages? (GM panel display) */
 export function anyMessaging() {
   return smsOn() || allPhones().some((p) => isComputer(p.phone));
 }
 
 /**
- * Habillages au choix du MJ, par appareil, et les modèles auxquels ils conviennent.
- * Tout appareil créé porte un habillage : "default" = celui du modèle. Un habillage inconnu
- * (retiré, renommé) ou qui ne convient pas au modèle retombe aussi sur celui du modèle.
+ * Looks the GM can pick per device, and the models they fit.
+ * Every created device stores a look: "default" = the model's look. An unknown look
+ * (removed, renamed) or one that does not fit the model also falls back to the model's look.
  */
 const SCREENS = ["mobile", "smartphone", "computer", "desktop"];
 export const DEFAULT_THEME = "default";
@@ -52,12 +52,12 @@ export function themeFits(theme, model) {
   return !!THEMES[theme]?.models.includes(model);
 }
 
-/** Habillage à enregistrer : le choix s'il convient au modèle, sinon "default". */
+/** Look to store: the choice if it fits the model, otherwise "default". */
 export function cleanTheme(theme, model) {
   return themeFits(theme, model) ? theme : DEFAULT_THEME;
 }
 
-/** Habillage affiché : celui choisi s'il convient, sinon celui du modèle (repli). */
+/** Look to display: the chosen one if it fits, otherwise the model's look (fallback). */
 export function skinOf(phone) {
   const model = MODELS[phone?.model] ? phone.model : "smartphone";
   return themeFits(phone?.theme, model) ? phone.theme : model;
@@ -71,23 +71,23 @@ export function isLandline(phone) {
   return phone?.model === "landline";
 }
 
-/** Appareil installé dans un lieu (fixe, poste de bureau) plutôt que porté. */
+/** Device installed in a place (landline, terminal) rather than carried. */
 export function isFixed(phone) {
   return !!modelOf(phone).fixed;
 }
 
-/** Qui a l'appareil en main : les agents présents sur sa scène s'il est fixe, sinon son porteur. */
+/** Who holds the device: agents on its scene if installed, otherwise its carrier. */
 export function holders(p, { activeOnly = false } = {}) {
   return isFixed(p.phone) ? landlineUsers(p.phone) : phoneUsers(p.actor, { activeOnly });
 }
 
-/** Nom du porteur pour les messages MJ (le lieu pour un appareil fixe). */
+/** Holder name for GM messages (the place for an installed device). */
 export function holderName(item, phone) {
   if (isFixed(phone)) return `📍 ${game.scenes.get(phone.sceneId)?.name ?? t("NoPlace")}`;
   return item?.parent instanceof Actor ? item.parent.name : "?";
 }
 
-/** Le fixe sonne pour les agents dont un jeton est sur sa scène (à défaut, les joueurs qui la regardent). */
+/** An installed device rings for agents with a token on its scene (otherwise, players viewing it). */
 export function landlineUsers(phone) {
   const scene = game.scenes.get(phone?.sceneId);
   if (!scene) return [];
@@ -97,19 +97,19 @@ export function landlineUsers(phone) {
   return present.length ? present : players.filter((u) => u.viewedScene === scene.id);
 }
 
-/** SMS activés pour ce monde ? (désactivés = téléphones d'avant les SMS) */
+/** Texts enabled in this world? (disabled = phones from before texting) */
 export function smsOn() {
   return game.settings.get(MODULE_ID, "smsEnabled");
 }
 
-/** Le téléphone capte-t-il ? (coupure générale ou zone sans réseau pour ce téléphone) */
+/** Does the device have signal? (network cut, or no signal for this device) */
 export function hasSignal(phone) {
-  // Un fixe ne dépend pas du réseau mobile : seule une ligne coupée l'empêche de fonctionner.
+  // An installed device does not depend on the mobile network: only its own cut line stops it.
   if (isFixed(phone)) return !phone.noSignal;
   return !game.settings.get(MODULE_ID, "networkDown") && !phone?.noSignal;
 }
 
-/** Tous les téléphones : objets portés par des acteurs + objets du monde (abandonnés). */
+/** All devices: items carried by actors + world items (held by nobody). */
 export function allPhones() {
   const out = [];
   const push = (item) => {
@@ -127,7 +127,7 @@ export function phonesByNumber(number) {
   return allPhones().filter((p) => norm(p.phone.number) === n);
 }
 
-/** Joueurs qui « tiennent » le téléphone porté par cet acteur. */
+/** Players who "hold" the device carried by this actor. */
 export function phoneUsers(actor, { activeOnly = false } = {}) {
   if (!actor) return [];
   const players = game.users.filter((u) => !u.isGM);
@@ -149,23 +149,23 @@ export function findContact(phone, str) {
   return (phone?.contacts ?? []).find((c) => norm(c.name) === s || (c.number && norm(c.number) === s)) ?? null;
 }
 
-/** Clé de conversation : le numéro du contact s'il en a un, sinon son nom, sinon la saisie brute. */
+/** Conversation key: the contact's number if any, otherwise its name, otherwise the raw input. */
 export function keyFor(phone, str) {
   const c = findContact(phone, str);
   return c ? c.number || c.name : String(str ?? "").trim();
 }
 
-/** Nom affiché pour une clé, vu depuis ce téléphone. */
+/** Display name for a key, as seen from this device. */
 export function displayName(phone, key) {
   return findContact(phone, key)?.name ?? maskedLabel(key);
 }
 
-/** Deux clés désignent-elles la même conversation, vu depuis ce téléphone ? */
+/** Do two keys point to the same conversation, as seen from this device? */
 export function sameConv(phone, a, b) {
   return norm(keyFor(phone, a)) === norm(keyFor(phone, b));
 }
 
-/** Compatibilité avec les entrées de la v0.2. */
+/** Compatibility with v0.2 entries. */
 export function normalizeEntry(e) {
   return { ...e, dir: e.dir ?? "in", with: e.with ?? e.from ?? MASKED };
 }
@@ -175,8 +175,8 @@ export function getLog(phone, { includePending = false } = {}) {
 }
 
 /**
- * File d'écriture par appareil : chaque modification de l'historique attend la précédente
- * et relit l'état à jour, pour que deux messages simultanés ne s'écrasent pas.
+ * Write queue per device: each history change waits for the previous one
+ * and re-reads the current state, so two simultaneous messages do not overwrite each other.
  */
 export const writeQueues = new Map();
 export function withItemLock(item, fn) {
@@ -188,13 +188,13 @@ export function withItemLock(item, fn) {
   return run;
 }
 
-/** Garde toutes les entrées préparées, et les LOG_MAX plus récentes des autres. */
+/** Keeps all prepared entries, and the LOG_MAX most recent of the others. */
 export function trimLog(log) {
   let n = 0;
   return log.filter((e) => e.prep || ++n <= LOG_MAX);
 }
 
-/** Modifie l'historique : fn reçoit une copie à jour et renvoie le nouvel historique (ou null si rien ne change). */
+/** Changes the history: fn gets an up-to-date copy and returns the new history (or null if nothing changes). */
 export function mutateLog(item, fn) {
   if (!item) return Promise.resolve();
   return withItemLock(item, async () => {
@@ -209,7 +209,7 @@ export function addLog(item, entry) {
   return mutateLog(item, (log) => [{ id: foundry.utils.randomID(), t: Date.now(), ...entry }, ...log]);
 }
 
-/** Message reçu pas encore lu par le joueur. */
+/** Received message not yet read by the player. */
 export function isUnread(e) {
   return e.dir === "in" && e.kind === "sms" && e.read === false;
 }
@@ -235,7 +235,7 @@ export function patchLog(item, predicate, patch) {
   });
 }
 
-/** Conversations d'un téléphone, triées par activité (+ contacts sans message). */
+/** A device's conversations, sorted by activity (+ contacts without messages). */
 export function conversations(phone) {
   const map = new Map();
   for (const e of getLog(phone)) {
@@ -253,22 +253,77 @@ export function conversations(phone) {
   return [...map.values()].sort((a, b) => (b.entries[0]?.t ?? 0) - (a.entries[0]?.t ?? 0));
 }
 
+/** Item icon for each model (shipped with the module, always available). */
+export const modelImg = (model) => `modules/${MODULE_ID}/icons/${MODELS[model] ? model : "smartphone"}.svg`;
+
+/** Is the item image a default one (Foundry's or ours) that can be replaced? */
+export function isDefaultImg(img, type) {
+  if (!img || img === "icons/svg/item-bag.svg" || img === Item.DEFAULT_ICON || img.startsWith(`modules/${MODULE_ID}/icons/`)) return true;
+  return !!type && img === Item.getDefaultArtwork?.({ type })?.img;
+}
+
+/** Item description field for this system (string or { value }), or null. */
+function descriptionPath(item) {
+  const d = item.system?.description;
+  if (typeof d === "string") return "system.description";
+  if (typeof d?.value === "string") return "system.description.value";
+  return null;
+}
+
+/** Short device description: "Smartphone · 555-0142". */
+export function deviceDescription(phone) {
+  return `<p>${esc(modelOf(phone).label)} · ${esc(phone.number ?? "")}</p>`;
+}
+
+/**
+ * Fields to set on a device item, without overwriting a GM choice: "device" sheet,
+ * model icon, and description (only if empty or written by the module).
+ */
+export function deviceItemPatch(item, phone) {
+  const patch = {};
+  const model = phone.model ?? "smartphone";
+  if (item.getFlag("core", "sheetClass") === undefined) patch["flags.core.sheetClass"] = SHEET_ID;
+  if (isDefaultImg(item.img, item.type) && item.img !== modelImg(model)) patch.img = modelImg(model);
+  const path = descriptionPath(item);
+  if (path) {
+    const current = foundry.utils.getProperty(item, path) ?? "";
+    const auto = deviceDescription(phone);
+    const ours = item.getFlag(MODULE_ID, "desc");
+    if ((!current.trim() || current === ours) && current !== auto) {
+      patch[path] = auto;
+      patch[`flags.${MODULE_ID}.desc`] = auto;
+    }
+  }
+  return patch;
+}
+
+/** Random number for the model: an email address for a laptop or a terminal. */
+export function randomAddress(model) {
+  return MODELS[model]?.mail ? randomEmail() : randomNumber();
+}
+
 export function pickItemType() {
   const types = (game.documentTypes?.Item ?? Object.keys(CONFIG.Item.typeLabels ?? {})).filter((t) => t !== "base");
   return types.find((t) => /equip|gear|item|stuff|objet|possession|inventory/i.test(t)) ?? types[0];
 }
 
 export async function createPhone(actor, { label, number, model = "smartphone", sceneId = null, theme = null }) {
-  const options = actor ? { parent: actor } : {};
-  return Item.create(
+  const options = actor ? { parent: actor, spt: true } : { spt: true };
+  const item = await Item.create(
     {
       name: label,
       type: pickItemType(),
-      img: "icons/svg/item-bag.svg",
-      flags: { [MODULE_ID]: { phone: { label, number, model, sceneId, theme: cleanTheme(theme, model), mode: "on", contacts: [], log: [] } } }
+      img: modelImg(model),
+      flags: {
+        core: { sheetClass: SHEET_ID },
+        [MODULE_ID]: { phone: { label, number, model, sceneId, theme: cleanTheme(theme, model), mode: "on", contacts: [], log: [] } }
+      }
     },
     options
   );
+  const patch = item ? deviceItemPatch(item, getPhoneData(item)) : {};
+  if (Object.keys(patch).length) await item.update(patch);
+  return item;
 }
 
 export async function markPhone(item, { label, number, model, sceneId, theme }) {
@@ -277,10 +332,16 @@ export async function markPhone(item, { label, number, model, sceneId, theme }) 
   if (model) next.model = model;
   if (sceneId !== undefined) next.sceneId = sceneId;
   if (theme !== undefined || !next.theme) next.theme = cleanTheme(theme ?? next.theme, next.model ?? "smartphone");
-  return item.update({ [`flags.${MODULE_ID}.phone`]: next });
+  const patch = deviceItemPatch(item, next);
+  // The item follows the device's new name if it still had the old one (a deliberate name is kept).
+  if (prev.label && item.name === prev.label && label && label !== prev.label) patch.name = label;
+  return item.update({ [`flags.${MODULE_ID}.phone`]: next, ...patch });
 }
 
 export async function unmarkPhone(item) {
-  return item.unsetFlag(MODULE_ID, "phone");
+  // The item becomes an ordinary item again, with the system sheet.
+  const patch = item.getFlag("core", "sheetClass") === SHEET_ID ? { "flags.core.-=sheetClass": null } : {};
+  if (item.img?.startsWith(`modules/${MODULE_ID}/icons/`)) patch.img = Item.DEFAULT_ICON;
+  return item.update({ [`flags.${MODULE_ID}.-=phone`]: null, ...patch });
 }
 

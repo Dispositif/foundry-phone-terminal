@@ -9,11 +9,11 @@ import { hangUpAll, pendingCalls, ring } from "./ring.js";
 import { esc, isMasked, nl2br, norm } from "./util.js";
 import { t, tn } from "./i18n.js";
 /* -------------------------------------------- */
-/*  Panneau MJ                                  */
+/*  GM panel                                    */
 /* -------------------------------------------- */
 
 
-/** Zone de dépôt pour une pièce jointe. */
+/** Drop zone for an attachment. */
 export function bindDrop(zone, onAtt) {
   if (!zone) return;
   zone.addEventListener("dragover", (ev) => {
@@ -31,11 +31,11 @@ export function bindDrop(zone, onAtt) {
   });
 }
 
-/** Messages envoyés par les joueurs à des PNJ (la « boîte de réception » du MJ). */
-/** Bulles visibles par fil dans la boîte du MJ. */
+/** Messages sent by players to NPCs (the GM's "inbox"). */
+/** Bubbles shown per thread in the GM inbox. */
 const INBOX_BUBBLES = 6;
 
-/** Pièce jointe dans une bulle de la boîte MJ : vignette ou nom du journal. */
+/** Attachment in a GM inbox bubble: thumbnail or journal name. */
 function bubbleAtt(att) {
   if (!att) return "";
   if (att.type === "image") return `<img class="spt-bb-img" src="${esc(att.src)}" alt="">`;
@@ -52,7 +52,7 @@ export function gmInbox() {
   return out.sort((a, b) => b.e.t - a.e.t);
 }
 
-/** Sélecteur d'appareil : icône du modèle à gauche, mise à jour au changement. */
+/** Device selector: model icon on the left, updated on change. */
 export function deviceSelect(mine, p, labelFn) {
   if (mine.length <= 1) {
     return `<div class="spt-icon-select"><i class="fas ${modelOf(p.phone).icon}"></i> <strong>${esc(labelFn(p))}</strong></div>`;
@@ -63,7 +63,7 @@ export function deviceSelect(mine, p, labelFn) {
   return `<div class="spt-icon-select spt-phone-select"><i class="fas ${modelOf(p.phone).icon}"></i><select data-phone-select data-icon-select>${opts}</select></div>`;
 }
 
-/** Synchronise l'icône placée avant chaque <select data-icon-select>. */
+/** Syncs the icon placed before each <select data-icon-select>. */
 export function bindIconSelects(root) {
   for (const select of root.querySelectorAll("select[data-icon-select]")) {
     const icon = select.parentElement.querySelector(":scope > i");
@@ -99,15 +99,23 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       give: async function (event, target) { giveDialog(await fromUuid(target.dataset.uuid)); },
       openPhone: function (event, target) { openPhone(target.dataset.uuid); },
       unmarkPhone: async function (event, target) {
+        // Removing the device deletes the item. "Keep the item" only removes the device function.
         const item = await fromUuid(target.dataset.uuid);
-        const ok = await DialogV2.confirm({
-          window: { title: t("Unmark.Title") },
-          content: `<p>${t("Unmark.Confirm", { name: esc(item.name) })}</p>`
+        const choice = await DialogV2.wait({
+          window: { title: t("Unmark.Title"), icon: "fas fa-trash" },
+          content: `<p>${t("Unmark.Confirm", { name: esc(item.name) })}</p>`,
+          buttons: [
+            { action: "delete", label: t("Unmark.Delete"), icon: "fas fa-trash", default: true },
+            { action: "keep", label: t("Unmark.Keep"), icon: "fas fa-box" },
+            { action: "cancel", label: t("Cancel"), icon: "fas fa-xmark" }
+          ],
+          rejectClose: false
         });
-        if (ok) unmarkPhone(item);
+        if (choice === "delete") await item.delete();
+        else if (choice === "keep") await unmarkPhone(item);
       },
       selectPhone: function (event, target) {
-        // Un clic sur un appareil le choisit comme destinataire et ouvre l'onglet Envoyer.
+        // Clicking a device makes it the recipient and opens the Send tab.
         this._focusSend = true;
         this._setState({ target: `phone:${target.dataset.number}`, tab: "send" });
       },
@@ -159,7 +167,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
 
   _state = { target: null, sender: t("Masked"), text: "", att: null, tab: "send", mode: "message", drafts: {} };
 
-  /** Change l'état (onglet, mode, destinataire…) en gardant la saisie en cours. */
+  /** Changes the state (tab, mode, recipient…) while keeping the current input. */
   _setState(patch) {
     this._readForm();
     Object.assign(this._state, patch);
@@ -181,19 +189,19 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   async render(...args) {
-    // Conserve la saisie en cours avant tout re-rendu (les actions peuvent modifier _state ensuite).
+    // Keep the current input before any re-render (actions may change _state afterwards).
     if (this.rendered && !this._skipRead) this._readForm();
     this._skipRead = false;
     return super.render(...args);
   }
 
-  /** Données du template : tout est calculé ici, le template ne fait qu'afficher. */
+  /** Template data: everything is computed here, the template only displays. */
   async _prepareContext() {
     const phones = allPhones().sort((a, b) => phoneLabel(a).localeCompare(phoneLabel(b)));
     const players = game.users.filter((u) => !u.isGM);
     const countByNumber = phones.reduce((m, p) => m.set(norm(p.phone.number), (m.get(norm(p.phone.number)) ?? 0) + 1), new Map());
 
-    // Destinataires : un numéro par ligne, quelle que soit son écriture (555-133 = 555133).
+    // Recipients: one line per number, however it is written (555-133 = 555133).
     const numbers = [...new Map(phones.map((p) => [norm(p.phone.number), p.phone.number])).values()];
     const targets = [...numbers.map((n) => `phone:${n}`), ...players.map((u) => `user:${u.id}`)];
     if (!targets.includes(this._state.target)) this._state.target = targets[0] ?? "";
@@ -208,7 +216,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       selected: this._state.target === `user:${u.id}`
     }));
 
-    // Messages des agents : un fil par appareil et par correspondant PNJ, le plus récent en haut.
+    // Agents' messages: one thread per device and NPC correspondent, most recent first.
     const inboxAll = gmInbox();
     const threads = new Map();
     for (const { item, phone, e } of inboxAll) {
@@ -238,7 +246,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       };
     });
 
-    // Appareils groupés : par porteur, puis par lieu, puis « sans porteur ».
+    // Devices grouped: by holder, then by place, then "held by nobody".
     const groups = new Map();
     const groupOf = (p) => {
       if (isFixed(p.phone)) {
@@ -273,7 +281,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     }
     const sortedGroups = [...groups.values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
 
-    // Ce que le destinataire choisi accepte : on ne montre que les formulaires possibles.
+    // What the chosen recipient accepts: only the possible forms are shown.
     const [kind, id] = (this._state.target ?? "").split(/:(.*)/s);
     const tp = kind === "phone" ? phones.filter((p) => norm(p.phone.number) === norm(id)) : [];
     const canMessage = kind === "phone" ? tp.some((p) => msgOn(p.phone)) : kind === "user" && anyMessaging();
@@ -327,7 +335,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     });
   }
 
-  /** Réponse en ligne dans un fil : envoyée sous l'identité du PNJ, le fil passe en lu. */
+  /** Inline reply in a thread: sent as the NPC, and the thread is marked read. */
   async _sendReply(th) {
     const input = th?.querySelector("[data-draft]");
     const text = input?.value.trim();
@@ -347,7 +355,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     ring(this._state.target, { caller: this._normSender() });
   }
 
-  /** Expéditeur saisi ; « Numéro masqué » (dans toute langue) est stocké sous sa forme interne. */
+  /** Typed sender; "Hidden number" (in any language) is stored in its internal form. */
   _normSender() {
     const s = this._state.sender.trim();
     return !s || isMasked(s) ? MASKED : s;

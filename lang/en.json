@@ -244,7 +244,9 @@
     },
     "Unmark": {
       "Title": "Remove device",
-      "Confirm": "\"{name}\" will no longer be a device (the item is kept, the history is lost)."
+      "Confirm": "\"{name}\" and its history will be deleted.",
+      "Delete": "Delete",
+      "Keep": "Keep the item"
     },
     "Image": "Image",
     "Devices": "Devices",
@@ -347,6 +349,10 @@
       "AgentId": "Agent ID",
       "Ref": "Ref.",
       "Confidential": "Confidential"
+    },
+    "Sheet": {
+      "Label": "Phone & Terminal device",
+      "ItemSheet": "Item sheet"
     }
   }
 }

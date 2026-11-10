@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.24.0
+- Clicking a device item opens the device itself (the phone for the player, the GM view for the GM) instead of an empty item sheet. The GM reaches the system's item sheet from the device view.
+- Device items get an icon per model (smartphone, mobile, laptop, terminal, landline), unless the GM chose another image.
+- Device name and item name stay in step: renaming one renames the other, as long as both still had the same name.
+- Removing a device from the GM panel deletes its item. "Keep the item" only removes the device function.
+- New laptops and terminals get a random email address (user33@mail.net) instead of a phone number.
+- Dragging a carried device onto another character hands it over with its history, instead of making a copy with the same number. Duplicating it in place gives a new device with its own number. Installed devices are unchanged.
+- The item description shows the model and number ("Smartphone · 555-0142"), unless the GM wrote one.
+- Fix: the GM inbox styles no longer leak into the player's conversation view.
+- Fix: with a look, the window title bar buttons (controls, close) showed empty boxes instead of their icons.
+
 ## 0.23.0
 - GM **Messages** tab shows one thread per agent and NPC, as chat bubbles: the agent on the left, the NPC's replies on the right.
 - Reply inline under each thread (Enter sends), or call the agent back.
