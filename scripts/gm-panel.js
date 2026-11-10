@@ -83,7 +83,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     id: "spt-phone-panel",
     tag: "form",
     classes: ["spt-phone-panel"],
-    window: { title: "Phone & Terminal", icon: "fas fa-tower-cell", resizable: true },
+    window: { title: "Phones & Computers", icon: "fas fa-tower-cell", resizable: true },
     position: { width: 460, height: 620 },
     form: { handler: () => {}, submitOnChange: false, closeOnSubmit: false },
     actions: {

@@ -1,5 +1,5 @@
 /**
- * Phone & Terminal (soren-phone-terminal)
+ * Phones & Computers (soren-phones-computers)
  * Storytelling tool: the GM is the network.
  * - Devices = items flagged by the module (number, name, mode, contacts, history).
  * - The GM calls / texts a device; players reply, write and call.
@@ -8,7 +8,7 @@
  * Target: Foundry VTT v13-v14 (ApplicationV2 / DialogV2 only).
  */
 
-import { DIRECTORY_SAMPLE, LEGACY_IDS, MODULE_ID, SOCKET } from "./constants.js";
+import { DIRECTORY_SAMPLE, LEGACY_IDS, MODULE_ID, SHEET_ID, SOCKET } from "./constants.js";
 import { ensureDeviceItems, registerPhoneSheet } from "./item-sheet.js";
 import { allPhones, createPhone, getLog, getPhoneData, isFixed, markPhone, phoneUsers, randomAddress } from "./devices.js";
 import { transferPhone } from "./dialogs.js";
@@ -167,8 +167,21 @@ Hooks.on("getSceneControlButtons", (controls) => {
   };
 });
 
-/** Migrates data from former versions (devices and world settings). */
+/** Migrates data from former module ids: device flags, item sheet, world and client settings. */
 export async function migrateLegacy() {
+  // Client settings (language, volume): each user's browser, once.
+  for (const [key, cfg] of game.settings.settings) {
+    if (cfg.namespace !== MODULE_ID || cfg.scope !== "client") continue;
+    try {
+      if (localStorage.getItem(key) !== null) continue;
+      for (const id of LEGACY_IDS) {
+        const old = localStorage.getItem(`${id}.${cfg.key}`);
+        if (old === null) continue;
+        localStorage.setItem(key, old);
+        break;
+      }
+    } catch {}
+  }
   if (!isActiveGM()) return;
   const items = [...game.items, ...game.actors.contents.flatMap((a) => a.items.contents)];
   let n = 0;
@@ -176,16 +189,22 @@ export async function migrateLegacy() {
     if (item._source.flags?.[MODULE_ID]?.phone) continue;
     const oldId = LEGACY_IDS.find((id) => item._source.flags?.[id]?.phone);
     if (!oldId) continue;
-    await item.update({ [`flags.${MODULE_ID}.phone`]: item._source.flags[oldId].phone, [`flags.-=${oldId}`]: null });
+    // Moves the whole flag scope (phone, desc, demo), the device sheet and the model icon if they were the old module's.
+    const patch = { [`flags.${MODULE_ID}`]: item._source.flags[oldId], [`flags.-=${oldId}`]: null };
+    if (item._source.flags?.core?.sheetClass === `${oldId}.PhoneSheet`) patch["flags.core.sheetClass"] = SHEET_ID;
+    if (item._source.img?.startsWith(`modules/${oldId}/`)) patch.img = item._source.img.replace(`modules/${oldId}/`, `modules/${MODULE_ID}/`);
+    await item.update(patch);
     n++;
   }
   // World settings: migrated once, if the new module has none yet.
+  let moved = 0;
   try {
     const world = game.settings.storage.get("world");
-    for (const key of ["smsEnabled", "floatingButton", "ringTimeout", "networkDown"]) {
-      if (world.find((s) => s.key === `${MODULE_ID}.${key}`)) continue;
+    for (const [, cfg] of game.settings.settings) {
+      if (cfg.namespace !== MODULE_ID || cfg.scope !== "world") continue;
+      if (world.find((s) => s.key === `${MODULE_ID}.${cfg.key}`)) continue;
       for (const id of LEGACY_IDS) {
-        const old = world.find((s) => s.key === `${id}.${key}`);
+        const old = world.find((s) => s.key === `${id}.${cfg.key}`);
         if (!old) continue;
         let value = old.value;
         if (typeof value === "string") {
@@ -193,14 +212,27 @@ export async function migrateLegacy() {
             value = JSON.parse(value);
           } catch {}
         }
-        await game.settings.set(MODULE_ID, key, value);
+        await game.settings.set(MODULE_ID, cfg.key, value);
+        moved++;
         break;
       }
     }
   } catch (err) {
     console.warn(`${MODULE_ID} | could not migrate settings`, err);
   }
-  if (n) ui.notifications.info(`📱 Phone & Terminal : ${t("Migrated", { n })}`);
+  const oldActive = LEGACY_IDS.some((id) => game.modules.get(id)?.active);
+  // Only GMs coming from the former module see this: a fresh install has nothing to migrate.
+  if (n || moved || oldActive) renamedNotice(n, oldActive);
+}
+
+/** Tells the GM the module was renamed, what was recovered, and what to do with the old one. */
+function renamedNotice(n, oldActive) {
+  const lines = [t("Renamed.Body"), n ? t("Migrated", { n }) : "", oldActive ? `<strong>${t("Renamed.Disable")}</strong>` : t("Renamed.Uninstall")];
+  foundry.applications.api.DialogV2.prompt({
+    window: { title: t("Renamed.Title"), icon: "fas fa-mobile-screen" },
+    content: lines.filter(Boolean).map((l) => `<p>${l}</p>`).join(""),
+    ok: { label: t("Renamed.Ok") }
+  }).catch(() => {});
 }
 
 Hooks.once("ready", async () => {

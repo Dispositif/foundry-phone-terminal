@@ -1,7 +1,7 @@
 import { labels } from "./i18n.js";
 
-export const MODULE_ID = "soren-phone-terminal";
-export const LEGACY_IDS = ["soren-burner-phone", "dg-telephone"]; // former ids (Burner Phone v0.8-0.15, DG Téléphone v0.1-0.7)
+export const MODULE_ID = "soren-phones-computers";
+export const LEGACY_IDS = ["soren-phone-terminal", "soren-burner-phone", "dg-telephone"]; // former ids (Phone & Terminal v0.16-0.29, Burner Phone v0.8-0.15, DG Téléphone v0.1-0.7)
 export const SOCKET = `module.${MODULE_ID}`;
 export const RING_SRC = `modules/${MODULE_ID}/sounds/ring.wav`;
 export const SMS_SRC = `modules/${MODULE_ID}/sounds/sms.wav`;

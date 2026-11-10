@@ -1,4 +1,4 @@
-# Phone & Terminal
+# Phones & Computers
 
 *Phones and computers as a storytelling tool. You are the network.*
 
@@ -13,7 +13,7 @@ A Foundry VTT module that gives your characters phones, laptops and room termina
 - **NPC directory:** list your NPCs once, name and number. You see at a glance who the agents are calling, and public numbers (pizzeria, taxi, hospital) work as yellow pages for the players.
 - Foundry VTT v13 and v14. Any game system.
 - Interface in English and French.
-- **Manifest URL:** `https://github.com/Dispositif/foundry-phone-terminal/releases/latest/download/module.json`
+- **Manifest URL:** `https://github.com/Dispositif/foundry-phones-computers/releases/latest/download/module.json`
 
 <img src="docs/player.webp" alt="Player view" width="560">
 
@@ -47,20 +47,22 @@ A Foundry VTT module that gives your characters phones, laptops and room termina
 In Foundry: **Add-on Modules → Install Module**, then paste the manifest URL:
 
 ```
-https://github.com/Dispositif/foundry-phone-terminal/releases/latest/download/module.json
+https://github.com/Dispositif/foundry-phones-computers/releases/latest/download/module.json
 ```
 
-Enable **Phone & Terminal** in your world. To try it on an empty world, run this in a GM macro:
+Enable **Phones & Computers** in your world. To try it on an empty world, run this in a GM macro:
 
 ```js
-game.modules.get("soren-phone-terminal").api.demo()
+game.modules.get("soren-phones-computers").api.demo()
 ```
 
 It creates a smartphone for each assigned character without a device, a landline and a terminal on the current scene, and an NPC mobile with a prepared message. To remove them all:
 
 ```js
-game.modules.get("soren-phone-terminal").api.removeDemo()
+game.modules.get("soren-phones-computers").api.removeDemo()
 ```
+
+**Upgrading from Phone & Terminal (`soren-phone-terminal`, v0.29 and earlier).** The module changed its id, so Foundry sees a new module. Install it with the same manifest URL, enable it instead of the old one and reload the world: devices, histories, contacts, settings and the NPC directory are moved over automatically. Then uninstall the old module.
 
 ---
 

@@ -1,4 +1,4 @@
-# Phone & Terminal
+# Phones & Computers
 
 *Le téléphone et l'ordinateur comme outils narratifs. Le réseau, c'est vous.*
 
@@ -13,7 +13,7 @@ Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateur
 - **Annuaire PNJ :** listez vos PNJ une fois, nom et numéro. Vous voyez d'un coup d'œil qui les agents appellent, et les numéros publics (pizzeria, taxi, hôpital) servent de pages jaunes aux joueurs.
 - Foundry VTT v13 et v14. N'importe quel système de jeu.
 - Interface en français et en anglais.
-- **URL du manifeste :** `https://github.com/Dispositif/foundry-phone-terminal/releases/latest/download/module.json`
+- **URL du manifeste :** `https://github.com/Dispositif/foundry-phones-computers/releases/latest/download/module.json`
 
 <img src="docs/player.webp" alt="Vue joueur" width="560">
 
@@ -47,20 +47,22 @@ Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateur
 Dans Foundry : **Modules → Installer un module**, puis collez l'URL du manifeste :
 
 ```
-https://github.com/Dispositif/foundry-phone-terminal/releases/latest/download/module.json
+https://github.com/Dispositif/foundry-phones-computers/releases/latest/download/module.json
 ```
 
-Activez **Phone & Terminal** dans votre monde. Pour essayer sur un monde vierge, lancez dans une macro MJ :
+Activez **Phones & Computers** dans votre monde. Pour essayer sur un monde vierge, lancez dans une macro MJ :
 
 ```js
-game.modules.get("soren-phone-terminal").api.demo()
+game.modules.get("soren-phones-computers").api.demo()
 ```
 
 Cela crée un smartphone pour chaque personnage assigné sans appareil, un téléphone fixe et un terminal sur la scène affichée, et un mobile de PNJ avec un message préparé. Pour tout retirer :
 
 ```js
-game.modules.get("soren-phone-terminal").api.removeDemo()
+game.modules.get("soren-phones-computers").api.removeDemo()
 ```
+
+**Mise à jour depuis Phone & Terminal (`soren-phone-terminal`, v0.29 et avant).** Le module a changé d'id, Foundry le voit donc comme un nouveau module. Installez-le avec la même URL de manifeste, activez-le à la place de l'ancien et rechargez le monde : appareils, historiques, contacts, réglages et annuaire sont repris automatiquement. Désinstallez ensuite l'ancien module.
 
 ---
 

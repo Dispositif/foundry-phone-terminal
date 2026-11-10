@@ -362,7 +362,7 @@
       "vintage": "Vintage, rotary dial (1920-1980)"
     },
     "Sheet": {
-      "Label": "Phone & Terminal device",
+      "Label": "Phones & Computers device",
       "ItemSheet": "Item sheet"
     },
     "PowerOn": "Switch on",
@@ -372,6 +372,13 @@
       "Placeholder": "# Scenario&#10;Marlin Hunt | 555-0242&#10;# Public&#10;Pizza Delta | 555-0202 | public",
       "Unknown": "unknown number"
     },
-    "CallOrMessage": "Call / Message"
+    "CallOrMessage": "Call / Message",
+    "Renamed": {
+      "Title": "Phones & Computers",
+      "Body": "<em>Phone &amp; Terminal</em> is now <strong>Phones &amp; Computers</strong>. Your devices, histories, contacts and settings have been moved over to the new module.",
+      "Uninstall": "You can now uninstall the old module <em>Phone &amp; Terminal</em> (Add-on Modules screen).",
+      "Disable": "The old module Phone &amp; Terminal is still enabled: disable it in Manage Modules, otherwise phones ring twice. Then uninstall it.",
+      "Ok": "Got it"
+    }
   }
 }

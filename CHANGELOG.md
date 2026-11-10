@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.30.0
+- Module renamed **Phones & Computers**, new id `soren-phones-computers` (was `soren-phone-terminal`). Same manifest URL, but Foundry sees a new module: install it, enable it instead of the old one, reload the world, then uninstall the old one. Devices, histories, contacts, settings and the NPC directory are migrated automatically.
+- GitHub repository renamed `foundry-phones-computers`; old links redirect.
+- After the migration, the GM sees a one-time window: what was recovered, and to disable then uninstall the old module (it warns again on each load while the old module is still enabled). A fresh install never shows it.
+- The migration now moves every module flag and setting (it used to skip the newer settings, such as the directory), the device sheet choice and the model icons.
+
 ## 0.29.0
 - **Device frames**: every device is drawn around its screen, without the Foundry title bar: smartphone, old mobile (decorative keypad), laptop, terminal (office monitor, or a CRT for the Console and Military looks, olive for Military), modern desk phone and black bakelite rotary phone (handset and coiled cord). The menu and close buttons stay, discreet, on the top edge, and the window still drags from there. The GM view gets the frame too, with its orange line.
 

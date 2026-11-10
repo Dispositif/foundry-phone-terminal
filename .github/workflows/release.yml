@@ -23,13 +23,13 @@ jobs:
           VERSION="${TAG#v}"
           jq --arg v "$VERSION" \
              --arg m "https://github.com/$REPO/releases/latest/download/module.json" \
-             --arg d "https://github.com/$REPO/releases/download/$TAG/soren-phone-terminal.zip" \
+             --arg d "https://github.com/$REPO/releases/download/$TAG/soren-phones-computers.zip" \
              '.version=$v | .manifest=$m | .download=$d' module.json > module.tmp && mv module.tmp module.json
 
       - name: Build zip
-        run: zip -r soren-phone-terminal.zip module.json README.md README.fr.md CHANGELOG.md LICENSE scripts styles lang sounds templates icons
+        run: zip -r soren-phones-computers.zip module.json README.md README.fr.md CHANGELOG.md LICENSE scripts styles lang sounds templates icons
 
       - name: Upload assets
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" module.json soren-phone-terminal.zip --clobber
+        run: gh release upload "${{ github.event.release.tag_name }}" module.json soren-phones-computers.zip --clobber

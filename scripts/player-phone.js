@@ -61,7 +61,7 @@ export class PlayerPhone extends ApplicationV2 {
   static DEFAULT_OPTIONS = {
     id: "spt-player-phone",
     classes: ["spt-player-phone"],
-    window: { title: "Phone & Terminal", icon: "fas fa-mobile-screen", resizable: true },
+    window: { title: "Phones & Computers", icon: "fas fa-mobile-screen", resizable: true },
     position: { width: 340, height: 520 },
     actions: {
       open: function (event, target) { this._go("conv", target.dataset.key); },

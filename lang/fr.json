@@ -362,7 +362,7 @@
       "vintage": "Vintage, cadran rotatif (1920-1980)"
     },
     "Sheet": {
-      "Label": "Appareil Phone & Terminal",
+      "Label": "Appareil Phones & Computers",
       "ItemSheet": "Fiche de l'objet"
     },
     "PowerOn": "Allumer",
@@ -372,6 +372,13 @@
       "Placeholder": "# Scénario&#10;Marlin Hunt | 555-0242&#10;# Public&#10;Pizza Delta | 555-0202 | public",
       "Unknown": "numéro inconnu"
     },
-    "CallOrMessage": "Appeler / Écrire"
+    "CallOrMessage": "Appeler / Écrire",
+    "Renamed": {
+      "Title": "Phones & Computers",
+      "Body": "<em>Phone &amp; Terminal</em> s'appelle désormais <strong>Phones &amp; Computers</strong>. Vos appareils, historiques, contacts et réglages ont été repris dans le nouveau module.",
+      "Uninstall": "Vous pouvez maintenant désinstaller l'ancien module <em>Phone &amp; Terminal</em> (écran Modules).",
+      "Disable": "L'ancien module Phone &amp; Terminal est encore activé : désactivez-le dans Gérer les modules, sinon les téléphones sonnent en double. Désinstallez-le ensuite.",
+      "Ok": "Compris"
+    }
   }
 }
