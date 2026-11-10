@@ -127,7 +127,10 @@
       "Nobody": "Not held",
       "Actions": "Actions",
       "Status": "Network status",
-      "Shared": "Shared access"
+      "Shared": "Shared access",
+      "Compromised": "Compromised (tapped, known to the enemy…)",
+      "NotCompromised": "Mark as compromised",
+      "CompromisedDevice": "Compromised device: {label}"
     },
     "Document": "Document",
     "RemoveAttachment": "Remove attachment",

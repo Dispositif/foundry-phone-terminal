@@ -127,7 +127,10 @@
       "Nobody": "Sans porteur",
       "Actions": "Actions",
       "Status": "État du réseau",
-      "Shared": "Accès partagé"
+      "Shared": "Accès partagé",
+      "Compromised": "Compromis (sur écoute, connu de l'ennemi…)",
+      "NotCompromised": "Marquer comme compromis",
+      "CompromisedDevice": "Appareil compromis : {label}"
     },
     "Document": "Document",
     "RemoveAttachment": "Retirer la pièce jointe",

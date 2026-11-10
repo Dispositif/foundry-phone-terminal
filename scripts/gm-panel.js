@@ -96,7 +96,7 @@ function trackingRows(phones) {
         .filter((p) => p.actor?.id === actor.id && TRACK_LEVEL[p.phone.model] && modeOf(p.phone) !== "off" && hasSignal(p.phone))
         .map((p) => {
           const [level, via] = TRACK_LEVEL[p.phone.model];
-          return { icon: modelOf(p.phone).icon, modelLabel: modelOf(p.phone).label, label: p.phone.label, level, via };
+          return { icon: modelOf(p.phone).icon, modelLabel: modelOf(p.phone).label, label: p.phone.label, level, via, compromised: !!p.phone.compromised };
         })
         .sort((a, b) => TRACK_ORDER[a.level] - TRACK_ORDER[b.level]);
       for (const d of devices) d.levelLabel = `${t(`Track.${d.level}`)} (${t(`Track.Via.${d.via}`)})`;
@@ -187,6 +187,10 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
         const item = await fromUuid(target.dataset.uuid);
         await item.update({ [`flags.${MODULE_ID}.phone.locked`]: !getPhoneData(item)?.locked });
       },
+      toggleCompromised: async function (event, target) {
+        const item = await fromUuid(target.dataset.uuid);
+        await item.update({ [`flags.${MODULE_ID}.phone.compromised`]: !getPhoneData(item)?.compromised });
+      },
       toggleSignal: async function (event, target) {
         const item = await fromUuid(target.dataset.uuid);
         await item.update({ [`flags.${MODULE_ID}.phone.noSignal`]: !getPhoneData(item)?.noSignal });
@@ -274,6 +278,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
         who: holderName(th.item, th.phone),
         to: gmName(th.phone, th.key),
         unknown: isUnknownNumber(th.phone, th.key),
+        compromised: !!th.phone.compromised,
         unread: th.unread,
         canCall: !modelOf(th.phone).noCalls,
         draft: this._state.drafts[th.id] ?? "",
@@ -317,6 +322,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
         modeLabel: mode.label,
         fixed,
         locked: !!p.phone.locked,
+        compromised: !!p.phone.compromised,
         noSignal: !fixed && !!p.phone.noSignal,
         cloned: countByNumber.get(norm(p.phone.number)) > 1,
         unread,

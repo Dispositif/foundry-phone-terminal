@@ -693,3 +693,7 @@ a.spt-link:hover { filter: brightness(1.15); }
 .spt-track-group .spt-dev-group-head strong { flex: 1; min-width: 0; }
 .spt-track-none { background: #6b6b6b; }
 .spt-track-small { flex: 0 0 auto; font-size: 0.85em; opacity: 0.6; white-space: nowrap; }
+
+/* GM only: compromised device (tapped, known to the enemy). */
+.spt-gm .spt-compromised, .spt-phone-ring .spt-compromised { color: #d2402f; }
+.spt-gm .spt-dev-actions a:not(.spt-compromised)[data-action="toggleCompromised"] { opacity: 0.45; }

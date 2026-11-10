@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.34.0
+- **Compromised devices** (GM only): a warning toggle on each device in the GM panel marks a device as compromised (tapped, known to the enemy…). The mark shows in the devices list, the Tracking tab, the Messages tab and the GM's incoming call window, and the GM gets a warning when a compromised device calls or texts another agent or is called or texted by one. Players never see it.
+
 ## 0.33.1
 - GM side (incoming call from an agent, messages tab): a number from the NPC directory shows the directory name, even when the agent saved it under another name in their contacts.
 - GM messages and calls sent under an NPC directory name (public or not) now arrive as that NPC's number: the agent sees their own contact name for it, in the same conversation.

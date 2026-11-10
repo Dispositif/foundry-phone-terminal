@@ -19,6 +19,11 @@ export function senderHolds(item, userId) {
   return ok;
 }
 
+/** Warns the GM when a compromised device (tapped, known to the enemy) sends or receives. */
+function warnCompromised(...phones) {
+  for (const phone of phones) if (phone?.compromised) ui.notifications.warn(t("Gm.CompromisedDevice", { label: phone.label }));
+}
+
 export async function onPlayerSms({ fromItemUuid, to, text, att = null, fwd = false, userId }) {
   const from = fromUuidSync(fromItemUuid);
   if (!senderHolds(from, userId)) return;
@@ -32,6 +37,7 @@ export async function onPlayerSms({ fromItemUuid, to, text, att = null, fwd = fa
   // A pager only gets pages from the GM: an agent writing to one reaches the GM, who decides.
   const targets = phonesByNumber(key).concat(phonesByNumber(to)).filter((p, i, arr) => p.item !== from && !modelOf(p.phone).pager && arr.findIndex((q) => q.item === p.item) === i);
   const who = `${holderName(from, fromPhone)} (${fromPhone.label})`;
+  warnCompromised(fromPhone, ...targets.map((p) => p.phone));
 
   if (targets.length) {
     // Between PCs: delivered directly, copy to the GM.
@@ -73,6 +79,7 @@ export async function onPlayerCall({ fromItemUuid, to, callId, userId }) {
   const emptyRooms = targets.length > 0 && targets.every((p) => isLandline(p.phone) && !holders(p, { activeOnly: true }).length);
 
   if (targets.length && !emptyRooms) {
+    warnCompromised(fromPhone, ...targets.map((p) => p.phone));
     ring(`phone:${number}`, { caller: fromPhone.number, origin, callId });
     return;
   }
@@ -95,7 +102,7 @@ export async function onPlayerCall({ fromItemUuid, to, callId, userId }) {
     window: { title: emptyRooms ? t("Gm.EmptyLandlineCall") : t("Gm.AgentCalling"), icon: emptyRooms ? "fas fa-phone" : "fas fa-mobile-screen" },
     classes: ["spt-phone-ring-dialog"],
     position: { width: 520 },
-    content: `<div class="spt-phone-ring"><i class="fas fa-phone-volume"></i><p class="spt-caller">${esc(gmName(fromPhone, key))}${isUnknownNumber(fromPhone, key) ? ` <small>(${t("Directory.Unknown")})</small>` : ""}</p>${place ? `<p><strong>${esc(place)}</strong><br><em>${t("Gm.NobodyThere")}</em></p>` : ""}<p>${t("Gm.CalledBy", { who: `<strong>${esc(who)}</strong>` })}</p></div>`,
+    content: `<div class="spt-phone-ring"><i class="fas fa-phone-volume"></i><p class="spt-caller">${esc(gmName(fromPhone, key))}${isUnknownNumber(fromPhone, key) ? ` <small>(${t("Directory.Unknown")})</small>` : ""}</p>${place ? `<p><strong>${esc(place)}</strong><br><em>${t("Gm.NobodyThere")}</em></p>` : ""}<p>${t("Gm.CalledBy", { who: `<strong>${esc(who)}</strong>` })}</p>${fromPhone.compromised ? `<p class="spt-compromised"><i class="fas fa-triangle-exclamation"></i> ${t("Gm.CompromisedDevice", { label: esc(fromPhone.label) })}</p>` : ""}</div>`,
     buttons: Object.entries(NPC_OUTCOMES).map(([action, o]) => ({ action, label: o.label, icon: o.icon, default: action === "answer", callback: () => action })),
     submit: (result) => {
       call.dialog = null;

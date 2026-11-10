@@ -70,7 +70,7 @@
       <div class="spt-gthreads">
         {{#each inbox}}
         <div class="spt-gthread {{#if unread}}unread{{/if}}" data-thread="{{id}}" data-uuid="{{uuid}}" data-key="{{key}}">
-          <div class="spt-gthread-head"><strong>{{who}}</strong> <i class="fas fa-arrow-right" aria-hidden="true"></i> {{to}}{{#if unknown}} <small class="spt-dim">({{spt "Directory.Unknown"}})</small>{{/if}}{{#if unread}} <span class="spt-badge">{{unread}}</span>{{/if}}</div>
+          <div class="spt-gthread-head"><strong>{{who}}</strong>{{#if compromised}} <i class="fas fa-triangle-exclamation spt-compromised" title="{{spt "Gm.Compromised"}}"></i>{{/if}} <i class="fas fa-arrow-right" aria-hidden="true"></i> {{to}}{{#if unknown}} <small class="spt-dim">({{spt "Directory.Unknown"}})</small>{{/if}}{{#if unread}} <span class="spt-badge">{{unread}}</span>{{/if}}</div>
           {{#if more}}<div class="spt-gthread-more">…</div>{{/if}}
           {{#each bubbles}}
           <div class="spt-bb {{dir}} {{#if pending}}pending{{/if}}">{{#if fwd}}<span class="spt-bb-fwd"><i class="fas fa-share"></i> {{spt "Fwd.Forwarded"}}</span>{{/if}}{{{att}}}{{#if text}}<div>{{{text}}}</div>{{/if}}</div>
@@ -106,6 +106,7 @@
               <span class="spt-dev-label">{{label}} <small>{{number}}</small></span>
               {{#if modeIcon}}<i class="fas {{modeIcon}} spt-dim" title="{{modeLabel}}"></i>{{/if}}
               {{#if locked}}<i class="fas fa-lock spt-warn spt-dev-state" title="{{spt "Gm.Locked"}}"></i>{{/if}}
+              {{#if compromised}}<i class="fas fa-triangle-exclamation spt-compromised spt-dev-state" title="{{spt "Gm.Compromised"}}"></i>{{/if}}
               {{#if noSignal}}<i class="fas fa-signal spt-nosignal spt-dev-state" title="{{spt "Gm.NoSignal"}}"></i>{{/if}}
               {{#if cloned}}<i class="fas fa-clone spt-warn" title="{{spt "Gm.ClonedHint"}}"></i>{{/if}}
               {{#if unread}}<span class="spt-row-unread" title="{{unreadTitle}}"><i class="fas fa-envelope"></i> {{unread}}</span>{{/if}}
@@ -113,6 +114,7 @@
             <span class="spt-dev-actions" aria-label="{{spt "Gm.Actions"}}">
               <a data-action="openPhone" data-uuid="{{uuid}}" title="{{spt "Gm.OpenPrepare"}}" aria-label="{{spt "Gm.OpenPrepare"}}"><i class="fas fa-pen-to-square"></i></a>
               <a data-action="toggleLock" data-uuid="{{uuid}}" class="{{#if locked}}spt-locked{{/if}}" title="{{#if locked}}{{spt "Gm.Locked"}}{{else}}{{spt "Gm.Unlocked"}}{{/if}}" aria-label="{{#if locked}}{{spt "Gm.Locked"}}{{else}}{{spt "Gm.Unlocked"}}{{/if}}"><i class="fas {{#if locked}}fa-lock{{else}}fa-lock-open{{/if}}"></i></a>
+              <a data-action="toggleCompromised" data-uuid="{{uuid}}" class="{{#if compromised}}spt-compromised{{/if}}" title="{{#if compromised}}{{spt "Gm.Compromised"}}{{else}}{{spt "Gm.NotCompromised"}}{{/if}}" aria-label="{{#if compromised}}{{spt "Gm.Compromised"}}{{else}}{{spt "Gm.NotCompromised"}}{{/if}}"><i class="fas fa-triangle-exclamation"></i></a>
               {{#unless fixed}}<a data-action="toggleSignal" data-uuid="{{uuid}}" class="{{#if noSignal}}spt-nosignal{{/if}}" title="{{#if noSignal}}{{spt "Gm.NoSignal"}}{{else}}{{spt "Gm.SignalOk"}}{{/if}}" aria-label="{{#if noSignal}}{{spt "Gm.NoSignal"}}{{else}}{{spt "Gm.SignalOk"}}{{/if}}"><i class="fas fa-signal"></i></a>{{/unless}}
               <a data-action="contacts" data-uuid="{{uuid}}" title="{{spt "Contacts.Title"}}" aria-label="{{spt "Contacts.Title"}}"><i class="fas fa-address-book"></i></a>
               {{#unless fixed}}<a data-action="give" data-uuid="{{uuid}}" title="{{spt "Gm.GiveTo"}}" aria-label="{{spt "Gm.GiveTo"}}"><i class="fas fa-hand-holding"></i></a>{{/unless}}
@@ -144,7 +146,7 @@
           {{#each devices}}
           <li class="spt-dev spt-track">
             <i class="fas {{icon}}" title="{{modelLabel}}"></i>
-            <span class="spt-dev-label">{{label}}</span>
+            <span class="spt-dev-label">{{label}}{{#if compromised}} <i class="fas fa-triangle-exclamation spt-compromised" title="{{spt "Gm.Compromised"}}"></i>{{/if}}</span>
             <span class="spt-track-small">{{levelLabel}}</span>
           </li>
           {{/each}}
