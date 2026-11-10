@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.29.0
+- **Device frames**: every device is drawn around its screen, without the Foundry title bar: smartphone, old mobile (decorative keypad), laptop, terminal (office monitor, or a CRT for the Console and Military looks, olive for Military), modern desk phone and black bakelite rotary phone (handset and coiled cord). The menu and close buttons stay, discreet, on the top edge, and the window still drags from there. The GM view gets the frame too, with its orange line.
+
 ## 0.28.0
 - **NPC directory** (GM panel, Devices tab, **Directory** button): one NPC per line, `Name | number`, `#` lines as section titles, easy to paste. Directory NPCs come first in the sender suggestions; the GM sees their names in Messages and in the incoming call window, and a number known nowhere is flagged "unknown number".
 - Secret NPCs stay secret: a message sent as a directory NPC shows its number on the agent's side, unless the agent has it in their contacts.

@@ -443,3 +443,141 @@ a.spt-link:hover { filter: brightness(1.15); }
 
 /* "Call / Message" button: two icons side by side. */
 .spt-phone-foot button i + i { margin-left: 0.3em; }
+
+/* ---------- Device frames (player and GM view) ----------
+   The window itself becomes the device body. The Foundry header stays as a discreet
+   transparent bar over the top bezel (drag, menu, close). Minimized windows stay plain. */
+.application.spt-player-phone.spt-framed:not(.minimized) {
+  box-sizing: border-box; overflow: visible; border: none; isolation: isolate;
+  min-width: 0; color: #cfd3da;
+}
+.application.spt-player-phone.spt-framed:not(.minimized)::before,
+.application.spt-player-phone.spt-framed:not(.minimized)::after { display: none; }
+.spt-player-phone.spt-framed:not(.minimized) > .window-header {
+  position: absolute; z-index: 3; left: 0; right: 0; top: 0; height: 30px; min-height: 0;
+  display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 0 18px;
+  background: transparent; border: none; box-shadow: none; color: #cfd3da;
+  opacity: 0.5; transition: opacity 0.15s;
+}
+.spt-player-phone.spt-framed:not(.minimized):hover > .window-header { opacity: 1; }
+.spt-player-phone.spt-framed:not(.minimized) > .window-header .window-icon { display: none; }
+.spt-player-phone.spt-framed:not(.minimized) > .window-header .window-title { visibility: hidden; flex: 1; }
+.spt-player-phone.spt-framed:not(.minimized) > .window-header .header-control {
+  flex: 0 0 auto; width: 20px; height: 20px; min-height: 0; padding: 0; margin: 0;
+  display: grid; place-items: center; font-size: 11px; line-height: 1;
+  border: none; border-radius: 50%; background: rgba(255,255,255,0.08); color: inherit; box-shadow: none;
+}
+.spt-player-phone.spt-framed:not(.minimized) > .window-content { position: relative; z-index: 1; flex: 1; min-height: 0; }
+.spt-player-phone.spt-framed.minimized .spt-frame-deco { display: none; }
+.spt-frame-deco { position: absolute; z-index: 2; pointer-events: none; }
+
+/* Smartphone */
+.application.spt-player-phone.spt-frame-smartphone:not(.minimized) {
+  padding: 14px; border-radius: 46px;
+  background: linear-gradient(145deg, #2b2e33, #0d0e10 60%, #1c1e22);
+  box-shadow: 0 0 0 2px #4a4e55, 0 0 0 4px #15171a, 0 24px 50px rgba(0,0,0,0.55), inset 0 0 6px rgba(255,255,255,0.08);
+}
+.spt-player-phone.spt-frame-smartphone:not(.minimized) > .window-header { top: 16px; padding: 0 30px; }
+.spt-player-phone.spt-frame-smartphone:not(.minimized) > .window-content { border-radius: 34px; padding-top: 34px; padding-bottom: 20px; }
+.spt-frame-camera { top: 22px; left: 50%; transform: translateX(-50%); width: 14px; height: 14px; border-radius: 50%; background: #000; box-shadow: 0 0 0 2px #1a1c1f; }
+.spt-frame-homebar { bottom: 22px; left: 50%; transform: translateX(-50%); width: 110px; height: 4px; border-radius: 3px; background: rgba(255,255,255,0.55); }
+.spt-frame-side { right: -5px; top: 150px; width: 4px; height: 70px; border-radius: 0 3px 3px 0; background: #3a3d43; }
+.spt-frame-side.l, .spt-frame-side.l2 { right: auto; left: -5px; height: 40px; border-radius: 3px 0 0 3px; }
+.spt-frame-side.l { top: 120px; }
+.spt-frame-side.l2 { top: 175px; }
+
+/* Old mobile (candybar): LCD screen, decorative keypad */
+.application.spt-player-phone.spt-frame-mobile:not(.minimized) {
+  padding: 22px 20px 0; border-radius: 40px 40px 34px 34px;
+  background: linear-gradient(160deg, #5d6672, #2e333a 55%, #22262b);
+  box-shadow: 0 0 0 2px #1a1d21, 0 22px 44px rgba(0,0,0,0.55), inset 0 2px 3px rgba(255,255,255,0.18);
+}
+.spt-player-phone.spt-frame-mobile:not(.minimized) > .window-header { top: 0; height: 22px; padding: 0 30px; color: #e6e9ee; }
+.spt-player-phone.spt-frame-mobile:not(.minimized) > .window-content { border-radius: 8px; border: 6px solid #15181b; }
+.spt-frame-deco.spt-frame-speaker, .spt-frame-deco.spt-frame-keys { position: relative; z-index: auto; flex: 0 0 auto; }
+.spt-frame-speaker { height: 6px; width: 60px; margin: 0 auto 12px; border-radius: 3px; background: repeating-linear-gradient(90deg, #111 0 3px, #3a3f46 3px 6px); }
+.spt-frame-keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; padding: 16px 8px 22px; }
+.spt-frame-keys span { height: 24px; border-radius: 12px; background: linear-gradient(#cfd4da, #9aa1aa); color: #222; font: bold 12px sans-serif; display: grid; place-items: center; box-shadow: 0 2px 0 #555; }
+.spt-frame-keys span.nav { grid-column: span 3; height: 30px; border-radius: 15px; display: flex; justify-content: space-around; background: linear-gradient(#e8ebee, #aab1ba); }
+
+/* Laptop: the window is the lid, the base sticks out below */
+.application.spt-player-phone.spt-frame-computer:not(.minimized) {
+  padding: 22px 22px 26px; border-radius: 16px 16px 4px 4px;
+  background: linear-gradient(#2a2d32, #17191c);
+  box-shadow: 0 0 0 2px #3c4047, 0 30px 40px rgba(0,0,0,0.5);
+}
+.spt-player-phone.spt-frame-computer:not(.minimized) > .window-header { top: 1px; height: 20px; padding: 0 16px; }
+.spt-player-phone.spt-frame-computer:not(.minimized) > .window-header .header-control { width: 16px; height: 16px; font-size: 10px; }
+.spt-player-phone.spt-frame-computer:not(.minimized) > .window-content { border-radius: 3px; }
+.spt-frame-webcam { top: 9px; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; border-radius: 50%; background: #0b0c0d; box-shadow: 0 0 0 1px #333; }
+.spt-frame-base { left: -34px; right: -34px; bottom: -16px; height: 16px; border-radius: 0 0 18px 18px; background: linear-gradient(#c9ced5, #8b929b); box-shadow: 0 10px 18px rgba(0,0,0,0.45); }
+.spt-frame-base::after { content: ""; display: block; width: 90px; height: 5px; margin: 0 auto; border-radius: 0 0 6px 6px; background: #7a8089; }
+
+/* GM view in a frame: the orange line becomes an outline, so the bezel shadows stay. */
+.spt-player-phone.spt-framed.spt-gm-view:not(.minimized) > .window-content { outline: 2px solid var(--spt-warn); outline-offset: -2px; }
+
+/* Terminal: flat office monitor on a stand */
+.application.spt-player-phone.spt-frame-monitor:not(.minimized) {
+  padding: 16px 16px 34px; border-radius: 10px;
+  background: linear-gradient(#d3d0c8, #b8b5ad);
+  box-shadow: 0 0 0 1px #8f8c85, 0 30px 40px rgba(0,0,0,0.45), inset 0 1px 0 #ece9e2;
+}
+.spt-player-phone.spt-frame-monitor:not(.minimized) > .window-header { height: 16px; padding: 0 12px; color: #4a4842; }
+.spt-player-phone.spt-frame-monitor:not(.minimized) > .window-header .header-control { width: 14px; height: 14px; font-size: 9px; background: transparent; }
+.spt-player-phone.spt-frame-monitor:not(.minimized) > .window-content { border-radius: 2px; box-shadow: 0 0 0 2px #77746d; }
+.spt-frame-monitor .spt-frame-led { right: 22px; bottom: 13px; width: 8px; height: 8px; border-radius: 50%; background: #58d36a; box-shadow: 0 0 6px #58d36a; }
+.spt-frame-stand {
+  z-index: -1; left: 50%; bottom: -62px; transform: translateX(-50%); width: 230px; height: 62px;
+  background: linear-gradient(90deg, #a9a69e, #cfccc4 50%, #a9a69e) center top / 70px 46px no-repeat,
+    radial-gradient(ellipse at center, #c4c1b9 0 60%, #9d9a92 61% 70%, transparent 71%) center bottom / 230px 26px no-repeat;
+}
+
+/* Terminal, Console and Military looks: CRT monitor (olive case for Military) */
+.application.spt-player-phone.spt-frame-crt:not(.minimized) {
+  --spt-case: #d9d2bf; --spt-case2: #b9b09a; --spt-case-line: #8a836f;
+  padding: 34px 40px 64px; border-radius: 22px 22px 14px 14px;
+  background: linear-gradient(170deg, var(--spt-case), var(--spt-case2));
+  box-shadow: 0 0 0 1px var(--spt-case-line), 0 30px 46px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.5);
+}
+.application.spt-player-phone.spt-frame-crt.spt-skin-military:not(.minimized) { --spt-case: #6b6d4a; --spt-case2: #4b4d33; --spt-case-line: #33351f; }
+.spt-player-phone.spt-frame-crt:not(.minimized) > .window-header { height: 30px; padding: 0 22px; color: #5b5545; }
+.spt-player-phone.spt-frame-crt.spt-skin-military:not(.minimized) > .window-header { color: #d8d4b6; }
+.spt-player-phone.spt-frame-crt:not(.minimized) > .window-content { border-radius: 38px / 30px; box-shadow: 0 0 0 10px #2a2a26, 0 0 0 12px var(--spt-case-line), inset 0 0 40px rgba(0,0,0,0.8); }
+.spt-frame-scan {
+  z-index: 3; left: 40px; right: 40px; top: 34px; bottom: 64px; border-radius: 38px / 30px;
+  background: repeating-linear-gradient(transparent 0 2px, rgba(0,0,0,0.18) 2px 3px), radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.08), transparent 55%);
+}
+.spt-frame-crt .spt-frame-led { right: 44px; bottom: 26px; width: 9px; height: 9px; border-radius: 50%; background: #7bff7b; box-shadow: 0 0 6px #7bff7b; }
+.spt-frame-vents { left: 44px; bottom: 24px; width: 140px; height: 14px; border-radius: 2px; opacity: 0.7; background: repeating-linear-gradient(90deg, var(--spt-case-line) 0 4px, transparent 4px 9px); }
+
+/* Landlines: handset on top, coiled cord on the side */
+.spt-frame-handset { pointer-events: none; }
+.spt-frame-handset::before, .spt-frame-handset::after { content: ""; position: absolute; }
+.spt-frame-cord { z-index: -1; left: -16px; top: 60px; width: 14px; height: 220px; border-radius: 7px; background: repeating-linear-gradient(#4a4e55 0 3px, #2b2e33 3px 6px); }
+
+/* Modern landline: grey desk phone */
+.application.spt-player-phone.spt-frame-desk:not(.minimized) {
+  padding: 92px 18px 20px; border-radius: 26px 26px 30px 30px;
+  background: linear-gradient(#e3e1dc, #c3c0ba);
+  box-shadow: 0 0 0 1px #9b988f, 0 26px 40px rgba(0,0,0,0.5), inset 0 2px 0 #f5f4f1;
+}
+.spt-player-phone.spt-frame-desk:not(.minimized) > .window-header { height: 22px; padding: 0 14px; color: #55534d; }
+.spt-player-phone.spt-frame-desk:not(.minimized) > .window-content { border-radius: 14px; box-shadow: inset 0 2px 6px rgba(0,0,0,0.25), 0 0 0 1px #a7a49c; }
+.spt-frame-desk .spt-frame-handset { left: 14px; right: 14px; top: 24px; height: 52px; border-radius: 26px; background: linear-gradient(#5e636a, #3a3e44); box-shadow: 0 6px 10px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.2); }
+.spt-frame-desk .spt-frame-handset::before, .spt-frame-desk .spt-frame-handset::after { top: 10px; width: 30px; height: 30px; border-radius: 50%; background: repeating-radial-gradient(circle, #2a2d31 0 2px, #4a4e55 2px 4px); }
+.spt-frame-desk .spt-frame-handset::before { left: 14px; }
+.spt-frame-desk .spt-frame-handset::after { right: 14px; }
+
+/* Vintage landline: black bakelite dome, handset on its cradle */
+.application.spt-player-phone.spt-frame-rotary:not(.minimized) {
+  padding: 110px 30px 26px; border-radius: 50% 50% 26px 26px / 34% 34% 26px 26px;
+  background: radial-gradient(ellipse at 35% 25%, #4a4541, #1b1917 55%, #0c0b0a);
+  box-shadow: 0 0 0 1px #000, 0 28px 44px rgba(0,0,0,0.6), inset 0 2px 2px rgba(255,255,255,0.12);
+}
+.spt-player-phone.spt-frame-rotary:not(.minimized) > .window-header { top: 64px; height: 22px; padding: 0 28px; color: #c9bfa8; }
+.spt-player-phone.spt-frame-rotary:not(.minimized) > .window-content { border-radius: 18px; box-shadow: inset 0 0 14px rgba(0,0,0,0.7); }
+.spt-frame-rotary .spt-frame-handset { left: 10px; right: 10px; top: -12px; height: 58px; border-radius: 29px 29px 22px 22px; background: radial-gradient(ellipse at 40% 20%, #55504b, #141210 70%); box-shadow: 0 8px 12px rgba(0,0,0,0.55); }
+.spt-frame-rotary .spt-frame-handset::before, .spt-frame-rotary .spt-frame-handset::after { bottom: -14px; width: 16px; height: 18px; border-radius: 0 0 6px 6px; background: #0f0e0d; }
+.spt-frame-rotary .spt-frame-handset::before { left: 60px; }
+.spt-frame-rotary .spt-frame-handset::after { right: 60px; }
+.spt-frame-rotary .spt-frame-cord { background: repeating-linear-gradient(#2a2623 0 3px, #0d0c0b 3px 6px); }

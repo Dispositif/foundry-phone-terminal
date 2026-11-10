@@ -101,6 +101,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
   - phones and computers: **Text console** (green phosphor on black, text only) or **Secure (military)** (khaki, upper case, "Classified" banner);
   - laptop and terminal: **Federal (FBI)**, a navy and gold government workstation, emails shown as case files with a reference and a "Confidential" stamp, and an "Identification required" lock screen.
 - Every device stores its look ("default" means the model's look). A look removed or renamed in a future version falls back to the model's look.
+- Each device is drawn as the real thing around its screen: smartphone, old mobile with a decorative keypad, laptop, terminal monitor (a CRT for the Console and Military looks), desk phone or bakelite rotary phone. The Foundry title bar gives way to two discreet buttons on the top edge (menu, close); drag the window from there. The GM view uses the same frame.
 - The incoming call window uses the look of the ringing device, and so does the GM view of a device, with an orange "GM view · preparation" border.
 
 ### Who holds the device?

@@ -101,6 +101,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
   - téléphones et ordinateurs : **Console texte** (vert phosphore sur noir, texte seul) ou **Sécurisé (militaire)** (kaki, majuscules, bandeau « Confidentiel défense ») ;
   - ordinateur et terminal : **Fédéral (FBI)**, poste gouvernemental bleu marine et or, mails présentés en fiches de dossier (référence, tampon « Confidentiel »), écran de verrouillage « Identification requise ».
 - Chaque appareil enregistre son habillage (« default » = celui du modèle). Un habillage retiré ou renommé dans une version future retombe sur celui du modèle.
+- Chaque appareil est dessiné comme le vrai autour de son écran : smartphone, vieux mobile avec clavier décoratif, ordinateur portable, écran de terminal (un CRT pour les habillages Console et Militaire), poste de bureau ou téléphone à cadran en bakélite. La barre de titre Foundry laisse place à deux boutons discrets sur le bord haut (menu, fermer) ; on déplace la fenêtre par là. La vue MJ a le même cadre.
 - La fenêtre d'appel entrant prend l'habillage de l'appareil qui sonne. La vue MJ d'un appareil aussi, avec un liseré orange « Vue MJ · préparation ».
 
 ### Qui a l'appareil en main ?

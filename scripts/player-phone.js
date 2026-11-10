@@ -14,6 +14,47 @@ import { t, tn } from "./i18n.js";
 /*  Player window: My phone                      */
 /* -------------------------------------------- */
 
+/** Device frames, by kind (see frameKind). Sizes are the window's, frame included. */
+const LANDLINE_DECO = `<span class="spt-frame-deco spt-frame-handset"></span><span class="spt-frame-deco spt-frame-cord"></span>`;
+const FRAMES = {
+  smartphone: {
+    width: 340, height: 640,
+    before: `<span class="spt-frame-deco spt-frame-side r"></span><span class="spt-frame-deco spt-frame-side l"></span><span class="spt-frame-deco spt-frame-side l2"></span><span class="spt-frame-deco spt-frame-camera"></span>`,
+    after: `<span class="spt-frame-deco spt-frame-homebar"></span>`
+  },
+  mobile: {
+    width: 290, height: 600, gm: { width: 330, height: 660 },
+    before: `<div class="spt-frame-deco spt-frame-speaker"></div>`,
+    after: `<div class="spt-frame-deco spt-frame-keys" aria-hidden="true"><span class="nav"><i class="fas fa-caret-left"></i><b>OK</b><i class="fas fa-caret-right"></i></span>${"123456789*0#".split("").map((k) => `<span>${k}</span>`).join("")}</div>`
+  },
+  computer: {
+    width: 640, height: 460,
+    before: `<span class="spt-frame-deco spt-frame-webcam"></span>`,
+    after: `<span class="spt-frame-deco spt-frame-base"></span>`
+  },
+  monitor: {
+    width: 640, height: 440,
+    before: `<span class="spt-frame-deco spt-frame-led"></span>`,
+    after: `<span class="spt-frame-deco spt-frame-stand"></span>`
+  },
+  crt: {
+    width: 620, height: 480,
+    before: `<span class="spt-frame-deco spt-frame-led"></span>`,
+    after: `<span class="spt-frame-deco spt-frame-scan"></span><span class="spt-frame-deco spt-frame-vents"></span>`
+  },
+  desk: { width: 330, height: 520, before: LANDLINE_DECO },
+  rotary: { width: 370, height: 540, before: LANDLINE_DECO }
+};
+
+/** Frame drawn around a device: by model, and by look for terminals and landlines. */
+function frameKind(phone) {
+  const model = phone?.model ?? "smartphone";
+  const skin = skinOf(phone);
+  if (model === "desktop") return ["console", "military"].includes(skin) ? "crt" : "monitor";
+  if (model === "landline") return skin === "modern" ? "desk" : "rotary";
+  return FRAMES[model] ? model : null;
+}
+
 export class PlayerPhone extends ApplicationV2 {
   static instance = null;
 
@@ -406,6 +447,30 @@ export class PlayerPhone extends ApplicationV2 {
     content.innerHTML = result;
   }
 
+  /**
+   * Draws the device around the screen (player and GM view).
+   * The Foundry header stays (drag, menu, close) as a discreet bar over the top bezel.
+   * The frame parts live next to .window-content, so they survive re-renders.
+   */
+  _applyFrame(cur) {
+    const el = this.element;
+    const kind = cur ? frameKind(cur.phone) : null;
+    const frame = FRAMES[kind];
+    // The key includes the GM view, which may get a larger window.
+    const key = frame ? `${kind}${this.gm ? "-gm" : ""}` : "";
+    if ((el.dataset.sptFrame ?? "") === key) return;
+    for (const d of el.querySelectorAll(".spt-frame-deco")) d.remove();
+    for (const k of Object.keys(FRAMES)) el.classList.toggle(`spt-frame-${k}`, k === kind);
+    el.classList.toggle("spt-framed", !!frame);
+    el.dataset.sptFrame = key;
+    if (!frame) return;
+    const content = el.querySelector(".window-content");
+    content?.insertAdjacentHTML("beforebegin", frame.before ?? "");
+    content?.insertAdjacentHTML("afterend", frame.after ?? "");
+    const size = (this.gm && frame.gm) || frame;
+    this.setPosition({ width: size.width, height: size.height });
+  }
+
   _onRender(context, options) {
     super._onRender?.(context, options);
     PlayerPhone.instance = this;
@@ -413,6 +478,7 @@ export class PlayerPhone extends ApplicationV2 {
     const skin = cur ? skinOf(cur.phone) : null;
     for (const k of SKINS) this.element.classList.toggle(`spt-skin-${k}`, k === skin);
     this.element.classList.toggle("spt-gm-view", this.gm);
+    this._applyFrame(cur);
     const el = this.element;
     // Banners: GM preparation, secure device.
     const content = el.querySelector(".window-content");
