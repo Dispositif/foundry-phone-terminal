@@ -1,6 +1,6 @@
 import { attChipHtml, attFromDrop, pickImage } from "./attachments.js";
 import { ApplicationV2, DialogV2, HandlebarsApplicationMixin, MASKED, MODES, MODULE_ID } from "./constants.js";
-import { allPhones, holders, sharedUsers, displayName, getLog, getPhoneData, holderName, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc } from "./devices.js";
+import { allPhones, holders, sharedUsers, displayName, getLog, getPhoneData, hasSignal, holderName, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc } from "./devices.js";
 import { contactsDialog, directoryDialog, editPhoneDialog, giveDialog, newPhoneDialog } from "./dialogs.js";
 import { copyJournalLink } from "./journal-links.js";
 import { openPhone } from "./main.js";
@@ -74,6 +74,42 @@ export function bindIconSelects(root) {
     select.addEventListener("change", sync);
     sync();
   }
+}
+
+/** How precisely the network can place a device: carried, switched on, with signal. */
+/** model -> [precision, how the network places it] */
+const TRACK_LEVEL = { smartphone: ["high", "gps"], computer: ["high", "wifi"], mobile: ["medium", "gsm"], pager: ["low", "gsm"] };
+const TRACK_ORDER = { high: 0, medium: 1, low: 2, none: 3 };
+
+/**
+ * One group per agent (player characters, and any player-owned actor carrying a device):
+ * the devices the network can locate and the best precision.
+ * An agent with nothing locatable is listed too: precision none, location unknown.
+ */
+function trackingRows(phones) {
+  const agents = new Map();
+  for (const u of game.users) if (!u.isGM && u.character) agents.set(u.character.id, u.character);
+  for (const p of phones) if (p.actor?.hasPlayerOwner) agents.set(p.actor.id, p.actor);
+  return [...agents.values()]
+    .map((actor) => {
+      const devices = phones
+        .filter((p) => p.actor?.id === actor.id && TRACK_LEVEL[p.phone.model] && modeOf(p.phone) !== "off" && hasSignal(p.phone))
+        .map((p) => {
+          const [level, via] = TRACK_LEVEL[p.phone.model];
+          return { icon: modelOf(p.phone).icon, modelLabel: modelOf(p.phone).label, label: p.phone.label, level, via };
+        })
+        .sort((a, b) => TRACK_ORDER[a.level] - TRACK_ORDER[b.level]);
+      for (const d of devices) d.levelLabel = `${t(`Track.${d.level}`)} (${t(`Track.Via.${d.via}`)})`;
+      const level = devices[0]?.level ?? "none";
+      return {
+        agent: actor.name,
+        img: actor.img,
+        level,
+        levelLabel: t(`Track.${level}`),
+        devices
+      };
+    })
+    .sort((a, b) => TRACK_ORDER[a.level] - TRACK_ORDER[b.level] || a.agent.localeCompare(b.agent));
 }
 
 export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
@@ -313,7 +349,8 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       inbox,
       inboxUnread: inboxAll.filter((x) => x.e.seen === false).length,
       groups: sortedGroups,
-      deviceCount: phones.length
+      deviceCount: phones.length,
+      tracking: this._state.tab === "tracking" ? trackingRows(phones) : []
     };
   }
 

@@ -119,6 +119,7 @@
       "CallBack": "Call back",
       "TabInbox": "Messages",
       "TabDevices": "Devices",
+      "TabTracking": "Tracking",
       "ModeMessage": "Message",
       "ModeCall": "Call",
       "NoInbox": "No messages from agents.",
@@ -373,6 +374,21 @@
       "Newer": "Newer page",
       "Older": "Older page"
     },
-    "Close": "Close"
+    "Close": "Close",
+    "Track": {
+      "Experimental": "Experimental feature",
+      "Hint": "How precisely the network can locate each agent.",
+      "None": "No agents.",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "none": "None",
+      "Unknown": "Unknown",
+      "Via": {
+        "gps": "GPS",
+        "wifi": "Wi-Fi",
+        "gsm": "GSM"
+      }
+    }
   }
 }

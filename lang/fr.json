@@ -119,6 +119,7 @@
       "CallBack": "Rappeler",
       "TabInbox": "Messages",
       "TabDevices": "Appareils",
+      "TabTracking": "Traçage",
       "ModeMessage": "Message",
       "ModeCall": "Appel",
       "NoInbox": "Aucun message des agents.",
@@ -373,6 +374,21 @@
       "Newer": "Message plus récent",
       "Older": "Message plus ancien"
     },
-    "Close": "Fermer"
+    "Close": "Fermer",
+    "Track": {
+      "Experimental": "Fonction expérimentale",
+      "Hint": "Précision avec laquelle le réseau peut localiser chaque agent.",
+      "None": "Aucun agent.",
+      "high": "Forte",
+      "medium": "Moyenne",
+      "low": "Faible",
+      "none": "Aucune",
+      "Unknown": "Inconnue",
+      "Via": {
+        "gps": "GPS",
+        "wifi": "Wi-Fi",
+        "gsm": "GSM"
+      }
+    }
   }
 }

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.33.0
+- New GM panel tab: **Tracking** (experimental feature). One group per agent: the best precision, and the devices the network can locate (carried, switched on, with signal): high for a smartphone (GPS) or a laptop (Wi-Fi), medium for a mobile (GSM), low for a pager (GSM). Terminals and landlines do not count. An agent with nothing locatable is listed with precision none and location unknown. A quick way to judge how exposed the agents are to an enemy with access to the network.
+
 ## 0.32.1
 - **Rotary landline**: no device menu any more, only its number on a paper label stuck on the set. The GM view is the same as the players' (it has no contacts, history, caller display, ring modes or power button); the GM cannot dial from it.
 - **Incoming calls show on the device itself** instead of a separate window, on the smartphone, the mobile (caller, green and red keys) and the modern landline (caller's number on the display when it is a number, Answer and Hang up keys). The device opens, or comes forward, on the ringing device; a phone can be answered even when locked. The rotary landline and computers keep the incoming call window.

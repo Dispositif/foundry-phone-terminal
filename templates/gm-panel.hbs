@@ -17,6 +17,7 @@
     <a class="spt-tab {{#if (eq tab "send")}}active{{/if}}" data-action="switchTab" data-tab="send" role="tab"><i class="fas fa-paper-plane"></i> {{spt "Gm.TabSend"}}</a>
     <a class="spt-tab {{#if (eq tab "inbox")}}active{{/if}}" data-action="switchTab" data-tab="inbox" role="tab"><i class="fas fa-inbox"></i> {{spt "Gm.TabInbox"}}{{#if inboxUnread}} <span class="spt-badge">{{inboxUnread}}</span>{{/if}}</a>
     <a class="spt-tab {{#if (eq tab "devices")}}active{{/if}}" data-action="switchTab" data-tab="devices" role="tab"><i class="fas fa-mobile-screen"></i> {{spt "Gm.TabDevices"}} <span class="spt-count">{{deviceCount}}</span></a>
+    <a class="spt-tab {{#if (eq tab "tracking")}}active{{/if}}" data-action="switchTab" data-tab="tracking" role="tab" title="{{spt "Track.Hint"}}"><i class="fas fa-location-crosshairs"></i> {{spt "Gm.TabTracking"}}</a>
   </nav>
 
   <div class="spt-tab-body">
@@ -124,6 +125,34 @@
       </div>
       {{else}}
       <p class="spt-phone-status">{{spt "Gm.NoDevices"}}</p>
+      {{/each}}
+    </section>
+  {{/if}}
+  {{#if (eq tab "tracking")}}
+    <section class="spt-gm-tracking">
+      <p class="spt-track-hint"><span class="spt-exp-tag"><i class="fas fa-flask"></i> {{spt "Track.Experimental"}}</span> {{spt "Track.Hint"}}</p>
+      {{#each tracking}}
+      <div class="spt-dev-group spt-track-group">
+        <header class="spt-dev-group-head">
+          {{#if img}}<img src="{{img}}" alt="">{{/if}}
+          <strong>{{agent}}</strong>
+          {{#if (eq level "none")}}<span class="spt-track-scene"><i class="fas fa-question"></i> {{spt "Track.Unknown"}}</span>{{/if}}
+          <span class="spt-track-level spt-track-{{level}}">{{levelLabel}}</span>
+        </header>
+        {{#if devices.length}}
+        <ul class="spt-dev-list">
+          {{#each devices}}
+          <li class="spt-dev spt-track">
+            <i class="fas {{icon}}" title="{{modelLabel}}"></i>
+            <span class="spt-dev-label">{{label}}</span>
+            <span class="spt-track-small">{{levelLabel}}</span>
+          </li>
+          {{/each}}
+        </ul>
+        {{/if}}
+      </div>
+      {{else}}
+      <p class="spt-phone-status">{{spt "Track.None"}}</p>
       {{/each}}
     </section>
   {{/if}}
