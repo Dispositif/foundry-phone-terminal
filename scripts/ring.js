@@ -1,5 +1,5 @@
 import { MASKED, MODULE_ID, RESULT_LABELS, SOCKET } from "./constants.js";
-import { addLog, displayName, getPhoneData, hasSignal, holders, isFixed, isLandline, keyFor, modelOf, phoneLabel, phonesByNumber, skinOf, modeOf } from "./devices.js";
+import { addLog, displayName, getPhoneData, hasSignal, holders, isFixed, isLandline, keyFor, modelOf, npcNumber, phoneLabel, phonesByNumber, skinOf, modeOf } from "./devices.js";
 import { esc, gmWhisper, maskedLabel, rerenderAll } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
@@ -17,7 +17,8 @@ export function ring(target, { caller = MASKED, origin = null, callId = foundry.
   if (!game.user.isGM) return ui.notifications.warn(t("Warn.GmOnlyCall"));
   const [kind, value] = String(target).split(/:(.*)/s);
   const timeout = game.settings.get(MODULE_ID, "ringTimeout");
-  const call = { caller, label: value, open: new Map(), origin, lastResult: "nobody" };
+  // A directory name rings as its number, so the agent's own contact name shows on their device.
+  const call = { caller, from: npcNumber(caller), label: value, open: new Map(), origin, lastResult: "nobody" };
 
   const emitRing = (userId, extra) => {
     call.open.set(userId, extra.itemUuid ?? null);
@@ -52,14 +53,14 @@ export function ring(target, { caller = MASKED, origin = null, callId = foundry.
           gmWhisper(`<p><strong>📞 ${esc(phoneLabel(p))}</strong> : ${RESULT_LABELS[result]}</p><p><em>${t("Caller")} : ${esc(maskedLabel(caller))}</em></p>`);
         }
         // Without signal, the missed call only shows when signal returns.
-        addLog(p.item, { kind: "call", dir: "in", with: keyFor(p.phone, caller), result: "missed", pending: result === "nosignal" || result === "off" });
+        addLog(p.item, { kind: "call", dir: "in", with: keyFor(p.phone, call.from), result: "missed", pending: result === "nosignal" || result === "off" });
         continue;
       }
       for (const u of users) {
         const model = modelOf(p.phone);
         emitRing(u.id, {
-          caller: modelOf(p.phone).callerId ? displayName(p.phone, caller) : null,
-          callerNumber: landlineNumber(p, caller),
+          caller: modelOf(p.phone).callerId ? displayName(p.phone, call.from) : null,
+          callerNumber: landlineNumber(p, call.from),
           itemUuid: p.item.uuid,
           phoneLabel: isLandline(p.phone) ? `${p.phone.label} (${game.scenes.get(p.phone.sceneId)?.name ?? ""})` : p.phone.label,
           silent: mode === "silent",
@@ -95,7 +96,7 @@ export function hangUp(callId, { notifyOrigin = true } = {}) {
     if (itemUuid && !logged.has(itemUuid)) {
       logged.add(itemUuid);
       const item = fromUuidSync(itemUuid);
-      if (item) addLog(item, { kind: "call", dir: "in", with: keyFor(getPhoneData(item), call.caller), result: "missed" });
+      if (item) addLog(item, { kind: "call", dir: "in", with: keyFor(getPhoneData(item), call.from), result: "missed" });
     }
   }
   if (call.origin && notifyOrigin) finishOrigin(call.origin, "noanswer");
@@ -115,7 +116,7 @@ export function onResponse({ callId, result, userId }) {
   call.lastResult = result;
   const user = game.users.get(userId);
   const item = itemUuid ? fromUuidSync(itemUuid) : null;
-  if (item) addLog(item, { kind: "call", dir: "in", with: keyFor(getPhoneData(item), call.caller), result });
+  if (item) addLog(item, { kind: "call", dir: "in", with: keyFor(getPhoneData(item), call.from), result });
 
   if (!call.origin) {
     const where = item ? ` (${getPhoneData(item)?.label ?? item.name})` : "";

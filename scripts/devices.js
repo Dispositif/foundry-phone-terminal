@@ -203,6 +203,15 @@ export function findNpc(str, { all = false } = {}) {
   return npcDirectory().find((e) => (all || e.pub) && (norm(e.name) === s || (e.number && norm(e.number) === s))) ?? null;
 }
 
+/**
+ * GM side: an NPC directory name (public or not) becomes its number, so the device files it
+ * under the agent's own contact for that number. Anything else is returned as is.
+ */
+export function npcNumber(str) {
+  const npc = findNpc(str, { all: true });
+  return npc?.number && norm(npc.name) === norm(str) ? npc.number : str;
+}
+
 /** Conversation key: the contact's number if any, otherwise its name, otherwise the raw input. Public directory names give their number. */
 export function keyFor(phone, str) {
   const c = findContact(phone, str) ?? findNpc(str);
@@ -214,12 +223,12 @@ export function displayName(phone, key) {
   return findContact(phone, key)?.name ?? findNpc(key)?.name ?? maskedLabel(key);
 }
 
-/** Name for the GM: as seen from the device, otherwise from the whole directory. */
+/** Name for the GM: the whole NPC directory first, otherwise as seen from the device. */
 export function gmName(phone, key) {
-  const shown = displayName(phone, key);
-  if (shown !== maskedLabel(key)) return shown;
+  // The NPC directory wins over the name the agent gave the contact: the GM sees who really answers.
   const npc = findNpc(key, { all: true });
-  return npc ? `${npc.name} (${key})` : shown;
+  if (npc) return npc.number ? `${npc.name} (${npc.number})` : npc.name;
+  return displayName(phone, key);
 }
 
 /** Number known nowhere (no contact, no directory entry, no device): probably a wrong number. */

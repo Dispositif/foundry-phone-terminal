@@ -1,6 +1,6 @@
 import { attChatHtml } from "./attachments.js";
 import { MASKED, MODULE_ID, PAGER_MAX, SOCKET } from "./constants.js";
-import { addLog, allPhones, getLog, getPhoneData, hasSignal, holders, keyFor, modelOf, msgOn, phoneLabel, phonesByNumber, withItemLock, modeOf } from "./devices.js";
+import { addLog, allPhones, getLog, getPhoneData, hasSignal, holders, keyFor, modelOf, msgOn, npcNumber, phoneLabel, phonesByNumber, withItemLock, modeOf } from "./devices.js";
 import { esc, maskedLabel, nl2br } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
@@ -124,7 +124,7 @@ export async function sendSms(target, text, { sender = MASKED, att = null } = {}
   const phones = phonesByNumber(value);
   if (!phones.length) return ui.notifications.warn(t("Warn.NoDevice", { value }));
   for (const p of phones) {
-    const ok = await deliverToPhone(p, sender, text, att);
+    const ok = await deliverToPhone(p, npcNumber(sender), text, att);
     if (ok === false) ui.notifications.warn(`📱 ${phoneLabel(p)} : ${t("Warn.NobodyHolds")}`);
   }
   ui.notifications.info(`📱 ${t("Info.SentTo", { name: value })}`);

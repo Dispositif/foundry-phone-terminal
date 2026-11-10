@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.33.1
+- GM side (incoming call from an agent, messages tab): a number from the NPC directory shows the directory name, even when the agent saved it under another name in their contacts.
+- GM messages and calls sent under an NPC directory name (public or not) now arrive as that NPC's number: the agent sees their own contact name for it, in the same conversation.
+
 ## 0.33.0
 - New GM panel tab: **Tracking** (experimental feature). One group per agent: the best precision, and the devices the network can locate (carried, switched on, with signal): high for a smartphone (GPS) or a laptop (Wi-Fi), medium for a mobile (GSM), low for a pager (GSM). Terminals and landlines do not count. An agent with nothing locatable is listed with precision none and location unknown. A quick way to judge how exposed the agents are to an enemy with access to the network.
 
