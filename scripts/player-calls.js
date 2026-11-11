@@ -1,9 +1,8 @@
 import { DialogV2, HANGUP_SRC, MODULE_ID, PICKUP_SRC, RINGBACK_SRC, RING_SRC, SOCKET, VIBRATE_SRC } from "./constants.js";
 import { displayName, getPhoneData, hasSignal, keyFor, modelOf, msgOn, skinOf, modeOf } from "./devices.js";
 import { updateFab } from "./fab.js";
-import { deviceNotice, esc, isMasked, maskedLabel, nl2br, playLocal, rerenderAll } from "./util.js";
+import { deviceNotice, esc, isMasked, maskedLabel, playLocal, rerenderAll } from "./util.js";
 import { PlayerPhone } from "./player-phone.js";
-import { attHtml, openAttachment } from "./attachments.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
 /*  Player: incoming calls                      */
@@ -233,16 +232,3 @@ function stopEntry(id, { tombstone = false } = {}) {
   else nearby.delete(id);
 }
 
-/** Message from the GM to a player without a device: a small phone-styled window, nothing in the chat. */
-export function messagePopup({ sender, text, att = null }) {
-  const body = [attHtml(att), text ? `<div>${nl2br(text)}</div>` : ""].filter(Boolean).join("");
-  const dlg = new DialogV2({
-    classes: ["spt-player-phone", "spt-skin-smartphone", "spt-message-popup"],
-    window: { title: t("NewMessage"), icon: "fas fa-comment-sms" },
-    content: `<header class="spt-phone-top conv"><strong>${esc(sender)}</strong></header><div class="spt-thread"><div class="spt-bubble in">${body}</div></div>`,
-    buttons: [{ action: "ok", label: t("Close"), default: true }]
-  });
-  dlg.render({ force: true }).then(() => {
-    for (const a of dlg.element?.querySelectorAll("[data-att-img], [data-att-doc]") ?? []) a.addEventListener("click", () => openAttachment(a));
-  });
-}

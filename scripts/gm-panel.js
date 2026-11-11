@@ -245,6 +245,8 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
   async _prepareContext() {
     const phones = allPhones().sort((a, b) => phoneLabel(a).localeCompare(phoneLabel(b)));
     const players = game.users.filter((u) => !u.isGM);
+    // Direct to a player: only with an assigned character, who carries (or gets) the phone.
+    const reachable = players.filter((u) => u.character).sort((a, b) => Number(b.active) - Number(a.active));
     const countByNumber = phones.reduce((m, p) => m.set(norm(p.phone.number), (m.get(norm(p.phone.number)) ?? 0) + 1), new Map());
 
     // Recipients: one line per number, however it is written (555-133 = 555133).
@@ -252,16 +254,16 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     const rank = (p) => (isFixed(p.phone) ? 2 : p.actor?.hasPlayerOwner ? 0 : 1);
     const byRank = [...phones].sort((a, b) => rank(a) - rank(b));
     const numbers = [...new Map(byRank.map((p) => [norm(p.phone.number), p.phone.number])).values()];
-    const targets = [...numbers.map((n) => `phone:${n}`), ...players.map((u) => `user:${u.id}`)];
+    const targets = [...reachable.map((u) => `user:${u.id}`), ...numbers.map((n) => `phone:${n}`)];
     if (!targets.includes(this._state.target)) this._state.target = targets[0] ?? "";
     const targetDevices = numbers.map((n) => {
       const ps = phones.filter((p) => norm(p.phone.number) === norm(n));
       const label = ps.length > 1 ? `${n} — ${ps.map((p) => p.actor?.name ?? "?").join(" + ")} (${t("Gm.Cloned")})` : phoneLabel(ps[0]);
       return { value: `phone:${n}`, label, icon: modelOf(ps[0].phone).icon, selected: this._state.target === `phone:${n}` };
     });
-    const targetPlayers = players.map((u) => ({
+    const targetPlayers = reachable.map((u) => ({
       value: `user:${u.id}`,
-      label: `${u.name}${u.character ? ` — ${u.character.name}` : ""}${u.active ? "" : ` (${t("Gm.Offline")})`}`,
+      label: `${u.name} — ${u.character.name}${u.active ? "" : ` (${t("Gm.Offline")})`}`,
       selected: this._state.target === `user:${u.id}`
     }));
 

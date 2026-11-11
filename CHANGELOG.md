@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.37.0
+- **Messages and calls sent to a player** (not to a device) now land on their character's phone instead of a popup window: the smartphone they carry, otherwise their mobile; if they carry none, one is created with the model of the new **Default device** setting (smartphone or mobile, default look). The message gets a history, the floating button badge and the in-device call screen like any other. The popup window is gone.
+- In the GM panel recipients, **Players (direct)** now come first, and only players with an assigned character are listed; a direct send to a player without a character is refused with a warning.
+- In the recipients, online players come before offline ones.
+- README and catalogue description mention the automatic device creation.
+
 ## 0.36.0
 - **New device in two steps.** Step 1: big tiles with the device icon and what it does, carried devices (smartphone, mobile, pager, laptop) then installed ones (modern landline, rotary landline, terminal). Step 2: a short form for that model: the agents' portraits to pick the holder in one click (or an NPC, or nobody), the place for an installed device (current scene first), a name that follows the holder ("Smartphone de Gomez"), a random number with a dice to draw another, and the looks only when there is a choice. "Create and open" opens the GM view of the new device right away. Editing a device keeps the full form.
 

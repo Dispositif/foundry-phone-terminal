@@ -7,7 +7,7 @@
 Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateurs portables et des terminaux installés dans les lieux. Chaque appel ou message vers un PNJ arrive chez le MJ, qui répond, laisse sonner ou décide que le numéro n'existe pas. Pensé pour l'enquête et le jeu narratif, pas comme un simulateur de smartphone.
 
 - **Un raccourci : Ctrl+Shift+P** ouvre le panneau MJ, ou le téléphone du joueur. Les joueurs ont un bouton flottant de téléphone, le MJ un bouton télécom avec le nombre de non-lus.
-- **Rien à configurer :** le MJ peut tout de suite appeler un joueur ou lui envoyer un message, depuis le panneau MJ.
+- **Rien à configurer :** le MJ peut tout de suite appeler un joueur ou lui envoyer un message, depuis le panneau MJ. Cela arrive sur le téléphone de son personnage : s'il n'en porte pas, il est créé automatiquement (smartphone ou mobile, réglage **Appareil par défaut**).
 - **Les appareils sont un plus.** Un appareil est un objet dans l'inventaire d'un personnage (téléphone, portable), ou il est installé dans un lieu : fixe ou terminal rattaché à une scène Foundry, utilisé par ceux qui s'y trouvent. Les appareils apportent l'historique, les contacts, les réponses, le partage et les habillages.
 - **Les agents communiquent aussi entre eux.** Avec des appareils, les personnages s'appellent et s'envoient des messages directement, sans intervention du MJ, qui reçoit une copie discrète des messages.
 - **Annuaire PNJ :** listez vos PNJ une fois, nom et numéro. Vous voyez d'un coup d'œil qui les agents appellent, et les numéros publics (pizzeria, taxi, hôpital) servent de pages jaunes aux joueurs.

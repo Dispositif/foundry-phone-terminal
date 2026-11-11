@@ -1,5 +1,5 @@
 import { MASKED, MODULE_ID, RESULT_LABELS, SOCKET } from "./constants.js";
-import { addLog, displayName, getPhoneData, hasSignal, holders, isFixed, isLandline, keyFor, modelOf, npcNumber, phoneLabel, phonesByNumber, skinOf, modeOf } from "./devices.js";
+import { addLog, defaultDeviceFor, displayName, getPhoneData, hasSignal, holders, isFixed, isLandline, keyFor, modelOf, npcNumber, phoneLabel, phonesByNumber, skinOf, modeOf } from "./devices.js";
 import { esc, gmWhisper, maskedLabel, rerenderAll } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
@@ -13,7 +13,7 @@ export const pendingCalls = new Map();
  * Rings a device (target = "phone:<number>") or a player ("user:<id>").
  * origin = { userId, itemUuid, callId, key, name } when the call comes from another PC.
  */
-export function ring(target, { caller = MASKED, origin = null, callId = foundry.utils.randomID() } = {}) {
+export async function ring(target, { caller = MASKED, origin = null, callId = foundry.utils.randomID() } = {}) {
   if (!game.user.isGM) return ui.notifications.warn(t("Warn.GmOnlyCall"));
   const [kind, value] = String(target).split(/:(.*)/s);
   const timeout = game.settings.get(MODULE_ID, "ringTimeout");
@@ -28,9 +28,11 @@ export function ring(target, { caller = MASKED, origin = null, callId = foundry.
   if (kind === "user") {
     const user = game.users.get(value);
     if (!user) return ui.notifications.warn(t("Warn.PlayerNotFound"));
-    call.label = user.name;
-    if (!user.active) return ui.notifications.warn(`📱 ${t("Warn.UserOffline", { name: user.name })}`);
-    emitRing(user.id, { caller });
+    // The player's character phone (created with the default model if needed) rings like any device.
+    const p = await defaultDeviceFor(user);
+    if (p) return ring(`phone:${p.phone.number}`, { caller, origin, callId });
+    // No assigned character to carry a phone: nothing rings.
+    return ui.notifications.warn(t("Warn.NoCharacter", { name: user.name }));
   } else {
     const phones = phonesByNumber(value).filter((p) => p.item.uuid !== origin?.itemUuid);
     if (!phones.length) {

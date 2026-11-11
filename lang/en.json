@@ -59,7 +59,8 @@
       "NameOrNumber": "Enter a name or a number.",
       "GmOnlyPanel": "GM only panel.",
       "PagerCut": "pager message cut to {n} characters.",
-      "NoCalls": "this device does not take calls."
+      "NoCalls": "this device does not take calls.",
+      "NoCharacter": "{name} has no assigned character: nothing sent. Assign them a character (User configuration), or send to a device."
     },
     "Caller": "Caller",
     "Info": {
@@ -69,7 +70,8 @@
       "SmsPendingOff": "switched off, message pending.",
       "SentTo": "Message sent to {name}.",
       "Installed": "{model} \"{label}\" installed.",
-      "Created": "Device \"{label}\" ({number}) created."
+      "Created": "Device \"{label}\" ({number}) created.",
+      "DefaultCreated": "Created \"{label}\" for {name}."
     },
     "Gm": {
       "OnLine": "{who} is on the line with {name}.",
@@ -327,6 +329,10 @@
       "numberPrefix": {
         "name": "Phone number prefix",
         "hint": "Start of the numbers given to new devices (555- by default): 555-0123. Numbers ending in 02xx (555-0200 to 555-0299) are never given out: keep them for the NPC directory."
+      },
+      "defaultDevice": {
+        "name": "Default device",
+        "hint": "A message or call sent to a player (not to a device) lands on their character's phone. If the character carries none, one of this model is created."
       }
     },
     "Migrated": "{n} device(s) recovered from the previous version.",

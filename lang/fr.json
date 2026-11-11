@@ -59,7 +59,8 @@
       "NameOrNumber": "Indiquez un nom ou un numéro.",
       "GmOnlyPanel": "Panneau réservé au MJ.",
       "PagerCut": "message de bipeur coupé à {n} caractères.",
-      "NoCalls": "cet appareil ne reçoit pas d'appels."
+      "NoCalls": "cet appareil ne reçoit pas d'appels.",
+      "NoCharacter": "{name} n'a pas de personnage assigné : rien n'est envoyé. Assignez-lui un personnage (configuration de l'utilisateur), ou envoyez à un appareil."
     },
     "Caller": "Appelant",
     "Info": {
@@ -69,7 +70,8 @@
       "SmsPendingOff": "éteint, message en attente.",
       "SentTo": "Message envoyé à {name}.",
       "Installed": "{model} « {label} » installé.",
-      "Created": "Appareil « {label} » ({number}) créé."
+      "Created": "Appareil « {label} » ({number}) créé.",
+      "DefaultCreated": "« {label} » créé pour {name}."
     },
     "Gm": {
       "OnLine": "{who} est en ligne avec {name}.",
@@ -327,6 +329,10 @@
       "numberPrefix": {
         "name": "Préfixe des numéros",
         "hint": "Début des numéros donnés aux nouveaux appareils (555- par défaut) : 555-0123. Les numéros en 02xx (555-0200 à 555-0299) ne sont jamais attribués : gardez-les pour l'annuaire PNJ."
+      },
+      "defaultDevice": {
+        "name": "Appareil par défaut",
+        "hint": "Un message ou un appel envoyé à un joueur (et non à un appareil) arrive sur le téléphone de son personnage. S'il n'en porte pas, un appareil de ce modèle est créé."
       }
     },
     "Migrated": "{n} appareil(s) repris de l'ancienne version.",

@@ -27,8 +27,8 @@
         <label>{{spt "Gm.Recipient"}}</label>
         <div class="spt-icon-select"><i class="fas fa-mobile-screen"></i>
           <select name="target" data-icon-select>
+            {{#if targetPlayers.length}}<optgroup label="{{spt "Gm.PlayersDirect"}}">{{#each targetPlayers}}<option value="{{value}}" data-icon="fa-user" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</optgroup>{{/if}}
             {{#if targetDevices.length}}<optgroup label="{{spt "Devices"}}">{{#each targetDevices}}<option value="{{value}}" data-icon="{{icon}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</optgroup>{{/if}}
-            <optgroup label="{{spt "Gm.PlayersDirect"}}">{{#each targetPlayers}}<option value="{{value}}" data-icon="fa-user" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</optgroup>
           </select>
         </div>
       </div>

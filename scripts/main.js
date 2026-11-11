@@ -96,6 +96,15 @@ Hooks.once("init", () => {
     range: { min: 0, max: 120, step: 5 },
     default: 60
   });
+  game.settings.register(MODULE_ID, "defaultDevice", {
+    name: "SPT.Settings.defaultDevice.name",
+    hint: "SPT.Settings.defaultDevice.hint",
+    scope: "world",
+    config: true,
+    type: String,
+    choices: { smartphone: "SPT.Model.smartphone", mobile: "SPT.Model.mobile" },
+    default: "smartphone"
+  });
   game.settings.register(MODULE_ID, "floatingButton", {
     name: "SPT.Settings.floatingButton.name",
     hint: "SPT.Settings.floatingButton.hint",

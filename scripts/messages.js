@@ -1,6 +1,6 @@
 import { attChatHtml } from "./attachments.js";
 import { MASKED, MODULE_ID, PAGER_MAX, SOCKET } from "./constants.js";
-import { addLog, allPhones, getLog, getPhoneData, hasSignal, holders, keyFor, modelOf, msgOn, npcNumber, phoneLabel, phonesByNumber, withItemLock, modeOf } from "./devices.js";
+import { addLog, allPhones, defaultDeviceFor, getLog, getPhoneData, hasSignal, holders, keyFor, modelOf, msgOn, npcNumber, phoneLabel, phonesByNumber, withItemLock, modeOf } from "./devices.js";
 import { esc, maskedLabel, nl2br } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
@@ -114,11 +114,14 @@ export async function sendSms(target, text, { sender = MASKED, att = null } = {}
   if (kind === "user") {
     const user = game.users.get(value);
     if (!user) return ui.notifications.warn(t("Warn.PlayerNotFound"));
-    if (att) await grantAttachments([att], [user]);
-    // No device: the message pops up on the player's screen only (never in the chat).
-    if (!user.active) return ui.notifications.warn(`📱 ${t("Warn.UserOffline", { name: user.name })}`);
-    game.socket.emit(SOCKET, { type: "sms", targetUserId: user.id, popup: { sender: maskedLabel(sender), text, att } });
-    return ui.notifications.info(`📱 ${t("Info.SentTo", { name: user.name })}`);
+    // The player's character phone (created with the default model if needed): the message lands there.
+    const p = await defaultDeviceFor(user);
+    if (p) {
+      await deliverToPhone(p, npcNumber(sender), text, att);
+      return ui.notifications.info(`📱 ${t("Info.SentTo", { name: `${user.name} (${p.phone.label})` })}`);
+    }
+    // No assigned character to carry a phone: nothing is sent.
+    return ui.notifications.warn(t("Warn.NoCharacter", { name: user.name }));
   }
 
   const phones = phonesByNumber(value);

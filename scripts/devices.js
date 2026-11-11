@@ -451,3 +451,24 @@ export async function unmarkPhone(item) {
   return item.update({ [`flags.${MODULE_ID}.-=phone`]: null, ...patch });
 }
 
+
+/**
+ * GM: the device a message or call "to a player" lands on. The player's character carried phone
+ * (smartphone first, then mobile); if it has none, one of the default model (world setting) is created.
+ * null when the player has no assigned character to carry it.
+ */
+export async function defaultDeviceFor(user) {
+  const actor = user?.character ?? null;
+  if (!actor) return null;
+  const order = ["smartphone", "mobile"];
+  const carried = allPhones()
+    .filter((p) => p.actor === actor && order.includes(p.phone.model))
+    .sort((a, b) => order.indexOf(a.phone.model) - order.indexOf(b.phone.model));
+  if (carried.length) return carried[0];
+  const model = game.settings.get(MODULE_ID, "defaultDevice") || "smartphone";
+  const label = MODELS[model]?.label ?? MODELS.smartphone.label;
+  const item = await createPhone(actor, { label, number: randomAddress(model), model, theme: DEFAULT_THEME });
+  if (!item) return null;
+  ui.notifications.info(`📱 ${t("Info.DefaultCreated", { label, name: actor.name })}`);
+  return { item, phone: getPhoneData(item), actor };
+}

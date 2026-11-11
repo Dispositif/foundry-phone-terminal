@@ -2,7 +2,6 @@ import { onPlayerAccess } from "./attachments.js";
 import { MODULE_ID, SMS_SRC, VIBRATE_SRC } from "./constants.js";
 import { markEntryRead, markRead } from "./devices.js";
 import { openPager } from "./pager.js";
-import { messagePopup } from "./player-calls.js";
 import { onPlayerCall, onPlayerHangup, onPlayerSms, senderHolds } from "./gm-actions.js";
 import { activeCall, endCall, onCallResult, receiveNearbyCall, receiveNearbyRing, receiveRing, stopNearbyRing } from "./player-calls.js";
 import { onResponse } from "./ring.js";
@@ -35,7 +34,6 @@ export function onSocket(data) {
       if (forMe) {
         playLocal(data.silent ? VIBRATE_SRC : data.notif ? `modules/${MODULE_ID}/sounds/${data.notif}` : SMS_SRC);
         if (data.open) openPager(data.open, { latest: true });
-        if (data.popup) messagePopup(data.popup);
       }
       break;
     case "callResult":
