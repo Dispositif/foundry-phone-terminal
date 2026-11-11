@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.34.1
+- Fixed: **Cancel** in the GM's text dialogs saved the word "cancel": the NPC directory and a device's contacts were replaced by it, and a new or edited device, a hand-over or a forward could go through with it. Cancel now changes nothing.
+
 ## 0.34.0
 - **Compromised devices** (GM only): a warning toggle on each device in the GM panel marks a device as compromised (tapped, known to the enemy…). The mark shows in the devices list, the Tracking tab, the Messages tab and the GM's incoming call window, and the GM gets a warning when a compromised device calls or texts another agent or is called or texted by one. Players never see it.
 

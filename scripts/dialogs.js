@@ -94,7 +94,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
           };
         }
       },
-      { action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => null }
+      { action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => false }
     ],
     rejectClose: false
   });
@@ -166,11 +166,11 @@ export async function giveDialog(item) {
       <p class="hint">${t("Give.Hint")}</p></div>`,
     buttons: [
       { action: "ok", label: t("Give.Give"), icon: "fas fa-check", default: true, callback: (event, button) => button.form.elements.target.value },
-      { action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => null }
+      { action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => false }
     ],
     rejectClose: false
   });
-  if (res === null || res === undefined) return;
+  if (res === false || res == null) return; // Cancel (DialogV2 turns a null callback result into the action name)
   const actor = resolveHolder(res);
   if (actor === undefined) return ui.notifications.warn(t("Warn.ActorNotFound", { name: res }));
   await transferPhone(item, actor);
@@ -206,11 +206,11 @@ export async function contactsDialog(item) {
       </div>`,
     buttons: [
       { action: "ok", label: t("Save"), icon: "fas fa-check", default: true, callback: (event, button) => button.form.elements.contacts.value },
-      { action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => null }
+      { action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => false }
     ],
     rejectClose: false
   });
-  if (res === null || res === undefined) return;
+  if (res === false || res == null) return; // Cancel (DialogV2 turns a null callback result into the action name)
   const contacts = res
     .split("\n")
     .map((l) => l.split("|").map((s) => s.trim()))
@@ -250,10 +250,10 @@ export async function directoryDialog() {
       </div>`,
     buttons: [
       { action: "ok", label: t("Save"), icon: "fas fa-check", default: true, callback: (event, button) => button.form.elements.directory.value },
-      { action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => null }
+      { action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => false }
     ],
     rejectClose: false
   });
-  if (res === null || res === undefined) return;
+  if (res === false || res == null) return; // Cancel (DialogV2 turns a null callback result into the action name)
   await game.settings.set(MODULE_ID, "directory", res.trim());
 }

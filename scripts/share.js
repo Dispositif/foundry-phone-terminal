@@ -54,7 +54,7 @@ export async function showScreen(p, title, html) {
     content: `<div class="spt-phone-form"><p>${t("Share.ShowTo")}</p>${boxes}</div>`,
     buttons: [
       { action: "ok", label: t("Share.Show"), icon: "fas fa-eye", default: true, callback: (event, button) => [...button.form.querySelectorAll("[name=u]:checked")].map((i) => i.value) },
-      { action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => null }
+      { action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => false }
     ],
     rejectClose: false
   });
@@ -97,7 +97,7 @@ export async function forwardEntry(p, e) {
         <datalist id="spt-fwd-known">${known}</datalist></div>`,
     buttons: [
       { action: "ok", label: t("Fwd.Forward"), icon: "fas fa-share", default: true, callback: (event, button) => button.form.elements.to.value.trim() },
-      { action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => null }
+      { action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => false }
     ],
     rejectClose: false
   });
