@@ -129,7 +129,10 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       ring: function () { this._doRing(); },
       hangup: function () { hangUpAll(); },
       sms: function () { this._doSms(); },
-      newPhone: function () { newPhoneDialog(); },
+      newPhone: async function () {
+        const res = await newPhoneDialog();
+        if (res?.open && res.item) openPhone(res.item.uuid);
+      },
       directory: function () { directoryDialog(); },
       editPhone: async function (event, target) { editPhoneDialog(await fromUuid(target.dataset.uuid)); },
       contacts: async function (event, target) { contactsDialog(await fromUuid(target.dataset.uuid)); },

@@ -126,23 +126,162 @@ export function resolveHolder(name) {
   return game.actors.find((a) => norm(a.name) === n);
 }
 
-export async function newPhoneDialog() {
-  const res = await phoneFormDialog({
-    title: t("NewDevice"),
-    selectHtml: holderField()
+/* New device: step 1 picks the model on big tiles, step 2 is a short form for that model. */
+
+/** Tiles: carried devices first, then installed ones. A landline look (modern, rotary) is its own tile. */
+const NEW_KINDS = [
+  { key: "smartphone", model: "smartphone", carried: true },
+  { key: "mobile", model: "mobile", carried: true },
+  { key: "pager", model: "pager", carried: true },
+  { key: "computer", model: "computer", carried: true },
+  { key: "landline", model: "landline", theme: "modern" },
+  { key: "rotary", model: "landline", theme: "vintage" },
+  { key: "desktop", model: "desktop" }
+];
+const kindLabel = (k) => (k.key === "landline" || k.key === "rotary" ? t(`NewDev.${k.key}`) : MODELS[k.model].label);
+
+/** Step 1: resolves with the chosen kind, or null. */
+async function pickKind() {
+  const tile = (k) => `<button type="button" class="spt-kind" data-kind="${k.key}">
+      <img src="modules/${MODULE_ID}/icons/${k.model}.svg" alt="" ${k.key === "rotary" ? 'class="spt-sepia"' : ""}>
+      <b>${esc(kindLabel(k))}</b><small>${t(`NewDev.Caps.${k.key}`)}</small></button>`;
+  let picked = null;
+  // DialogV2.wait wires the render callback (a plain constructor ignores it); a tile click closes it.
+  await DialogV2.wait({
+    window: { title: `${t("NewDevice")} · 1/2`, icon: "fas fa-plus" },
+    classes: ["spt-new-device"],
+    position: { width: 500 },
+    content: `<div class="spt-kinds">
+        <h4>${t("NewDev.Carried")}</h4><div class="spt-kind-grid">${NEW_KINDS.filter((k) => k.carried).map(tile).join("")}</div>
+        <h4>${t("NewDev.Installed")}</h4><div class="spt-kind-grid three">${NEW_KINDS.filter((k) => !k.carried).map(tile).join("")}</div>
+      </div>`,
+    buttons: [{ action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => false }],
+    render: (event, x) => {
+      const dialog = x?.element ? x : event?.target;
+      const root = dialog?.element ?? x;
+      root?.querySelectorAll?.("[data-kind]").forEach((b) =>
+        b.addEventListener("click", (ev) => {
+          ev.preventDefault();
+          picked = NEW_KINDS.find((k) => k.key === b.dataset.kind);
+          dialog?.close();
+        })
+      );
+    },
+    rejectClose: false
   });
-  if (!res) return;
-  if (MODELS[res.model]?.fixed) {
-    if (!res.sceneId) return ui.notifications.warn(t("Warn.SceneNotFound", { name: res.sceneName ?? "" }));
-    const item = await createPhone(null, res);
-    ui.notifications.info(`📍 ${t("Info.Installed", { model: MODELS[res.model].label, label: res.label })}`);
-    return item;
+  return picked;
+}
+
+/** Step 2: short form for the chosen kind. Resolves with { ...data, open } or "back" or false. */
+function kindForm(kind) {
+  const model = MODELS[kind.model];
+  const fixed = !!model.fixed;
+  const pcs = playerActors();
+  const npcs = game.actors.filter((a) => !pcs.includes(a)).sort((a, b) => a.name.localeCompare(b.name));
+  const first = pcs[0] ?? null;
+  const nameFor = (actor) => (actor ? t("NewDev.NameFor", { model: kindLabel(kind), name: actor.name }) : kindLabel(kind));
+  const chip = (value, inner, checked = false) => `<label class="spt-chip"><input type="radio" name="holder" value="${value}" ${checked ? "checked" : ""}>${inner}</label>`;
+  const holderRow = fixed
+    ? `<div class="form-group"><label>${t("Form.Place")}</label><select name="scene">${game.scenes
+        .map((sc) => `<option value="${sc.id}" ${sc.id === canvas?.scene?.id ? "selected" : ""}>${esc(sc.name)}</option>`)
+        .join("")}</select></div>`
+    : `<div class="spt-row"><label>${t("Form.HeldBy")}</label><div class="spt-chips">
+        ${pcs.map((a, i) => chip(a.id, `<img src="${esc(a.img)}" alt="">${esc(a.name)}`, i === 0)).join("")}
+        ${chip("npc", `<i class="fas fa-user"></i> ${t("NewDev.Npc")}`)}
+        ${chip("", `<i class="fas fa-ban"></i> ${t("NewDev.Nobody")}`, !first)}
+      </div>
+      <div class="spt-npc hidden"><input type="text" name="npc" list="spt-npcs" placeholder="${t("NewDev.NpcName")}"><datalist id="spt-npcs">${npcs
+        .map((a) => `<option value="${esc(a.name)}">`)
+        .join("")}</datalist></div></div>`;
+  // Looks: only when the model has a choice (a landline's look is its tile).
+  const looks = fixed && kind.model === "landline" ? [] : [DEFAULT_THEME, ...Object.keys(THEMES).filter((k) => THEMES[k].models.includes(kind.model))];
+  const lookRow =
+    looks.length > 1
+      ? `<div class="spt-row"><label>${t("Form.Theme")}</label><div class="spt-chips">${looks
+          .map((k, i) => `<label class="spt-chip plain"><input type="radio" name="theme" value="${k}" ${i === 0 ? "checked" : ""}>${t(`Theme.${k}`)}</label>`)
+          .join("")}</div></div>`
+      : "";
+  const read = (form, open) => {
+    const f = form.elements;
+    const holder = f.holder?.value ?? "";
+    let actor = null;
+    if (!fixed && holder === "npc") actor = resolveHolder(f.npc.value) ?? undefined;
+    else if (!fixed && holder) actor = game.actors.get(holder) ?? null;
+    return {
+      actor,
+      npcName: f.npc?.value ?? "",
+      label: f.label.value.trim() || nameFor(actor || null),
+      number: f.number.value.trim() || randomAddress(kind.model),
+      model: kind.model,
+      theme: kind.theme ?? f.theme?.value ?? DEFAULT_THEME,
+      sceneId: fixed ? f.scene?.value || null : undefined,
+      open
+    };
+  };
+  return DialogV2.wait({
+    window: { title: `${t("NewDevice")} · 2/2`, icon: "fas fa-plus" },
+    classes: ["spt-new-device"],
+    position: { width: 500 },
+    content: `<div class="spt-phone-form">
+        <div class="spt-chosen"><img src="modules/${MODULE_ID}/icons/${kind.model}.svg" alt="" ${kind.key === "rotary" ? 'class="spt-sepia"' : ""}>
+          <div><b>${esc(kindLabel(kind))}</b><small>${t(`NewDev.Caps.${kind.key}`)}</small></div></div>
+        ${holderRow}
+        <div class="form-group"><label>${t("Form.DeviceName")}</label><input type="text" name="label" value="${esc(fixed ? kindLabel(kind) : nameFor(first))}"></div>
+        <div class="form-group"><label>${t("Form.Number")}</label><div class="form-fields">
+          <input type="text" name="number" value="${esc(randomAddress(kind.model))}">
+          <button type="button" class="spt-dice" title="${t("NewDev.OtherNumber")}"><i class="fas fa-dice"></i></button></div></div>
+        ${lookRow}
+      </div>`,
+    render: (event, x) => {
+      const root = x?.element ?? x;
+      const labelInput = root?.querySelector?.("[name=label]");
+      let lastAuto = labelInput?.value;
+      // The name follows the holder until the GM types one.
+      const follow = () => {
+        if (!labelInput || labelInput.value !== lastAuto) return;
+        const v = root.querySelector("[name=holder]:checked")?.value ?? "";
+        const actor = v === "npc" ? resolveHolder(root.querySelector("[name=npc]")?.value) : game.actors.get(v);
+        labelInput.value = lastAuto = nameFor(actor ?? null);
+      };
+      root?.querySelectorAll?.("[name=holder]").forEach((r) =>
+        r.addEventListener("change", () => {
+          root.querySelector(".spt-npc")?.classList.toggle("hidden", r.value !== "npc" || !r.checked);
+          follow();
+        })
+      );
+      root?.querySelector?.("[name=npc]")?.addEventListener("change", follow);
+      root?.querySelector?.(".spt-dice")?.addEventListener("click", () => {
+        root.querySelector("[name=number]").value = randomAddress(kind.model);
+      });
+    },
+    buttons: [
+      { action: "back", label: t("NewDev.Change"), icon: "fas fa-arrow-left", callback: () => "back" },
+      { action: "create", label: t("NewDev.Create"), icon: "fas fa-check", callback: (event, button) => read(button.form, false) },
+      { action: "open", label: t("NewDev.CreateOpen"), icon: `fas ${model.icon}`, default: true, callback: (event, button) => read(button.form, true) }
+    ],
+    rejectClose: false
+  });
+}
+
+/** GM: new device in two steps. Resolves with { item, open } or nothing. */
+export async function newPhoneDialog() {
+  for (;;) {
+    const kind = await pickKind();
+    if (!kind) return;
+    const res = await kindForm(kind);
+    if (res === "back") continue;
+    if (!res || typeof res !== "object") return;
+    if (res.actor === undefined) return ui.notifications.warn(t("Warn.ActorNotFound", { name: res.npcName }));
+    if (MODELS[res.model]?.fixed) {
+      if (!res.sceneId) return ui.notifications.warn(t("Warn.SceneNotFound", { name: "" }));
+      const item = await createPhone(null, res);
+      ui.notifications.info(`📍 ${t("Info.Installed", { model: kindLabel(kind), label: res.label })}`);
+      return { item, open: res.open };
+    }
+    const item = await createPhone(res.actor, res);
+    ui.notifications.info(`📱 ${t("Info.Created", { label: res.label, number: res.number })}`);
+    return { item, open: res.open };
   }
-  const actor = resolveHolder(res.target);
-  if (actor === undefined) return ui.notifications.warn(t("Warn.ActorNotFound", { name: res.target }));
-  const item = await createPhone(actor, res);
-  ui.notifications.info(`📱 ${t("Info.Created", { label: res.label, number: res.number })}`);
-  return item;
 }
 
 /** Gives the device to another holder (or back to world items), history included. */

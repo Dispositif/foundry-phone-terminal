@@ -697,3 +697,26 @@ a.spt-link:hover { filter: brightness(1.15); }
 /* GM only: compromised device (tapped, known to the enemy). */
 .spt-gm .spt-compromised, .spt-phone-ring .spt-compromised { color: #d2402f; }
 .spt-gm .spt-dev-actions a:not(.spt-compromised)[data-action="toggleCompromised"] { opacity: 0.45; }
+
+/* GM: new device (step 1 tiles, step 2 short form). */
+.spt-new-device h4 { margin: 0.2rem 0 0.4rem; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.65; border: none; }
+.spt-new-device .spt-kind-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 0.8rem; }
+.spt-new-device .spt-kind-grid.three { grid-template-columns: repeat(3, 1fr); }
+.spt-new-device .spt-kind { display: flex; flex-direction: column; align-items: center; gap: 3px; height: auto; padding: 10px 6px 8px; line-height: 1.2; border-radius: 8px; }
+.spt-new-device .spt-kind img, .spt-new-device .spt-chosen img { width: 44px; height: 44px; border: none; margin-bottom: 4px; }
+.spt-new-device .spt-kind b { font-size: 0.95em; }
+.spt-new-device .spt-kind small, .spt-new-device .spt-chosen small { display: block; font-size: 0.8em; opacity: 0.7; }
+.spt-new-device .spt-kind:hover { box-shadow: 0 0 0 2px var(--color-warm-2, #ff8a3d) inset; }
+.spt-new-device .spt-sepia { filter: sepia(1); }
+.spt-new-device .spt-chosen { display: flex; align-items: center; gap: 10px; padding: 6px 10px; margin-bottom: 0.6rem; border: 1px solid rgba(128,128,128,0.4); border-radius: 8px; }
+.spt-new-device .spt-chosen img { width: 34px; height: 34px; margin: 0; }
+.spt-new-device .spt-row { margin-bottom: 0.6rem; }
+.spt-new-device .spt-row > label { display: block; margin-bottom: 4px; }
+.spt-new-device .spt-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.spt-new-device .spt-chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px 2px 2px; border: 1px solid rgba(128,128,128,0.45); border-radius: 20px; cursor: pointer; }
+.spt-new-device .spt-chip.plain, .spt-new-device .spt-chip:has(i) { padding: 3px 10px; }
+.spt-new-device .spt-chip input { display: none; }
+.spt-new-device .spt-chip img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: none; }
+.spt-new-device .spt-chip:has(input:checked) { border-color: var(--color-warm-2, #ff8a3d); box-shadow: 0 0 0 1px var(--color-warm-2, #ff8a3d) inset; }
+.spt-new-device .spt-npc { margin-top: 6px; }
+.spt-new-device .spt-dice { flex: 0 0 2.4em; }

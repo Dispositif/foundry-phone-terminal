@@ -397,6 +397,29 @@
     "Scene": {
       "DeadZone": "Dead zone",
       "DeadZoneHint": "Phones & Computers: no mobile network and no Wi-Fi for the devices carried by agents whose player is on this scene. Landlines and terminals keep their line."
+    },
+    "NewDev": {
+      "landline": "Modern landline",
+      "rotary": "Rotary landline",
+      "Carried": "Carried by a character",
+      "Installed": "Installed in a place",
+      "Caps": {
+        "smartphone": "Calls, texts, photos",
+        "mobile": "Calls, texts",
+        "pager": "12 characters",
+        "computer": "Emails, documents",
+        "landline": "Calls",
+        "rotary": "Calls",
+        "desktop": "Emails, documents"
+      },
+      "NameFor": "{name}'s {model}",
+      "Npc": "NPC…",
+      "NpcName": "NPC name",
+      "Nobody": "Nobody",
+      "OtherNumber": "Another number",
+      "Change": "Change",
+      "Create": "Create",
+      "CreateOpen": "Create and open"
     }
   }
 }

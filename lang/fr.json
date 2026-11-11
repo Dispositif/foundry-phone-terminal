@@ -397,6 +397,29 @@
     "Scene": {
       "DeadZone": "Zone blanche",
       "DeadZoneHint": "Phones & Computers : ni réseau mobile ni Wi-Fi pour les appareils portés par les agents dont le joueur est sur cette scène. Les fixes et terminaux gardent leur ligne."
+    },
+    "NewDev": {
+      "landline": "Fixe moderne",
+      "rotary": "Fixe à cadran",
+      "Carried": "Porté par un personnage",
+      "Installed": "Installé dans un lieu",
+      "Caps": {
+        "smartphone": "Appels, SMS, photos",
+        "mobile": "Appels, SMS",
+        "pager": "12 caractères",
+        "computer": "Mails, documents",
+        "landline": "Appels",
+        "rotary": "Appels",
+        "desktop": "Mails, documents"
+      },
+      "NameFor": "{model} de {name}",
+      "Npc": "PNJ…",
+      "NpcName": "Nom du PNJ",
+      "Nobody": "Personne",
+      "OtherNumber": "Autre numéro",
+      "Change": "Changer",
+      "Create": "Créer",
+      "CreateOpen": "Créer et ouvrir"
     }
   }
 }

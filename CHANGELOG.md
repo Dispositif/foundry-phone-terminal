@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.36.0
+- **New device in two steps.** Step 1: big tiles with the device icon and what it does, carried devices (smartphone, mobile, pager, laptop) then installed ones (modern landline, rotary landline, terminal). Step 2: a short form for that model: the agents' portraits to pick the holder in one click (or an NPC, or nobody), the place for an installed device (current scene first), a name that follows the holder ("Smartphone de Gomez"), a random number with a dice to draw another, and the looks only when there is a choice. "Create and open" opens the GM view of the new device right away. Editing a device keeps the full form.
+
 ## 0.35.0
 - **Dead zones**: a "Dead zone" checkbox in the scene configuration (Basics tab). While an agent's player is on such a scene (token or not), the devices that agent carries have no mobile network and no Wi-Fi: messages wait, calls fail as unreachable. Back on another scene, what was waiting arrives. Landlines and terminals keep their line. The Tracking tab shows the agent as "Dead zone".
 
