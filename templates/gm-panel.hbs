@@ -138,7 +138,7 @@
         <header class="spt-dev-group-head">
           {{#if img}}<img src="{{img}}" alt="">{{/if}}
           <strong>{{agent}}</strong>
-          {{#if (eq level "none")}}<span class="spt-track-scene"><i class="fas fa-question"></i> {{spt "Track.Unknown"}}</span>{{/if}}
+          {{#if location}}<span class="spt-track-scene"><i class="fas fa-question"></i> {{location}}</span>{{/if}}
           <span class="spt-track-level spt-track-{{level}}">{{levelLabel}}</span>
         </header>
         {{#if devices.length}}

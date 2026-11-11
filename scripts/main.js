@@ -258,9 +258,33 @@ Hooks.on("preUpdateItem", (item, changes) => {
 });
 // Presence on a scene: who sees installed devices (terminal).
 for (const hook of ["createToken", "deleteToken", "canvasReady"]) Hooks.on(hook, () => rerenderAll());
+
+// Dead zones: a scene unmarked delivers what was waiting (a player changing scene: see updateUser).
+Hooks.on("updateScene", (scene, changes) => {
+  if (changes?.flags?.[MODULE_ID] === undefined) return;
+  rerenderAll();
+  if (isActiveGM()) flushAll();
+});
+
+/** Scene configuration: "dead zone" checkbox (no mobile network, no Wi-Fi). */
+Hooks.on("renderSceneConfig", (app, html) => {
+  const root = html instanceof HTMLElement ? html : html?.[0];
+  const tab = root?.querySelector('.tab[data-tab="basics"]') ?? root?.querySelector("form");
+  if (!tab || tab.querySelector(".spt-deadzone")) return;
+  const checked = app.document?.getFlag(MODULE_ID, "deadZone") ? "checked" : "";
+  tab.insertAdjacentHTML("beforeend", `<div class="form-group spt-deadzone">
+      <label><i class="fas fa-signal"></i> ${t("Scene.DeadZone")}</label>
+      <div class="form-fields"><input type="checkbox" name="flags.${MODULE_ID}.deadZone" ${checked}></div>
+      <p class="hint">${t("Scene.DeadZoneHint")}</p>
+    </div>`);
+});
 Hooks.on("updateUser", (user, changes) => {
   if (user.isSelf && "character" in changes) updateFab();
-  if ("viewedScene" in changes) rerenderAll();
+  if ("viewedScene" in changes) {
+    rerenderAll();
+    // Leaving a dead zone: what was waiting arrives.
+    if (isActiveGM()) flushAll();
+  }
 });
 /**
  * A carried device exists only once. Dragged onto another character (Foundry copies it),

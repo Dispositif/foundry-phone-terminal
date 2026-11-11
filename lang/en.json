@@ -391,7 +391,12 @@
         "gps": "GPS",
         "wifi": "Wi-Fi",
         "gsm": "GSM"
-      }
+      },
+      "DeadZone": "Dead zone"
+    },
+    "Scene": {
+      "DeadZone": "Dead zone",
+      "DeadZoneHint": "Phones & Computers: no mobile network and no Wi-Fi for the devices carried by agents whose player is on this scene. Landlines and terminals keep their line."
     }
   }
 }

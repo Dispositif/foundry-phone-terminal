@@ -1,6 +1,6 @@
 import { attChipHtml, attFromDrop, pickImage } from "./attachments.js";
 import { ApplicationV2, DialogV2, HandlebarsApplicationMixin, MASKED, MODES, MODULE_ID } from "./constants.js";
-import { allPhones, holders, sharedUsers, displayName, getLog, getPhoneData, hasSignal, holderName, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc } from "./devices.js";
+import { allPhones, holders, sharedUsers, displayName, getLog, getPhoneData, hasSignal, holderName, inDeadZone, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc } from "./devices.js";
 import { contactsDialog, directoryDialog, editPhoneDialog, giveDialog, newPhoneDialog } from "./dialogs.js";
 import { copyJournalLink } from "./journal-links.js";
 import { openPhone } from "./main.js";
@@ -106,6 +106,7 @@ function trackingRows(phones) {
         img: actor.img,
         level,
         levelLabel: t(`Track.${level}`),
+        location: level !== "none" ? "" : inDeadZone(actor) ? t("Track.DeadZone") : t("Track.Unknown"),
         devices
       };
     })

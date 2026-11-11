@@ -5,8 +5,13 @@ import { t } from "./i18n.js";
 /*  Model: phones, contacts, history            */
 /* -------------------------------------------- */
 
+// Device data -> its item, so signal checks can find who carries the device.
+const PHONE_ITEM = new WeakMap();
+
 export function getPhoneData(item) {
-  return item?.getFlag(MODULE_ID, "phone") ?? null;
+  const phone = item?.getFlag(MODULE_ID, "phone") ?? null;
+  if (phone) PHONE_ITEM.set(phone, item);
+  return phone;
 }
 
 /** Device models and what they can do. */
@@ -125,11 +130,22 @@ export function landlineUsers(phone) {
   return present.length ? present : players.filter((u) => u.viewedScene === scene.id);
 }
 
-/** Does the device have signal? (network cut, or no signal for this device) */
+/**
+ * Is the agent in a dead zone? A scene can be marked "no mobile network, no Wi-Fi" in its configuration.
+ * What counts is the scene the agent's player is on (viewing), token or not.
+ */
+export function inDeadZone(actor) {
+  if (!actor) return false;
+  return phoneUsers(actor).some((u) => !!game.scenes.get(u.viewedScene)?.getFlag(MODULE_ID, "deadZone"));
+}
+
+/** Does the device have signal? (network cut, no signal for this device, or its holder in a dead zone) */
 export function hasSignal(phone) {
   // An installed device does not depend on the mobile network: it always has a line.
   if (isFixed(phone)) return true;
-  return !game.settings.get(MODULE_ID, "networkDown") && !phone?.noSignal;
+  if (game.settings.get(MODULE_ID, "networkDown") || phone?.noSignal) return false;
+  const holder = PHONE_ITEM.get(phone)?.parent;
+  return !(holder instanceof Actor && inDeadZone(holder));
 }
 
 /** All devices: items carried by actors + world items (held by nobody). */

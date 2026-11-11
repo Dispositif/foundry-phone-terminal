@@ -391,7 +391,12 @@
         "gps": "GPS",
         "wifi": "Wi-Fi",
         "gsm": "GSM"
-      }
+      },
+      "DeadZone": "Zone blanche"
+    },
+    "Scene": {
+      "DeadZone": "Zone blanche",
+      "DeadZoneHint": "Phones & Computers : ni réseau mobile ni Wi-Fi pour les appareils portés par les agents dont le joueur est sur cette scène. Les fixes et terminaux gardent leur ligne."
     }
   }
 }

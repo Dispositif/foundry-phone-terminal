@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.35.0
+- **Dead zones**: a "Dead zone" checkbox in the scene configuration (Basics tab). While an agent's player is on such a scene (token or not), the devices that agent carries have no mobile network and no Wi-Fi: messages wait, calls fail as unreachable. Back on another scene, what was waiting arrives. Landlines and terminals keep their line. The Tracking tab shows the agent as "Dead zone".
+
 ## 0.34.1
 - Fixed: **Cancel** in the GM's text dialogs saved the word "cancel": the NPC directory and a device's contacts were replaced by it, and a new or edited device, a hand-over or a forward could go through with it. Cancel now changes nothing.
 
