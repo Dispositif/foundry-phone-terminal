@@ -70,7 +70,7 @@ export function bindDrop(zone, onAtt) {
     zone.classList.remove("spt-drag");
     const att = attFromDrop(ev);
     if (att) onAtt(att);
-    else ui.notifications.warn(t("Warn.DropHint"));
+    else if (att !== false) ui.notifications.warn(t("Warn.DropHint"));
   });
 }
 

@@ -1,13 +1,12 @@
 import { DialogV2, MODULE_ID } from "./constants.js";
-import { DEFAULT_THEME, MODELS, directoryText, THEMES, createPhone, newTheme, getLog, getPhoneData, markPhone, phoneUsers, randomAddress } from "./devices.js";
-import { grantAttachments } from "./messages.js";
+import { DEFAULT_THEME, MODELS, directoryText, THEMES, createPhone, newTheme, getPhoneData, markPhone, randomAddress } from "./devices.js";
 import { esc, norm } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
 /*  Dialogs (GM, and contacts for the player)    */
 /* -------------------------------------------- */
 
-export async function phoneFormDialog({ title, selectHtml = "", label = null, number = null, model = "smartphone", sceneId = null, theme = null, withModel = true }) {
+export async function phoneFormDialog({ title, selectHtml = "", label = null, number = null, model = "smartphone", sceneId = null, theme = null, inbox = "on", withModel = true }) {
   // Default name = model label, as long as the GM has not changed it.
   const autoLabel = label === null;
   label ??= MODELS[model]?.label ?? MODELS.smartphone.label;
@@ -37,6 +36,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
         <div class="form-group"><label>${t("Form.DeviceName")}</label><input type="text" name="label" value="${esc(label)}" placeholder="${t("Form.DeviceNameHint")}"></div>
         <div class="form-group"><label>${t("Form.Number")}</label><input type="text" name="number" value="${esc(number)}"></div>
         <div class="form-group"><label>${t("Form.Theme")}</label><select name="theme">${themeOpts}</select></div>
+        <div class="form-group spt-if-computer"><label>${t("Form.Inbox")}</label><select name="inbox">${["on", "locked", "none"].map((k) => `<option value="${k}" ${k === inbox ? "selected" : ""}>${t(`Form.Inbox_${k}`)}</option>`).join("")}</select></div>
       </div>`,
     render: (event, x) => {
       // v13+: (event, dialog); an HTML element is accepted too.
@@ -60,6 +60,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
         const landline = !!MODELS[select?.value ?? model]?.fixed;
         root.querySelector(".spt-if-landline")?.classList.toggle("hidden", !landline);
         root.querySelector(".spt-if-mobile")?.classList.toggle("hidden", landline);
+        root.querySelector(".spt-if-computer")?.classList.toggle("hidden", !MODELS[select?.value ?? model]?.mail);
         // Looks: only those that fit the chosen model.
         const m = select?.value ?? model;
         const themeSel = root.querySelector("[name=theme]");
@@ -90,6 +91,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
             model,
             sceneName,
             theme: f.theme?.value ?? DEFAULT_THEME,
+            inbox: MODELS[model ?? "smartphone"]?.mail ? f.inbox?.value ?? "on" : undefined,
             sceneId: MODELS[model]?.fixed ? scene?.id ?? null : undefined
           };
         }
@@ -291,8 +293,6 @@ export async function transferPhone(item, actor) {
   delete data._id;
   const created = await Item.create(data, actor ? { parent: actor, spt: true } : { spt: true });
   await item.delete();
-  const atts = getLog(getPhoneData(created), { includePending: true }).map((e) => e.att).filter(Boolean);
-  if (actor && atts.length) await grantAttachments(atts, phoneUsers(actor));
   return created;
 }
 
@@ -324,7 +324,8 @@ export async function editPhoneDialog(item) {
     number: phone.number,
     model: phone.model ?? "smartphone",
     sceneId: phone.sceneId,
-    theme: phone.theme ?? null
+    theme: phone.theme ?? null,
+    inbox: phone.inbox ?? "on"
   });
   if (!res) return;
   if (MODELS[res.model]?.fixed && !res.sceneId) return ui.notifications.warn(t("Warn.SceneNotFound", { name: res.sceneName ?? "" }));

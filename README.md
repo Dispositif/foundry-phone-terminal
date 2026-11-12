@@ -36,7 +36,7 @@ A Foundry VTT module that gives your characters phones, laptops and room termina
 - **A terminal in a room.** Anyone standing there reads its mail. Attach journal pages to simulate files: archives, logs, case reports.
 - **A hack, a stolen phone.** Lock a device, unlock it when the roll succeeds. Hand it to another character with its whole history.
 - **A ready-to-play scenario.** `@SMS` and `@Call` links in a journal send a message or ring a phone in one click.
-- **A remote case file.** A terminal in the Items sidebar, with "Observer" permission for several players: they reach its mail from anywhere, like a secure FBI database. Attach journal pages as files.
+- **A remote case file.** A terminal in the Items sidebar, with "Observer" permission for several players: they reach its mail from anywhere, like a secure FBI database. Put journal pages in its Files tab, and lock the sensitive ones until the agents find the password.
 - **A prepared clue.** Write a device's history in advance: messages, photos, missed calls.
 - **Show, don't tell.** A player shows their screen to the agents in the same room, or forwards the photo.
 
@@ -93,6 +93,8 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 | **Landline** | installed in a scene | yes | no | no | no |
 
 - **Emails:** the first line acts as the subject.
+- **Files** (laptop, terminal): a second tab next to the mail. The GM drops journal pages or images in it from the GM view of the device. The player opens a file inside the screen: the journal's text and images (secret blocks hidden), without the Foundry journal and without read permission. Per file, the GM can **lock** it (listed with a padlock, "Access denied") or **hide** it (not listed until revealed).
+- **Mailbox** (Edit device, computers): Available, Locked ("Access restricted") or None (files only).
 - **Pager:** one line of 12 characters (a number to call back, a code, a word), sent by the GM from the Send tab; longer text is cut. It beeps (buzzes in silent mode) and its window opens by itself next to the phone; ◀ ▶ browse the history, the red light stays on until a key is pressed. A message an agent writes to a pager number reaches the GM. Click the bell on its screen to switch on, silent or off.
 - **Installed devices** (landline, terminal) are bound to a scene and don't depend on the mobile network: they always have a line.
 
@@ -150,7 +152,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 ### Sharing
 
 - **Show the screen** (eye icon, on a message or at the top of a conversation): the agent hands the device to the agents on the same scene. They see the image, the journal page (its content, without needing read permission) or the conversation, in a "X shows you their screen" window. Nothing remains once it is closed. Works without network.
-- **Forward** (arrow icon, on a message): the message and its attachment go out over the network to a contact or a number, like a real message (network needed, kept in the history). An agent recipient automatically gets permission to read the attached journal; an NPC recipient lands in the **Messages** tab of the GM panel. The message is marked "Forwarded". An old mobile forwards text only.
+- **Forward** (arrow icon, on a message): the message and its attachment go out over the network to a contact or a number, like a real message (network needed, kept in the history). An agent recipient reads the attached journal on their own device; an NPC recipient lands in the **Messages** tab of the GM panel. The message is marked "Forwarded". An old mobile forwards text only.
 
 ### Calls
 
@@ -182,7 +184,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 - The GM rings a device or sends it a message, under any identity: an NPC name, a number, or "Hidden number".
 - Recipient: a specific device, a number, or a player.
-- **Attachments** (smartphone, laptop, terminal): an image (paperclip, or drag a tile) or a journal page dragged from the sidebar. The recipient automatically gets permission to read it.
+- **Attachments** (smartphone, laptop, terminal): an image (paperclip, or drag a tile) or a journal page dragged from the sidebar. The journal shows as a card in the message and opens inside the device (text and images, secret blocks hidden), with an Enlarge icon for long documents. Players get no Foundry permission on it: the document only lives on the device.
 
 ### Agent to NPC
 
@@ -209,7 +211,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 ### The GM panel: Network (Ctrl+Shift+P)
 
-- The GM's **floating telecom button** opens it (on **Messages** when agents' messages are unread) and shows their count. It has its own setting.
+- The GM's **floating telecom button** opens it (on **Messages** when agents' messages are unread) and shows their count. It has its own setting. Under it, a small button per landline or terminal installed on the scene you are viewing opens that device's GM view.
 - Top bar: network status, pending messages, and a **Cut network** toggle for the whole mobile network.
 - **Send** tab: recipient (with the model's icon), displayed sender (free text, hidden number when empty, with suggestions: the recipient's contacts, recent senders, other devices' numbers), then **Message** or **Call**. Only what the recipient can do is offered (no message to a landline, no call to a terminal). **Send** or **Ring**, attachment, and **Copy as a link** to paste into a journal.
 - **Messages** tab, two sub-tabs:

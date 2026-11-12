@@ -1,6 +1,6 @@
 import { MODULE_ID } from "./constants.js";
 import { t, tn } from "./i18n.js";
-import { allPhones, getLog, getPhoneData, holders, isFixed, isPager, landlineUsers, modelOf, unreadCount } from "./devices.js";
+import { allPhones, getLog, getPhoneData, holders, isFixed, isPager, landlineUsers, modelOf, playerUnread } from "./devices.js";
 import { openPanel, openPhone } from "./main.js";
 import { activeCall } from "./player-calls.js";
 /* -------------------------------------------- */
@@ -74,12 +74,16 @@ export function updateFab() {
   main.hidden = !personal.length;
   const pIcon = modelOf(mainDevice(personal)?.phone).icon;
   main.querySelector("i").className = `fas ${pIcon}`;
-  const n = personal.reduce((sum, p) => sum + unreadCount(p.phone), 0);
+  const n = personal.reduce((sum, p) => sum + playerUnread(p.phone), 0);
   setFabBadge(main, n);
   main.classList.toggle("ringing", !!activeCall && !rooms.some(ringsHere));
   main.title = n ? tn("Unread", n) : t("MyPhone");
 
-  // Room buttons.
+  roomButtons(fab, rooms, { unread: (p) => playerUnread(p.phone), ringing: ringsHere });
+}
+
+/** Small buttons under the main one, one per installed device (landline, terminal). */
+function roomButtons(fab, rooms, { unread, ringing = () => false }) {
   const keep = new Set(rooms.map((p) => p.item.uuid));
   for (const b of fab.querySelectorAll(".spt-fab-room")) if (!keep.has(b.dataset.uuid)) b.remove();
   for (const p of rooms) {
@@ -90,17 +94,17 @@ export function updateFab() {
       fab.appendChild(b);
     }
     b.querySelector("i").className = `fas ${modelOf(p.phone).icon}`;
-    const u = unreadCount(p.phone);
+    const u = unread(p);
     setFabBadge(b, u);
-    b.classList.toggle("ringing", ringsHere(p));
+    b.classList.toggle("ringing", ringing(p));
     b.title = `${p.phone.label} — ${game.scenes.get(p.phone.sceneId)?.name ?? ""}${u ? ` (${tn("Unread", u)})` : ""}`;
   }
 }
 
 /** Agents' messages the GM has not opened yet (same count as the Messages tab). */
-function gmUnread() {
+function gmUnread(phones = allPhones()) {
   let n = 0;
-  for (const p of allPhones()) {
+  for (const p of phones) {
     for (const e of getLog(p.phone)) if (e.kind === "sms" && e.dir === "out" && !e.pj && !e.prep && e.seen === false) n++;
   }
   return n;
@@ -118,6 +122,10 @@ function updateGmFab() {
   const n = gmUnread();
   setFabBadge(main, n);
   main.title = n ? tn("Unread", n) : t("Gm.PanelTitle");
+  // Devices installed on the scene the GM is viewing: one click opens their GM view.
+  const sceneId = canvas?.scene?.id ?? game.user.viewedScene;
+  const rooms = sceneId ? allPhones().filter((p) => isFixed(p.phone) && p.phone.sceneId === sceneId) : [];
+  roomButtons(fab, rooms, { unread: (p) => gmUnread([p]) });
 }
 
 export function createFab() {
@@ -158,7 +166,7 @@ export function createFab() {
         uuid = mainDevice(personal)?.item.uuid;
       }
       if (uuid) {
-        if (!isPager(getPhoneData(fromUuidSync(uuid)))) saveLastDevice(uuid);
+        if (!game.user.isGM && !isPager(getPhoneData(fromUuidSync(uuid)))) saveLastDevice(uuid);
         openPhone(uuid);
       }
     }

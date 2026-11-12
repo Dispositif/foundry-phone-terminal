@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.39.0
+- **Files on computers.** Laptops and terminals get two tabs, **Mail** and **Files**. The GM drops journal pages or images into the Files tab of the device (GM view), or adds an image with the image button; nothing is notified. Players see a plain list (icon, name, Document or Image) and open a file **inside the screen**: the journal's text and images (secret blocks hidden), never the Foundry journal sheet, and no read permission is needed (the GM's browser renders the content). On hover: Show the screen and Forward.
+- Per file, in the GM view: **Lock** (listed with a padlock, "Access denied" when opened), **Hide** (not listed for the players until revealed), Rename and Delete.
+- **Journals in messages open on the device.** A journal page attached to a text or an email shows as a card in the bubble; it opens inside the screen (text and images, secrets hidden), with back to the conversation, Show the screen and Forward. The GM's browser renders it, so **players no longer get Foundry read permission** on attached journals: the document only lives on the device (permissions given before stay).
+- **Enlarge** (expand icon) on an opened file or document: the same large, resizable reader as Show the screen, for oneself. Handy on a smartphone.
+- A shown document opens large (760 px, 85 % of the height, 16 px text) and resizes with its window.
+- Drops are checked, on a message or a computer's files, with a clear warning for each case: a whole journal (drag one page instead), a page a device cannot show (PDF, video: use a text or image page), a video, or another kind of document (actor, scene…).
+- GM panel, Send tab: a short hint under the message says a journal page or an image can be dropped on it.
+- **GM floating button**: under the telecom button, a small button per landline or terminal installed on the scene you are viewing (with the count of agents' unread messages). One click opens its GM view. They follow the scene.
+- **Mailbox** setting per computer (Edit device): Available, **Locked** (the tab shows "Access restricted"; no badge, no writing) or **None** (files only, no tabs). The GM always sees the mailbox.
+
 ## 0.38.0
 - **Call in progress window.** Once a call is answered, a black window opens in the middle of every screen, with a running timer (MM:SS) since the answer. The rest of the table sees the agent's portrait (character sheet) and the other end: both portraits between two agents, a silhouette named "Unknown" for an NPC; the window's cross closes it. The agent on the line sees only the other end, as their device names it (contact or number), with a **Hang up** button. The GM sees both ends, hangs up for an NPC, and has **Cut the line** (skull) to cut any call: network failure, dead zone, an enemy who controls the network.
 - As soon as an agent dials, the rest of the table gets the window with "Calling…": the agent's portrait and an unknown end. It turns into the call when someone answers, and closes if nobody does.

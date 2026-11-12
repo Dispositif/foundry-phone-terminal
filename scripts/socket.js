@@ -1,4 +1,3 @@
-import { onPlayerAccess } from "./attachments.js";
 import { MODULE_ID, SMS_SRC, VIBRATE_SRC } from "./constants.js";
 import { markEntryRead, markRead } from "./devices.js";
 import { openPager } from "./pager.js";
@@ -7,6 +6,7 @@ import { activeCall, endCall, onCallResult, receiveNearbyCall, receiveNearbyRing
 import { onResponse } from "./ring.js";
 import { closeDial, endLive, openDial, openLive, openRinging } from "./live-call.js";
 import { receiveShow } from "./share.js";
+import { onDocRequest, onFileContent, onFileRequest } from "./files.js";
 import { isActiveGM, playLocal } from "./util.js";
 /* -------------------------------------------- */
 /*  Socket                                      */
@@ -65,9 +65,6 @@ export function onSocket(data) {
     case "playerCall":
       if (isActiveGM()) onPlayerCall(data);
       break;
-    case "playerAccess":
-      if (isActiveGM()) onPlayerAccess(data);
-      break;
     case "show":
       if (data.targetUserIds?.includes(game.user.id)) receiveShow(data);
       break;
@@ -76,6 +73,15 @@ export function onSocket(data) {
         const item = fromUuidSync(data.itemUuid);
         if (item && senderHolds(item, data.userId)) data.entryId ? markEntryRead(item, data.entryId) : markRead(item, data.key);
       }
+      break;
+    case "fileRequest":
+      if (isActiveGM()) onFileRequest(data);
+      break;
+    case "docRequest":
+      if (isActiveGM()) onDocRequest(data);
+      break;
+    case "fileContent":
+      if (forMe) onFileContent(data);
       break;
     case "playerHangup":
       if (isActiveGM()) onPlayerHangup(data);

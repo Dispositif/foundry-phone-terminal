@@ -13,27 +13,6 @@ export function smsHtml(sender, text, phoneName, att = null, mail = false, icon 
   return `<div class="spt-sms ${mail ? "spt-mail" : ""}"><div class="spt-sms-header"><i class="fas ${mail ? "fa-envelope" : "fa-comment-sms"}"></i> ${esc(maskedLabel(sender))} ${to}</div><div class="spt-sms-body">${body}</div></div>`;
 }
 
-
-/** The GM grants recipients permission to read attached pages/journals. */
-export async function grantAttachments(atts, users) {
-  if (!game.user.isGM || !users.length) return;
-  const { LIMITED, OBSERVER } = CONST.DOCUMENT_OWNERSHIP_LEVELS;
-  for (const att of atts) {
-    if (att?.type !== "doc") continue;
-    const doc = await fromUuid(att.uuid);
-    if (!doc) continue;
-    const entry = doc.documentName === "JournalEntryPage" ? doc.parent : null;
-    const docUp = {};
-    const entryUp = {};
-    for (const u of users) {
-      if (!doc.testUserPermission(u, "OBSERVER")) docUp[`ownership.${u.id}`] = OBSERVER;
-      if (entry && !entry.testUserPermission(u, "LIMITED")) entryUp[`ownership.${u.id}`] = LIMITED;
-    }
-    if (Object.keys(entryUp).length) await entry.update(entryUp);
-    if (Object.keys(docUp).length) await doc.update(docUp);
-  }
-}
-
 /** Delivers a message to a PC's device: history, whispered chat, beep. */
 export async function deliverToPhone(p, senderKeyOrName, text, att = null, { fwd = false } = {}) {
   const model = modelOf(p.phone);
@@ -55,7 +34,6 @@ export async function deliverToPhone(p, senderKeyOrName, text, att = null, { fwd
   }
   const key = keyFor(p.phone, senderKeyOrName);
   const extra = { ...(att ? { att } : {}), ...(fwd ? { fwd: true } : {}) };
-  if (att) await grantAttachments([att], holders(p));
   const switchedOff = modeOf(p.phone) === "off";
   if (!hasSignal(p.phone) || switchedOff) {
     // Pending: delivered (chat copy, beep) when signal returns or the device is switched on.

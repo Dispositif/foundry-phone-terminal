@@ -210,6 +210,11 @@ a.spt-link:hover { filter: brightness(1.15); }
 .spt-show-img { display: block; max-width: 100%; margin: 6px auto; border-radius: 6px; }
 .spt-show-doc { font-size: 1.05em; margin: 4px 0 8px; }
 .spt-show .spt-att-img { max-width: 100%; }
+/* Shown document: readable size, most of the screen height. */
+.spt-show-reading .spt-show { max-height: none; overflow: visible; }
+.spt-show-reading .window-content { overflow-y: auto; }
+.spt-show-reading .spt-doc { font-size: 16px; line-height: 1.55; }
+.spt-show-reading .spt-doc h1, .spt-show-reading .spt-doc h2, .spt-show-reading .spt-doc h3 { font-size: 1.25em; }
 
 /* ---------- Looks per model ---------- */
 /* Common rules: each look only sets its variables. */
@@ -801,3 +806,37 @@ a.spt-link:hover { filter: brightness(1.15); }
 .spt-device-notice .spt-busy { color: #e05a4a; }
 .spt-track-call { margin: 2px 0 4px 8px; font-size: 0.85em; opacity: 0.8; }
 .spt-track-call i { font-size: 0.85em; margin-right: 3px; }
+
+/* Computer files (laptop, terminal) */
+.spt-dtabs { display: flex; flex: 0 0 auto; border-bottom: 1px solid var(--skin-line-soft, rgba(128,128,128,0.25)); }
+.spt-dtabs a { flex: 1; text-align: center; padding: 6px 0; font-size: 0.92em; opacity: 0.65; border-bottom: 2px solid transparent; cursor: pointer; }
+.spt-dtabs a.active { opacity: 1; font-weight: 600; border-bottom-color: currentColor; }
+.spt-dtabs .spt-badge { position: static; display: inline-block; margin-left: 4px; }
+.spt-dtabs small { opacity: 0.7; }
+.spt-player-phone.spt-skin-federal .spt-dtabs { background: #e9dfc3; border-bottom-color: #b8964a; }
+.spt-player-phone.spt-skin-federal .spt-dtabs a { color: #1f3358; }
+.spt-files { list-style: none; margin: 0; padding: 0; flex: 1; overflow-y: auto; }
+.spt-file { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--skin-line-soft, rgba(128,128,128,0.2)); cursor: pointer; }
+.spt-file:hover { background: rgba(128,128,128,0.08); }
+.spt-file-icon { font-size: 1.3em; width: 1.4em; text-align: center; opacity: 0.8; }
+.spt-file-name { flex: 1; min-width: 0; }
+.spt-file-name strong { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.spt-file-name small { opacity: 0.6; }
+.spt-file.locked .spt-file-name, .spt-file.locked .spt-file-icon { opacity: 0.55; }
+.spt-file.spt-file-hidden { opacity: 0.45; }
+.spt-file-lock { opacity: 0.7; }
+.spt-file-acts { display: flex; gap: 0.7rem; opacity: 0; }
+.spt-file:hover .spt-file-acts, .spt-file-acts.gm { opacity: 0.8; }
+.spt-file-acts a.on { color: var(--spt-warn); }
+.spt-filedrop { padding: 10px 8px; border: 2px dashed rgba(128,128,128,0.4); border-radius: 6px; text-align: center; font-size: 0.9em; opacity: 0.8; }
+.spt-filedrop a { text-decoration: underline; cursor: pointer; white-space: nowrap; }
+.spt-filedrop.spt-drag { border-color: var(--spt-warn); opacity: 1; }
+.spt-fileview { flex: 1; overflow-y: auto; padding: 0.7rem 1rem; line-height: 1.45; }
+.spt-fileview img { max-width: 100%; }
+.spt-inbox-locked small { opacity: 0.7; }
+.spt-drop-hint { margin: 2px 0 6px; font-size: 0.85em; opacity: 0.65; }
+/* Journal attached to a message: a card that opens inside the device. */
+.spt-att-card { display: flex; align-items: center; gap: 0.5rem; margin: 2px 0 4px; padding: 6px 10px; border: 1px solid rgba(128,128,128,0.35); border-radius: 8px; background: rgba(128,128,128,0.08); cursor: pointer; text-decoration: none; color: inherit; }
+.spt-att-card > i { font-size: 1.4em; opacity: 0.8; }
+.spt-att-card strong { display: block; font-weight: 600; }
+.spt-att-card small { opacity: 0.65; text-decoration: underline; }

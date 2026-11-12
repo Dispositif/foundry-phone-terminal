@@ -1,14 +1,14 @@
 import { attChipHtml, attHtml, openAttachment, pickImage } from "./attachments.js";
 import { openSystemSheet } from "./item-sheet.js";
 import { ApplicationV2, MODES, MODULE_ID, SOCKET } from "./constants.js";
-import { SKINS, addLog, allPhones, conversations, displayName, findContact, getLog, getPhoneData, hasSignal, holders, isComputer, isFixed, isLandline, isPager, keyFor, markRead, modelOf, msgOn, mutateLog, phoneLabel, sameConv, isUnread, skinOf, unreadCount, modeOf, npcDirectory } from "./devices.js";
+import { SKINS, addLog, allPhones, conversations, displayName, findContact, getLog, getPhoneData, hasSignal, isComputer, isFixed, isLandline, isPager, keyFor, markRead, modelOf, msgOn, mutateLog, phoneLabel, sameConv, isUnread, skinOf, unreadCount, modeOf, npcDirectory, inboxOf, filesOf, playerUnread } from "./devices.js";
+import { addFile, findFile, loadEntryDoc, loadFile, patchFile, removeFile, renameFile } from "./files.js";
 import { addContactDialog, contactsDialog } from "./dialogs.js";
 import { loadLastDevice, myPhones, saveLastDevice } from "./fab.js";
 import { bindDrop, bindIconSelects, deviceSelect } from "./gm-panel.js";
-import { grantAttachments } from "./messages.js";
 import { activeCall, endCall, outgoing, playerCall, playerSendSms } from "./player-calls.js";
 import { dismissEnded, hangUpLive, liveOn, otherEnd, phoneClosed, statusHtml } from "./live-call.js";
-import { attShowHtml, findEntry, forwardEntry, showScreen } from "./share.js";
+import { attShowHtml, findEntry, forwardEntry, openReader, showScreen } from "./share.js";
 import { deviceNotice, esc, isMasked, nl2br } from "./util.js";
 import { openPager } from "./pager.js";
 import { t, tn } from "./i18n.js";
@@ -111,7 +111,10 @@ export class PlayerPhone extends ApplicationV2 {
         const e = p && findEntry(p.phone, target.dataset.id);
         if (!e) return;
         const who = displayName(p.phone, e.with);
-        const html = `${await attShowHtml(e.att)}${e.text ? `<div class="spt-thread"><div class="spt-bubble ${e.dir}">${nl2br(e.text)}</div></div>` : ""}`;
+        // A journal: the GM's browser renders it (the agent has no Foundry permission on it).
+        const doc = e.att?.type === "doc" ? await loadEntryDoc(p.item, e) : null;
+        const attPart = e.att?.type === "doc" ? `<h3 class="spt-show-doc"><i class="fas fa-file-lines"></i> ${esc(e.att.name ?? "")}</h3><div class="spt-doc">${doc ?? `<p><em>${t("Files.Unavailable")}</em></p>`}</div>` : await attShowHtml(e.att);
+        const html = `${attPart}${e.text ? `<div class="spt-thread"><div class="spt-bubble ${e.dir}">${nl2br(e.text)}</div></div>` : ""}`;
         showScreen(p, t(e.dir === "in" ? "Share.ReceivedFrom" : "Share.SentTo", { who }), html);
       },
       fwdEntry: function (event, target) {
@@ -134,6 +137,58 @@ export class PlayerPhone extends ApplicationV2 {
           .join("");
         showScreen(p, t("Share.ConversationWith", { who: displayName(p.phone, key) }), `<div class="spt-thread ${isComputer(p.phone) ? "mail" : ""}">${lines}</div>`);
       },
+      dtab: function (event, target) {
+        this._state.tab = target.dataset.tab;
+        this._go("list");
+      },
+      openFile: function (event, target) { this._openFile(target.dataset.id); },
+      openDoc: function (event, target) { this._openDoc(target.dataset.id); },
+      docBack: function () {
+        this._state.view = "conv";
+        this._state.file = null;
+        this._rerender();
+      },
+      enlarge: function () {
+        const p = this._current();
+        const st = this._state.file;
+        if (!p || !st?.html) return;
+        const f = st.entryId ? null : findFile(p.phone, st.id);
+        const e = st.entryId ? findEntry(p.phone, st.entryId) : null;
+        const title = f?.name ?? e?.att?.name ?? "";
+        openReader(title, f?.type === "image" ? st.html : `<div class="spt-doc">${st.html}</div>`, skinOf(p.phone));
+      },
+      fileShow: async function (event, target) {
+        const p = this._current();
+        const f = p && findFile(p.phone, target.dataset.id);
+        if (!f || f.locked || f.hidden) return;
+        const html = await loadFile(p.item, f);
+        if (!html) return deviceNotice(t("Files.Unavailable"), { warn: true });
+        showScreen(p, f.name, f.type === "image" ? html : `<div class="spt-doc">${html}</div>`);
+      },
+      fileFwd: function (event, target) {
+        const p = this._current();
+        const f = p && findFile(p.phone, target.dataset.id);
+        if (!f || f.locked || f.hidden) return;
+        const att = f.type === "image" ? { type: "image", src: f.src } : { type: "doc", uuid: f.uuid, name: f.name };
+        forwardEntry(p, { text: "", att });
+      },
+      gmFileLock: function (event, target) {
+        const p = this._current();
+        const f = p && findFile(p.phone, target.dataset.id);
+        if (f) patchFile(p.item, f.id, { locked: !f.locked });
+      },
+      gmFileHide: function (event, target) {
+        const p = this._current();
+        const f = p && findFile(p.phone, target.dataset.id);
+        if (f) patchFile(p.item, f.id, { hidden: !f.hidden });
+      },
+      gmFileRename: function (event, target) { const p = this._current(); if (p) renameFile(p.item, target.dataset.id); },
+      gmFileDelete: function (event, target) { const p = this._current(); if (p) removeFile(p.item, target.dataset.id); },
+      gmFileImage: async function () {
+        const p = this._current();
+        const src = p && (await pickImage());
+        if (src) addFile(p.item, { type: "image", src });
+      },
       gmDelete: async function (event, target) {
         const p = this._current();
         const { id, t: ts } = target.dataset;
@@ -142,7 +197,7 @@ export class PlayerPhone extends ApplicationV2 {
     }
   };
 
-  _state = { phoneUuid: null, view: "list", key: null, draft: "", to: "", entryType: "smsIn", att: null };
+  _state = { phoneUuid: null, view: "list", key: null, draft: "", to: "", entryType: "smsIn", att: null, tab: null, file: null };
 
   get title() {
     if (!this.gm) return this._mine().some((p) => isComputer(p.phone)) ? t("MyDevices") : t("MyPhone");
@@ -199,6 +254,7 @@ export class PlayerPhone extends ApplicationV2 {
 
   _go(view, key = null) {
     this._state.view = view;
+    if (view !== "file") this._state.file = null;
     this._state.key = key;
     this._state.draft = "";
     if (view === "new") this._state.to = "";
@@ -232,7 +288,6 @@ export class PlayerPhone extends ApplicationV2 {
     const att = type.kind === "sms" ? this._state.att : null;
     if (type.kind === "sms" && !text && !att) return deviceNotice(t("Warn.Empty"), { warn: true }), false;
     await addLog(p.item, { ...type.entry, with: key, ...(type.kind === "sms" ? { text } : {}), ...(att ? { att } : {}), read: true, prep: true });
-    if (att) await grantAttachments([att], holders(p));
     this._state.att = null;
     return true;
   }
@@ -285,9 +340,164 @@ export class PlayerPhone extends ApplicationV2 {
     if (!this.gm && p.phone.locked) return this._renderLocked(p, mine);
     // A rotary landline has nothing but its dial: the GM sees it as the players do.
     if (isLandline(p.phone) && (!this.gm || skinOf(p.phone) !== "modern")) return this._renderDialer(p, mine);
+    const computer = isComputer(p.phone);
+    // A player cannot write from a mailbox that is locked or absent.
+    if (computer && !this.gm && inboxOf(p.phone) !== "on" && ["conv", "new", "doc"].includes(this._state.view)) this._state.view = "list";
+    if (this._state.view === "file") return this._renderFile(p, mine);
+    if (this._state.view === "doc") return this._renderDoc(p);
     if (this._state.view === "conv") return this._renderConv(p);
     if (this._state.view === "new") return this._renderNew(p);
+    if (computer && this._tab(p) === "files") return this._renderFiles(p, mine);
+    if (computer && !this.gm && inboxOf(p.phone) === "locked") return this._renderInboxLocked(p, mine);
     return this._renderList(p, mine);
+  }
+
+  /** Computer tab: mailbox or files. Without a mailbox, a player only has the files. */
+  _tab(p) {
+    const inbox = inboxOf(p.phone);
+    if (!this.gm && inbox === "none") return "files";
+    return this._state.tab ?? (this.gm || inbox === "on" ? "inbox" : "files");
+  }
+
+  _tabsHtml(p) {
+    if (!isComputer(p.phone)) return "";
+    const inbox = inboxOf(p.phone);
+    if (!this.gm && inbox === "none") return "";
+    const tab = this._tab(p);
+    const unread = this.gm ? 0 : playerUnread(p.phone);
+    const icon = { on: "fa-envelope", locked: "fa-lock", none: "fa-ban" }[inbox] ?? "fa-envelope";
+    const hint = inbox === "on" ? "" : ` title="${t(`Form.Inbox_${inbox}`)}"`;
+    const n = filesOf(p.phone, { gm: this.gm }).length;
+    return `<nav class="spt-dtabs">
+        <a class="${tab === "inbox" ? "active" : ""}" data-action="dtab" data-tab="inbox"${hint}><i class="fas ${icon}"></i> ${t("Files.Inbox")}${unread ? ` <span class="spt-badge">${unread}</span>` : ""}</a>
+        <a class="${tab === "files" ? "active" : ""}" data-action="dtab" data-tab="files"><i class="fas fa-folder"></i> ${t("Files.Tab")} <small>${n}</small></a>
+      </nav>`;
+  }
+
+  _renderFiles(p, mine) {
+    const canFwd = inboxOf(p.phone) === "on";
+    const rows = filesOf(p.phone, { gm: this.gm })
+      .map((f) => {
+        const id = esc(f.id);
+        const icon = f.type === "image" ? "fa-file-image" : "fa-file-lines";
+        const kind = f.type === "image" ? t("Files.Image") : t("Document");
+        const acts = this.gm
+          ? `<span class="spt-file-acts gm">
+              <a data-action="gmFileLock" data-id="${id}" class="${f.locked ? "on" : ""}" title="${f.locked ? t("Files.Unlock") : t("Files.Lock")}"><i class="fas ${f.locked ? "fa-lock" : "fa-lock-open"}"></i></a>
+              <a data-action="gmFileHide" data-id="${id}" class="${f.hidden ? "on" : ""}" title="${f.hidden ? t("Files.Reveal") : t("Files.Hide")}"><i class="fas ${f.hidden ? "fa-eye-slash" : "fa-eye"}"></i></a>
+              <a data-action="gmFileRename" data-id="${id}" title="${t("Files.Rename")}"><i class="fas fa-pen"></i></a>
+              <a data-action="gmFileDelete" data-id="${id}" title="${t("Delete")}"><i class="fas fa-trash"></i></a>
+            </span>`
+          : f.locked
+          ? `<i class="fas fa-lock spt-file-lock" title="${t("Files.Denied")}"></i>`
+          : `<span class="spt-file-acts">
+              <a data-action="fileShow" data-id="${id}" title="${t("Share.ShowScreen")}"><i class="fas fa-eye"></i></a>
+              ${canFwd ? `<a data-action="fileFwd" data-id="${id}" title="${t("Fwd.Forward")}"><i class="fas fa-share"></i></a>` : ""}
+            </span>`;
+        return `<li class="spt-file ${f.locked ? "locked" : ""} ${f.hidden ? "spt-file-hidden" : ""}" data-action="openFile" data-id="${id}">
+            <i class="fas ${icon} spt-file-icon"></i>
+            <span class="spt-file-name"><strong>${esc(f.name)}</strong><small>${kind}</small></span>
+            ${acts}
+          </li>`;
+      })
+      .join("");
+    const foot = this.gm
+      ? `<footer class="spt-phone-foot spt-file-foot">
+          <div class="spt-filedrop"><i class="fas fa-file-import"></i> ${t("Files.Drop")} · <a data-action="gmFileImage"><i class="fas fa-image"></i> ${t("Files.PickImage")}</a></div>
+        </footer>`
+      : "";
+    return `${this._renderHeader(p, mine)}${this._tabsHtml(p)}
+      <ul class="spt-files">${rows || `<li class="spt-phone-empty">${t("Files.Empty")}</li>`}</ul>
+      ${foot}`;
+  }
+
+  async _openFile(id) {
+    const p = this._current();
+    const f = p && findFile(p.phone, id);
+    if (!f || (!this.gm && f.hidden)) return;
+    if (!this.gm && f.locked) return deviceNotice(t("Files.Denied"), { warn: true });
+    this._state.view = "file";
+    this._state.file = { id };
+    this._rerender();
+    const html = await loadFile(p.item, f);
+    if (this._state.file?.id !== id) return;
+    this._state.file = { id, html };
+    this._rerender();
+  }
+
+  /** A file opened inside the screen: the journal's content or the image, never the Foundry sheet. */
+  _renderFile(p, mine) {
+    const f = findFile(p.phone, this._state.file?.id);
+    if (!f || (!this.gm && (f.locked || f.hidden))) {
+      this._state.view = "list";
+      this._state.file = null;
+      return this._renderFiles(p, mine);
+    }
+    const html = this._state.file.html;
+    const body = html === undefined
+      ? `<p class="spt-phone-empty"><i class="fas fa-spinner fa-spin"></i> ${t("Files.Loading")}</p>`
+      : html === null
+      ? `<p class="spt-phone-empty">${t("Files.Unavailable")}</p>`
+      : html;
+    const id = esc(f.id);
+    const enlarge = html ? `<a data-action="enlarge" title="${t("Files.Enlarge")}"><i class="fas fa-expand"></i></a>` : "";
+    const acts = this.gm || !html ? enlarge : `${enlarge}<a data-action="fileShow" data-id="${id}" title="${t("Share.ShowScreen")}"><i class="fas fa-eye"></i></a>${inboxOf(p.phone) === "on" ? `<a data-action="fileFwd" data-id="${id}" title="${t("Fwd.Forward")}"><i class="fas fa-share"></i></a>` : ""}`;
+    return `<header class="spt-phone-top conv">
+        <a data-action="back" title="${t("Back")}"><i class="fas fa-chevron-left"></i></a>
+        <strong>${esc(f.name)}</strong>
+        <span class="spt-top-actions">${acts}</span>
+      </header>
+      <div class="spt-fileview">${body}</div>`;
+  }
+
+  async _openDoc(entryId) {
+    const p = this._current();
+    const e = p && findEntry(p.phone, entryId);
+    if (e?.att?.type !== "doc") return;
+    this._state.view = "doc";
+    this._state.file = { entryId };
+    this._rerender();
+    const html = await loadEntryDoc(p.item, e);
+    if (this._state.file?.entryId !== entryId) return;
+    this._state.file = { entryId, html };
+    this._rerender();
+  }
+
+  /** A journal attached to a message, read inside the screen. Back returns to the conversation. */
+  _renderDoc(p) {
+    const st = this._state.file;
+    const e = st?.entryId ? findEntry(p.phone, st.entryId) : null;
+    if (!e) {
+      this._state.view = this._state.key ? "conv" : "list";
+      this._state.file = null;
+      return this._state.key ? this._renderConv(p) : this._renderList(p, this._mine());
+    }
+    const html = st.html;
+    const body = html === undefined
+      ? `<p class="spt-phone-empty"><i class="fas fa-spinner fa-spin"></i> ${t("Files.Loading")}</p>`
+      : html === null
+      ? `<p class="spt-phone-empty">${t("Files.Unavailable")}</p>`
+      : html;
+    const id = esc(st.entryId);
+    const acts = !html ? "" : `<a data-action="enlarge" title="${t("Files.Enlarge")}"><i class="fas fa-expand"></i></a>${this.gm ? "" : `<a data-action="showEntry" data-id="${id}" title="${t("Share.ShowScreen")}"><i class="fas fa-eye"></i></a><a data-action="fwdEntry" data-id="${id}" title="${t("Fwd.Forward")}"><i class="fas fa-share"></i></a>`}`;
+    return `<header class="spt-phone-top conv">
+        <a data-action="docBack" title="${t("Back")}"><i class="fas fa-chevron-left"></i></a>
+        <strong>${esc(e.att.name ?? t("Document"))}</strong>
+        <span class="spt-top-actions">${acts}</span>
+      </header>
+      <div class="spt-fileview">${body}</div>`;
+  }
+
+  /** Attachment inside a bubble: an image, or a document card that opens on the device. */
+  _attHtml(e) {
+    if (e.att?.type !== "doc") return attHtml(e.att);
+    return `<a class="spt-att-card" data-action="openDoc" data-id="${esc(e.id ?? String(e.t))}"><i class="fas fa-file-lines"></i><span><strong>${esc(e.att.name ?? t("Document"))}</strong><small>${t("Files.Open")}</small></span></a>`;
+  }
+
+  /** Mailbox locked by the GM: the tab is there, the content is not. */
+  _renderInboxLocked(p, mine) {
+    return `${this._renderHeader(p, mine)}${this._tabsHtml(p)}
+      <div class="spt-lockscreen spt-inbox-locked"><i class="fas fa-lock"></i><p>${t("Files.Restricted")}</p><small>${t("Files.RestrictedHint")}</small></div>`;
   }
 
   /** Incoming call on a smartphone or mobile: shown on its own screen, even when locked. */
@@ -417,7 +627,7 @@ export class PlayerPhone extends ApplicationV2 {
           </li>`;
       })
       .join("");
-    return `${this._renderHeader(p, mine)}
+    return `${this._renderHeader(p, mine)}${this._tabsHtml(p)}
       <ul class="spt-conv-list">${rows || `<li class="spt-phone-empty">${t("NoConversation")}</li>`}</ul>
       <footer class="spt-phone-foot"><button type="button" data-action="compose">${composeLabel(p.phone, this.gm)}</button></footer>`;
   }
@@ -441,7 +651,7 @@ export class PlayerPhone extends ApplicationV2 {
     const bubbles = entries
       .map((e) =>
         e.kind === "sms"
-          ? `<div class="spt-bubble ${e.dir}">${fileTag(e)}${del(e)}${share(e)}${fwdTag(e)}${attHtml(e.att)}${e.text ? `<div>${nl2br(e.text)}</div>` : ""}${this.gm && e.dir === "in" && !e.prep ? `<span class="spt-read ${e.read === false ? "unread" : ""}">${e.pending ? t("Read.Pending") : e.read === false ? t("Read.Unread") : t("Read.Seen")}</span>` : ""}</div>`
+          ? `<div class="spt-bubble ${e.dir}">${fileTag(e)}${del(e)}${share(e)}${fwdTag(e)}${this._attHtml(e)}${e.text ? `<div>${nl2br(e.text)}</div>` : ""}${this.gm && e.dir === "in" && !e.prep ? `<span class="spt-read ${e.read === false ? "unread" : ""}">${e.pending ? t("Read.Pending") : e.read === false ? t("Read.Unread") : t("Read.Seen")}</span>` : ""}</div>`
           : `<div class="spt-call-line"><i class="fas ${e.result === "answer" ? "fa-phone" : "fa-phone-slash"}"></i> ${callLabel(e)} ${del(e)}</div>`
       )
       .join("");
@@ -605,7 +815,8 @@ export class PlayerPhone extends ApplicationV2 {
       });
     }
     const p = this._current();
-    for (const a of el.querySelectorAll("[data-att-img], [data-att-doc]")) a.addEventListener("click", () => openAttachment(a, this._current()?.item));
+    for (const a of el.querySelectorAll("[data-att-img]")) a.addEventListener("click", () => openAttachment(a));
+    if (this.gm && p) bindDrop(el.querySelector(".spt-filedrop"), (att) => addFile(p.item, att));
     if (this.gm) {
       bindDrop(el.querySelector(".spt-drop"), (att) => {
         this._readForm();

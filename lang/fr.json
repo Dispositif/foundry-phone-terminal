@@ -60,7 +60,11 @@
       "PagerCut": "message de bipeur coupé à {n} caractères.",
       "NoCalls": "cet appareil ne reçoit pas d'appels.",
       "NoCharacter": "{name} n'a pas de personnage assigné : rien n'est envoyé. Assignez-lui un personnage (configuration de l'utilisateur), ou envoyez à un appareil.",
-      "NetworkBusy": "Réseau encombré : un appel sonne ou est déjà en cours."
+      "NetworkBusy": "Réseau encombré : un appel sonne ou est déjà en cours.",
+      "WholeJournal": "Glissez une seule page, pas le journal entier : ouvrez le journal et glissez la page depuis sa table des matières.",
+      "PageType": "Cette page ne peut pas s'afficher sur un appareil (PDF, vidéo…) : utilisez une page de texte ou d'image.",
+      "NoVideo": "Les vidéos ne peuvent pas être jointes : utilisez une image.",
+      "WrongDrop": "Un objet de type {type} ne peut pas être joint : glissez une page de journal ou une image."
     },
     "Caller": "Appelant",
     "Info": {
@@ -133,7 +137,8 @@
       "CompromisedDevice": "Appareil compromis : {label}",
       "BetweenAgents": "Entre PJ (lecture seule)",
       "InboxNpc": "PNJ",
-      "InboxAgents": "Entre PJ"
+      "InboxAgents": "Entre PJ",
+      "DropJournal": "Glissez une page de journal ou une image sur le message : l'agent la lira sur son appareil."
     },
     "Document": "Document",
     "RemoveAttachment": "Retirer la pièce jointe",
@@ -213,7 +218,11 @@
       "HeldBy": "Porté par",
       "Nobody": "Personne (à préparer)",
       "HeldByHint": "Tapez quelques lettres pour trouver un agent ou un PNJ. Laissez vide pour préparer l'appareil sans porteur.",
-      "Theme": "Habillage"
+      "Theme": "Habillage",
+      "Inbox": "Messagerie",
+      "Inbox_on": "Disponible",
+      "Inbox_locked": "Verrouillée",
+      "Inbox_none": "Aucune (fichiers seulement)"
     },
     "Ok": "Valider",
     "NewDevice": "Nouvel appareil",
@@ -452,6 +461,26 @@
       "unassigned": "Non attribué",
       "cancelled": "Annulé",
       "busy": "Réseau encombré"
+    },
+    "Files": {
+      "Tab": "Fichiers",
+      "Inbox": "Mails",
+      "Empty": "Aucun fichier.",
+      "Image": "Image",
+      "Denied": "Accès refusé",
+      "Restricted": "Accès restreint",
+      "RestrictedHint": "Messagerie verrouillée par l'administrateur",
+      "Drop": "Glissez ici une page de journal ou une image",
+      "Lock": "Verrouiller (visible, mais impossible à ouvrir)",
+      "Unlock": "Déverrouiller",
+      "Hide": "Masquer aux joueurs",
+      "Reveal": "Montrer aux joueurs",
+      "Rename": "Renommer",
+      "Loading": "Ouverture…",
+      "Unavailable": "Fichier indisponible",
+      "PickImage": "ou choisir une image",
+      "Open": "Ouvrir",
+      "Enlarge": "Agrandir"
     }
   }
 }

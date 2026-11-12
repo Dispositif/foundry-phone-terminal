@@ -10,13 +10,13 @@
 
 import { DIRECTORY_SAMPLE, LEGACY_IDS, MODULE_ID, SHEET_ID, SOCKET } from "./constants.js";
 import { ensureDeviceItems, registerPhoneSheet } from "./item-sheet.js";
-import { allPhones, createPhone, getLog, getPhoneData, isFixed, isPager, markPhone, phoneUsers, randomAddress } from "./devices.js";
+import { allPhones, createPhone, getPhoneData, isFixed, isPager, markPhone, randomAddress } from "./devices.js";
 import { openPager } from "./pager.js";
 import { transferPhone } from "./dialogs.js";
 import { myPhones, updateFab } from "./fab.js";
 import { PhonePanel } from "./gm-panel.js";
 import { registerEnrichers, runJournalLink } from "./journal-links.js";
-import { flushAll, flushPending, grantAttachments, sendSms } from "./messages.js";
+import { flushAll, flushPending, sendSms } from "./messages.js";
 import { restoreLive } from "./live-call.js";
 import { PlayerPhone } from "./player-phone.js";
 import { hangUp, ring } from "./ring.js";
@@ -315,8 +315,6 @@ Hooks.on("createItem", async (item, options) => {
     return;
   }
   for (const p of twins) await p.item.delete();
-  const atts = getLog(phone, { includePending: true }).map((e) => e.att).filter(Boolean);
-  if (item.parent instanceof Actor && atts.length) await grantAttachments(atts, phoneUsers(item.parent));
 });
 
 for (const hook of ["createItem", "updateItem", "deleteItem"]) {

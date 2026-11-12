@@ -39,6 +39,22 @@ export function isComputer(phone) {
   return !!modelOf(phone).mail;
 }
 
+/** Computer mailbox: "on" (available), "locked" (tab shown, content restricted) or "none" (files only). */
+export function inboxOf(phone) {
+  return isComputer(phone) ? phone?.inbox ?? "on" : "on";
+}
+
+/** Files of a laptop or terminal; players never see hidden ones. */
+export function filesOf(phone, { gm = false } = {}) {
+  const files = isComputer(phone) ? phone?.files ?? [] : [];
+  return gm ? files : files.filter((f) => !f.hidden);
+}
+
+/** Unread count as the player sees it: nothing from a mailbox they cannot open. */
+export function playerUnread(phone) {
+  return inboxOf(phone) === "on" ? unreadCount(phone) : 0;
+}
+
 /** Ring mode (on, silent, off). Computers have none: always on. */
 export function modeOf(phone) {
   return isComputer(phone) ? "on" : phone?.mode ?? "on";
@@ -430,11 +446,12 @@ export async function createPhone(actor, { label, number, model = "smartphone", 
   return item;
 }
 
-export async function markPhone(item, { label, number, model, sceneId, theme }) {
+export async function markPhone(item, { label, number, model, sceneId, theme, inbox }) {
   const prev = getPhoneData(item) ?? { mode: "on", contacts: [], log: [] };
   const next = { ...prev, label, number };
   if (model) next.model = model;
   if (sceneId !== undefined) next.sceneId = sceneId;
+  if (inbox !== undefined) next.inbox = inbox;
   if (theme !== undefined || !next.theme) next.theme = cleanTheme(theme ?? next.theme, next.model ?? "smartphone");
   const patch = deviceItemPatch(item, next);
   // Device and item share one name.

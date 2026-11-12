@@ -60,7 +60,11 @@
       "PagerCut": "pager message cut to {n} characters.",
       "NoCalls": "this device does not take calls.",
       "NoCharacter": "{name} has no assigned character: nothing sent. Assign them a character (User configuration), or send to a device.",
-      "NetworkBusy": "Network busy: a call is already ringing or in progress."
+      "NetworkBusy": "Network busy: a call is already ringing or in progress.",
+      "WholeJournal": "Drop a single page, not the whole journal: open the journal and drag the page from its table of contents.",
+      "PageType": "This page cannot be shown on a device (PDF, video…): use a text or an image page.",
+      "NoVideo": "Videos cannot be attached: use an image.",
+      "WrongDrop": "A {type} cannot be attached: drop a journal page or an image."
     },
     "Caller": "Caller",
     "Info": {
@@ -133,7 +137,8 @@
       "CompromisedDevice": "Compromised device: {label}",
       "BetweenAgents": "Between PCs (read only)",
       "InboxNpc": "NPCs",
-      "InboxAgents": "Between PCs"
+      "InboxAgents": "Between PCs",
+      "DropJournal": "Drop a journal page or an image on the message: the agent reads it on their device."
     },
     "Document": "Document",
     "RemoveAttachment": "Remove attachment",
@@ -213,7 +218,11 @@
       "HeldBy": "Held by",
       "Nobody": "Nobody (to prepare)",
       "HeldByHint": "Type a few letters to find an agent or an NPC. Leave empty to prepare the device without a holder.",
-      "Theme": "Look"
+      "Theme": "Look",
+      "Inbox": "Mailbox",
+      "Inbox_on": "Available",
+      "Inbox_locked": "Locked",
+      "Inbox_none": "None (files only)"
     },
     "Ok": "OK",
     "NewDevice": "New device",
@@ -452,6 +461,26 @@
       "unassigned": "Not assigned",
       "cancelled": "Cancelled",
       "busy": "Network busy"
+    },
+    "Files": {
+      "Tab": "Files",
+      "Inbox": "Mail",
+      "Empty": "No files.",
+      "Image": "Image",
+      "Denied": "Access denied",
+      "Restricted": "Access restricted",
+      "RestrictedHint": "Mailbox locked by the administrator",
+      "Drop": "Drop a journal page or an image here",
+      "Lock": "Lock (players see it but cannot open it)",
+      "Unlock": "Unlock",
+      "Hide": "Hide from players",
+      "Reveal": "Show to players",
+      "Rename": "Rename",
+      "Loading": "Opening…",
+      "Unavailable": "File unavailable",
+      "PickImage": "or choose an image",
+      "Open": "Open",
+      "Enlarge": "Enlarge"
     }
   }
 }

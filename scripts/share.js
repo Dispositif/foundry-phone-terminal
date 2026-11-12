@@ -31,6 +31,11 @@ export async function attShowHtml(att) {
   if (att.type === "image") return `<img class="spt-show-img" src="${esc(att.src)}">`;
   const doc = await fromUuid(att.uuid);
   if (!doc) return `<p><em>${t("DocNotFound")}</em></p>`;
+  return `<h3 class="spt-show-doc"><i class="fas fa-file-lines"></i> ${esc(att.name ?? doc.name)}</h3><div class="spt-doc">${await docPagesHtml(doc)}</div>`;
+}
+
+/** A journal (or one page) rendered as HTML, as the current user may see it: text and images, secrets hidden. */
+export async function docPagesHtml(doc) {
   const pages = doc.documentName === "JournalEntryPage" ? [doc] : [...(doc.pages?.contents ?? [])].sort((a, b) => a.sort - b.sort);
   const TE = foundry.applications?.ux?.TextEditor?.implementation ?? globalThis.TextEditor;
   const parts = [];
@@ -40,7 +45,7 @@ export async function attShowHtml(att) {
     else if (pg.type === "text") parts.push(await TE.enrichHTML(pg.text?.content ?? "", { secrets: false, relativeTo: pg }));
     else parts.push(`<p><i class="fas fa-file"></i> ${esc(pg.name)}</p>`);
   }
-  return `<h3 class="spt-show-doc"><i class="fas fa-file-lines"></i> ${esc(att.name ?? doc.name)}</h3>${parts.join("")}`;
+  return parts.join("");
 }
 
 /** Shows the screen to nearby agents: they see it but keep nothing. */
@@ -66,12 +71,26 @@ export async function showScreen(p, title, html) {
 }
 
 export function receiveShow({ from, title, html, skin }) {
+  readerWindow({ windowTitle: t("Share.ShowsYou", { from }), icon: "fa-eye", heading: title, html, skin, button: t("Share.GiveBack") });
+}
+
+/** The same reader, for oneself: a document or image enlarged from the device. */
+export function openReader(title, html, skin) {
+  readerWindow({ windowTitle: title, icon: "fa-expand", heading: "", html, skin, button: t("Close") });
+}
+
+function readerWindow({ windowTitle, icon, heading, html, skin, button }) {
+  // A document is read, not glanced at: a large window; an image gets room too.
+  const doc = html.includes("spt-doc");
+  const img = !doc && html.includes("spt-show-img");
+  const width = Math.min(doc ? 760 : img ? 640 : 440, window.innerWidth - 40);
   new DialogV2({
-    window: { title: t("Share.ShowsYou", { from }), icon: "fas fa-eye" },
-    classes: ["spt-player-phone", "spt-show-window", `spt-skin-${skin}`],
-    position: { width: 440 },
-    content: `<div class="spt-show"><p class="spt-show-title">${esc(title)}</p>${html}</div>`,
-    buttons: [{ action: "close", label: t("Share.GiveBack"), icon: "fas fa-check", default: true }]
+    window: { title: windowTitle, icon: `fas ${icon}`, resizable: true },
+    classes: ["spt-player-phone", "spt-show-window", `spt-skin-${skin}`, ...(doc ? ["spt-show-reading"] : [])],
+    // A document gets a fixed height the player can resize; the window itself scrolls.
+    position: doc ? { width, height: Math.round(window.innerHeight * 0.85) } : { width },
+    content: `<div class="spt-show">${heading ? `<p class="spt-show-title">${esc(heading)}</p>` : ""}${html}</div>`,
+    buttons: [{ action: "close", label: button, icon: "fas fa-check", default: true }]
   }).render({ force: true });
 }
 

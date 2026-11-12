@@ -36,7 +36,7 @@ Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateur
 - **Un terminal dans une pièce.** Quiconque s'y trouve lit son courrier. Joignez des pages de journal pour simuler des fichiers : archives, journaux système, rapports d'enquête.
 - **Un piratage, un téléphone volé.** Verrouillez un appareil, déverrouillez-le quand le jet réussit. Remettez-le à un autre personnage avec tout son historique.
 - **Un scénario prêt à jouer.** Les liens `@SMS` et `@Call` dans un journal envoient un message ou font sonner un téléphone d'un clic.
-- **Un dossier à distance.** Un terminal dans la barre latérale Objets, avec le droit de lecture « Observateur » à plusieurs joueurs : ils consultent son courrier de n'importe où, comme une base de données sécurisée du FBI. Joignez des pages de journal en guise de fichiers.
+- **Un dossier à distance.** Un terminal dans la barre latérale Objets, avec le droit de lecture « Observateur » à plusieurs joueurs : ils consultent son courrier de n'importe où, comme une base de données sécurisée du FBI. Placez des pages de journal dans son onglet Fichiers, et verrouillez les plus sensibles jusqu'à ce que les agents trouvent le mot de passe.
 - **Un indice préparé.** Écrivez à l'avance l'historique d'un appareil : messages, photos, appels manqués.
 - **Montrer plutôt que raconter.** Un joueur montre son écran aux agents dans la même pièce, ou transfère la photo.
 
@@ -93,6 +93,8 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 | **Téléphone fixe** | installé dans une scène | oui | non | non | non |
 
 - **Mails** : la première ligne fait office d'objet.
+- **Fichiers** (ordinateur, terminal) : un second onglet à côté des mails. Le MJ y glisse des pages de journal ou des images depuis la vue MJ de l'appareil. Le joueur ouvre un fichier dans l'écran : le texte et les images du journal (blocs secrets masqués), sans le journal Foundry et sans droit de lecture. Pour chaque fichier, le MJ peut le **verrouiller** (visible avec un cadenas, « Accès refusé ») ou le **masquer** (absent de la liste jusqu'à ce qu'il le révèle).
+- **Messagerie** (Modifier l'appareil, ordinateurs) : Disponible, Verrouillée (« Accès restreint ») ou Aucune (fichiers seulement).
 - **Bipeur** : une ligne de 12 caractères (un numéro à rappeler, un code, un mot), envoyée par le MJ depuis l'onglet Envoyer ; un texte plus long est coupé. Il bipe (vibre en mode silencieux) et sa fenêtre s'ouvre toute seule à côté du téléphone ; ◀ ▶ parcourent l'historique, la LED rouge reste allumée jusqu'à l'appui sur une touche. Un message qu'un agent écrit à un bipeur arrive au MJ. La cloche sur l'écran passe en normal, silencieux ou éteint.
 - **Appareils installés** (fixe, terminal) : rattachés à une scène, ils ne dépendent pas du réseau mobile et ont toujours la ligne.
 
@@ -150,7 +152,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 ### Partager
 
 - **Montrer l'écran** (icône œil, sur un message ou en haut d'une conversation) : l'agent tend son appareil aux agents présents sur la même scène, cochés par défaut. Ils voient l'image, la page de journal (son contenu, sans avoir besoin du droit de lecture) ou la conversation, dans une fenêtre « X vous montre son écran ». Une fois fermée, il ne leur reste rien. Fonctionne sans réseau.
-- **Transférer** (icône flèche, sur un message) : le message et sa pièce jointe repartent par le réseau vers un contact ou un numéro, comme un vrai message (réseau nécessaire, trace dans l'historique). Un agent destinataire reçoit automatiquement le droit de lire le journal joint ; un PNJ le reçoit dans l'onglet **Messages** du panneau MJ. Le message porte la mention « Transféré ». Un vieux mobile ne transfère que le texte.
+- **Transférer** (icône flèche, sur un message) : le message et sa pièce jointe repartent par le réseau vers un contact ou un numéro, comme un vrai message (réseau nécessaire, trace dans l'historique). Un agent destinataire lit le journal joint sur son propre appareil ; un PNJ le reçoit dans l'onglet **Messages** du panneau MJ. Le message porte la mention « Transféré ». Un vieux mobile ne transfère que le texte.
 
 ### Appels
 
@@ -182,7 +184,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 - Le MJ fait sonner un appareil ou lui envoie un message, sous l'identité de son choix : un nom de PNJ, un numéro, ou « Numéro masqué ».
 - Destinataire : un appareil précis (liste « Appareils »), un numéro, ou un joueur.
-- **Pièces jointes** (smartphone, ordinateur, terminal) : une image (trombone, ou glisser une tuile) ou une page de journal glissée depuis la barre latérale. Le destinataire reçoit automatiquement le droit de lire le journal joint.
+- **Pièces jointes** (smartphone, ordinateur, terminal) : une image (trombone, ou glisser une tuile) ou une page de journal glissée depuis la barre latérale. Le journal apparaît en carte dans le message et s'ouvre dans l'appareil (texte et images, blocs secrets masqués), avec une icône Agrandir pour les longs documents. Les joueurs n'ont aucun droit Foundry dessus : le document n'existe que dans l'appareil.
 
 ### Un agent vers un PNJ
 
@@ -209,7 +211,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 ### Le panneau MJ : Réseau (Ctrl+Shift+P)
 
-- Le **bouton flottant télécom** du MJ l'ouvre (sur **Messages** s'il y a des messages d'agents non lus) et affiche leur nombre. Il a son propre réglage.
+- Le **bouton flottant télécom** du MJ l'ouvre (sur **Messages** s'il y a des messages d'agents non lus) et affiche leur nombre. Il a son propre réglage. En dessous, un petit bouton par fixe ou terminal installé sur la scène affichée ouvre la vue MJ de l'appareil.
 - Barre du haut : état du réseau, messages en attente, et bascule **Couper le réseau** mobile.
 - Onglet **Envoyer** : destinataire (avec l'icône du modèle), expéditeur affiché (texte libre, numéro masqué si vide, avec suggestions : contacts du destinataire, expéditeurs récents, numéros des autres appareils), puis **Message** ou **Appel**. Seul ce que le destinataire sait faire est proposé (pas de message vers une ligne fixe, pas d'appel vers un terminal). **Envoyer** ou **Faire sonner**, pièce jointe, et **Copier en lien** pour un journal.
 - Onglet **Messages**, deux sous-onglets :
