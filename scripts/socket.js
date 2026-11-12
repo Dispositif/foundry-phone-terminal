@@ -5,6 +5,7 @@ import { openPager } from "./pager.js";
 import { onPlayerCall, onPlayerHangup, onPlayerSms, senderHolds } from "./gm-actions.js";
 import { activeCall, endCall, onCallResult, receiveNearbyCall, receiveNearbyRing, receiveRing, stopNearbyRing } from "./player-calls.js";
 import { onResponse } from "./ring.js";
+import { closeDial, endLive, openDial, openLive, openRinging } from "./live-call.js";
 import { receiveShow } from "./share.js";
 import { isActiveGM, playLocal } from "./util.js";
 /* -------------------------------------------- */
@@ -19,13 +20,16 @@ export function onSocket(data) {
       break;
     case "ringNearby":
       receiveNearbyRing(data);
+      openRinging(data);
       break;
     case "callNearby":
       receiveNearbyCall(data);
+      openDial(data);
       break;
     case "ringNearbyStop":
     case "nearbyStop":
       stopNearbyRing(data);
+      closeDial(data.callId);
       break;
     case "cancel":
       if (forMe && activeCall?.callId === data.callId) endCall("cancelled");
@@ -45,6 +49,12 @@ export function onSocket(data) {
         if (data.bip && data.sms) playLocal(data.notif ? `modules/${MODULE_ID}/sounds/${data.notif}` : SMS_SRC);
         if (data.open) openPager(data.open, { latest: true });
       }
+      break;
+    case "liveStart":
+      openLive(data);
+      break;
+    case "liveEnd":
+      endLive(data.callId, data.reason);
       break;
     case "response":
       if (game.user.isGM) onResponse(data);

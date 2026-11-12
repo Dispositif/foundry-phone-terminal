@@ -302,9 +302,9 @@ export function addLog(item, entry) {
   return mutateLog(item, (log) => [{ id: foundry.utils.randomID(), t: Date.now(), ...entry }, ...log]);
 }
 
-/** Received message not yet read by the player. */
+/** Received message not yet read by the player, or missed call not yet seen (floating button badge). */
 export function isUnread(e) {
-  return e.dir === "in" && e.kind === "sms" && e.read === false;
+  return e.dir === "in" && e.read === false && (e.kind === "sms" || (e.kind === "call" && e.result === "missed"));
 }
 
 export function unreadCount(phone) {

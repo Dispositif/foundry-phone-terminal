@@ -1,17 +1,60 @@
 import { attChipHtml, attFromDrop, pickImage } from "./attachments.js";
 import { ApplicationV2, DialogV2, HandlebarsApplicationMixin, MASKED, MODES, MODULE_ID } from "./constants.js";
-import { allPhones, holders, sharedUsers, displayName, getLog, getPhoneData, hasSignal, holderName, inDeadZone, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc } from "./devices.js";
+import { allPhones, phonesByNumber, holders, sharedUsers, displayName, getLog, getPhoneData, hasSignal, holderName, inDeadZone, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc } from "./devices.js";
 import { contactsDialog, directoryDialog, editPhoneDialog, giveDialog, newPhoneDialog } from "./dialogs.js";
 import { copyJournalLink } from "./journal-links.js";
 import { openPhone } from "./main.js";
 import { sendSms } from "./messages.js";
 import { hangUpAll, pendingCalls, ring } from "./ring.js";
+import { clock, liveCalls, timerHtml } from "./live-call.js";
 import { esc, isMasked, nl2br, norm } from "./util.js";
 import { t, tn } from "./i18n.js";
 /* -------------------------------------------- */
 /*  GM panel                                    */
 /* -------------------------------------------- */
 
+
+const CALL_ROWS = 40;
+
+/**
+ * Every call, answered or not, between agents too: one line per call, most recent first.
+ * The two ends of a call are matched by its id (calls logged before 0.38 stay one line per device).
+ */
+function callRows(phones) {
+  const calls = new Map();
+  for (const p of phones) {
+    for (const e of getLog(p.phone, { includePending: true })) {
+      if (e.kind !== "call") continue;
+      const id = e.call ?? `${p.item.uuid}|${e.id ?? e.t}`;
+      if (!calls.has(id)) calls.set(id, { id, t: 0, outs: [], ins: [] });
+      const c = calls.get(id);
+      c.t = Math.max(c.t, e.t ?? 0);
+      (e.dir === "out" ? c.outs : c.ins).push({ p, e });
+    }
+  }
+  const who = ({ p }) => holderName(p.item, p.phone);
+  return [...calls.values()].sort((a, b) => b.t - a.t).slice(0, CALL_ROWS).map((c) => {
+    const out = c.outs[0];
+    const all = [...c.outs, ...c.ins];
+    // Caller: the agent's device that dialed, otherwise the NPC (or hidden number) the GM called as.
+    const from = out ? who(out) : gmName(c.ins[0].p.phone, c.ins[0].e.with);
+    const to = c.ins.length ? [...new Set(c.ins.map(who))].join(", ") : gmName(out.p.phone, out.e.with);
+    const answered = all.some((x) => x.e.result === "answer");
+    const result = answered ? "answer" : out ? out.e.result : c.ins[0].e.result;
+    const live = liveCalls.get(c.id);
+    const dur = all.find((x) => x.e.dur != null)?.e.dur;
+    return {
+      from,
+      to,
+      fromAgent: !!out,
+      answered,
+      compromised: all.some((x) => x.p.phone.compromised),
+      live: live && !live.ended && !live.dialing ? timerHtml(live) : "",
+      result: t(`Calls.${result}`),
+      dur: dur != null ? clock(dur) : ""
+    };
+  });
+}
 
 /** Drop zone for an attachment. */
 export function bindDrop(zone, onAtt) {
@@ -46,7 +89,8 @@ export function gmInbox() {
   const out = [];
   for (const p of allPhones()) {
     for (const e of getLog(p.phone)) {
-      if (e.kind === "sms" && e.dir === "out" && !e.pj && !e.prep) out.push({ ...p, e });
+      // To an NPC, and between agents (pj: read only for the GM, never unread).
+      if (e.kind === "sms" && e.dir === "out" && !e.prep) out.push({ ...p, e });
     }
   }
   return out.sort((a, b) => b.e.t - a.e.t);
@@ -86,6 +130,33 @@ const TRACK_ORDER = { high: 0, medium: 1, low: 2, none: 3 };
  * the devices the network can locate and the best precision.
  * An agent with nothing locatable is listed too: precision none, location unknown.
  */
+const RECENT_CALL_MS = 30 * 60 * 1000; // table time
+
+/**
+ * The agent's last call in the past 30 minutes (table time), on a device they carry:
+ * "12 min ago · → Marlin Hunt · 02:47". A trace on the network.
+ */
+function lastCall(actor, phones) {
+  let last = null;
+  for (const p of phones) {
+    if (p.actor?.id !== actor.id) continue;
+    for (const e of getLog(p.phone, { includePending: true })) {
+      if (e.kind !== "call" || !e.t || Date.now() - e.t > RECENT_CALL_MS) continue;
+      if (!last || e.t > last.e.t) last = { p, e };
+    }
+  }
+  if (!last) return "";
+  const { p, e } = last;
+  // The other end: an agent by name, otherwise as the GM knows the number.
+  const other = phonesByNumber(keyFor(p.phone, e.with)).find((q) => q.item !== p.item && q.actor?.hasPlayerOwner);
+  const who = other ? other.actor.name : gmName(p.phone, e.with);
+  const live = e.call ? liveCalls.get(e.call) : null;
+  const state = live && !live.ended && !live.dialing ? t("Live.OnLine") : e.dur != null ? clock(e.dur) : e.result !== "answer" ? t(`Calls.${e.result}`) : "";
+  const mins = Math.floor((Date.now() - e.t) / 60000);
+  const ago = mins < 1 ? t("Track.JustNow") : t("Track.MinAgo", { n: mins });
+  return `${ago} · ${e.dir === "out" ? "→" : "←"} ${who}${state ? ` · ${state}` : ""}`;
+}
+
 function trackingRows(phones) {
   const agents = new Map();
   for (const u of game.users) if (!u.isGM && u.character) agents.set(u.character.id, u.character);
@@ -107,6 +178,7 @@ function trackingRows(phones) {
         level,
         levelLabel: t(`Track.${level}`),
         location: level !== "none" ? "" : inDeadZone(actor) ? t("Track.DeadZone") : t("Track.Unknown"),
+        lastCall: lastCall(actor, phones),
         devices
       };
     })
@@ -124,6 +196,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     position: { width: 460, height: 620 },
     form: { handler: () => {}, submitOnChange: false, closeOnSubmit: false },
     actions: {
+      switchInbox: function (event, target) { this._setState({ inboxView: target.dataset.view }); },
       switchTab: function (event, target) { this._focusSend = true; this._setState({ tab: target.dataset.tab }); },
       mode: function (event, target) { this._focusSend = true; this._setState({ mode: target.dataset.mode }); },
       ring: function () { this._doRing(); },
@@ -211,7 +284,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static recentSenders = [];
 
-  _state = { target: null, sender: "", text: "", att: null, tab: "send", mode: "message", drafts: {} };
+  _state = { target: null, sender: "", text: "", att: null, tab: "send", mode: "message", drafts: {}, inboxView: "npc" };
 
   /** Changes the state (tab, mode, recipient…) while keeping the current input. */
   _setState(patch) {
@@ -271,22 +344,28 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     const inboxAll = gmInbox();
     const threads = new Map();
     for (const { item, phone, e } of inboxAll) {
-      const id = `${item.uuid}|${norm(keyFor(phone, e.with))}`;
-      if (!threads.has(id)) threads.set(id, { id, item, phone, key: e.with, unread: 0 });
+      // Between agents: one thread per pair of numbers, whichever of the two wrote last.
+      const id = e.pj ? `pj|${[norm(phone.number), norm(keyFor(phone, e.with))].sort().join("|")}` : `${item.uuid}|${norm(keyFor(phone, e.with))}`;
+      if (!threads.has(id)) threads.set(id, { id, item, phone, key: e.with, unread: 0, agents: !!e.pj });
       if (e.seen === false) threads.get(id).unread++;
     }
-    const inbox = [...threads.values()].slice(0, 12).map((th) => {
+    // Sub-tabs: messages to NPCs (the GM answers) or between agents (read only).
+    const agentThreads = [...threads.values()].filter((th) => th.agents);
+    const npcThreads = [...threads.values()].filter((th) => !th.agents);
+    const inbox = (this._state.inboxView === "agents" ? agentThreads : npcThreads).slice(0, 20).map((th) => {
       const conv = getLog(th.phone, { includePending: true }).filter((e) => e.kind === "sms" && sameConv(th.phone, e.with, th.key));
       return {
         id: th.id,
         uuid: th.item.uuid,
         key: th.key,
         who: holderName(th.item, th.phone),
-        to: gmName(th.phone, th.key),
-        unknown: isUnknownNumber(th.phone, th.key),
+        // Between agents: the other agent's name; to an NPC: the directory name.
+        to: th.agents ? [...new Set(phonesByNumber(keyFor(th.phone, th.key)).filter((p) => p.item !== th.item).map((p) => holderName(p.item, p.phone)))].join(", ") || gmName(th.phone, th.key) : gmName(th.phone, th.key),
+        agents: th.agents,
+        unknown: !th.agents && isUnknownNumber(th.phone, th.key),
         compromised: !!th.phone.compromised,
         unread: th.unread,
-        canCall: !modelOf(th.phone).noCalls,
+        canCall: !th.agents && !modelOf(th.phone).noCalls,
         draft: this._state.drafts[th.id] ?? "",
         bubbles: conv.slice(-INBOX_BUBBLES).map((e) => ({
           dir: e.dir,
@@ -360,9 +439,14 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       attChip: attChipHtml(this._state.att),
       inbox,
       inboxUnread: inboxAll.filter((x) => x.e.seen === false).length,
+      inboxView: this._state.inboxView,
+      showMarkAll: this._state.inboxView === "npc" && inboxAll.some((x) => x.e.seen === false),
+      npcThreadCount: npcThreads.length,
+      agentThreadCount: agentThreads.length,
       groups: sortedGroups,
       deviceCount: phones.length,
-      tracking: this._state.tab === "tracking" ? trackingRows(phones) : []
+      tracking: this._state.tab === "tracking" ? trackingRows(phones) : [],
+      calls: this._state.tab === "calls" ? callRows(phones) : []
     };
   }
 

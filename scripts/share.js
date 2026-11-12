@@ -1,7 +1,7 @@
 import { DialogV2, SOCKET } from "./constants.js";
 import { conversations, displayName, getLog, modelOf, skinOf } from "./devices.js";
 import { playerSendSms } from "./player-calls.js";
-import { deviceNotice, esc, gmWhisper, isMasked } from "./util.js";
+import { deviceNotice, esc, isMasked } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
 /*  Sharing: show screen, forward               */
@@ -62,7 +62,6 @@ export async function showScreen(p, title, html) {
   const from = userName(game.user);
   game.socket.emit(SOCKET, { type: "show", targetUserIds: ids, from, title, html, skin: skinOf(p.phone) });
   const names = users.filter((u) => ids.includes(u.id)).map(userName).join(", ");
-  gmWhisper(`<p class="spt-gm-copy"><i class="fas fa-eye"></i> ${t("Share.GmCopy", { from: `<strong>${esc(from)}</strong>`, title: esc(title), names: esc(names) })}</p>`);
   deviceNotice(t("Share.YouShow", { names }));
 }
 

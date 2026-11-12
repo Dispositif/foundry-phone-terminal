@@ -720,3 +720,84 @@ a.spt-link:hover { filter: brightness(1.15); }
 .spt-new-device .spt-chip:has(input:checked) { border-color: var(--color-warm-2, #ff8a3d); box-shadow: 0 0 0 1px var(--color-warm-2, #ff8a3d) inset; }
 .spt-new-device .spt-npc { margin-top: 6px; }
 .spt-new-device .spt-dice { flex: 0 0 2.4em; }
+
+/* Live call: black window centred for the whole table, who is on the phone. */
+.spt-live .window-content { background: #0b0c0e; color: #e8e8e8; padding: 0; }
+.spt-live-body { padding: 18px 20px 20px; text-align: center; }
+.spt-live-icon { font-size: 2rem; color: #7bd88f; }
+.spt-live-status { margin-top: 4px; font-size: 0.8rem; letter-spacing: 0.18em; text-transform: uppercase; color: #7bd88f; }
+.spt-live-status .spt-live-state i { font-size: 0.6rem; vertical-align: middle; margin-right: 4px; animation: spt-live-pulse 1.6s infinite; }
+.spt-live-state.ended { color: #e0a38f; }
+.spt-live-state.ended.cut { color: #e05a4a; }
+.spt-live-state.ended i { animation: none; }
+.spt-live-body.ended { cursor: pointer; }
+.spt-live-body.ended .spt-live-icon { color: #e0a38f; }
+.spt-live-body.ended .spt-live-face { filter: grayscale(0.8); opacity: 0.7; }
+@keyframes spt-live-pulse { 50% { opacity: 0.35; } }
+.spt-live-duo { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 16px 0 6px; }
+.spt-live-person { width: 150px; }
+.spt-live-face {
+  width: 104px; height: 104px; margin: 0 auto; border-radius: 50%;
+  border: 3px solid #555; background: #1a1b1e center top / cover no-repeat;
+  display: flex; align-items: center; justify-content: center;
+}
+.spt-live-person.pc .spt-live-face { border-color: #7bd88f; }
+.spt-live-face.unknown i { font-size: 3rem; color: #555; }
+.spt-live-name { margin-top: 8px; font-size: 1rem; font-weight: 600; }
+.spt-live-sub { font-size: 0.8rem; color: #888; margin-top: 2px; }
+.spt-live-link { width: 40px; border-top: 2px dotted rgba(123, 216, 143, 0.4); }
+.spt-live-buttons { display: flex; justify-content: center; gap: 10px; margin-top: 14px; }
+.spt-live-buttons button { width: auto; padding: 4px 22px; border-radius: 20px; border: none; font-weight: 600; }
+.spt-live-hangup { background: #c0392b; color: #fff; }
+.spt-live-cut { background: #2a2d33; color: #ddd; }
+.spt-live-buttons button:hover { filter: brightness(1.15); }
+.spt-lcd-live > i { animation: none; }
+.spt-live-timer { margin-left: 6px; letter-spacing: 0.05em; color: #9aa; font-variant-numeric: tabular-nums; opacity: 0.8; }
+/* Smartphone on the line: the other end on the screen itself. */
+.spt-live-screen .spt-live-status { margin: 0 0 10px; font-size: 0.75rem; }
+.spt-live-screen .spt-live-face { width: 96px; height: 96px; margin-bottom: 8px; }
+.spt-live-screen .spt-live-sub { margin: 0; font-size: 0.8rem; opacity: 0.7; }
+.spt-live-screen .spt-live-state { color: #7bd88f; }
+.spt-live-screen .spt-live-state.ended { color: #e0a38f; }
+.spt-live-screen .spt-live-state.ended.cut { color: #e05a4a; }
+/* Calls on the player side: answer in green, decline / hang up in red. */
+.spt-phone-ring-dialog .form-footer button[data-action="answer"],
+.spt-player-phone.spt-skin-modern .spt-dialer .spt-incoming-row .spt-answer { background: #2e9e4f; border-color: #237a3c; color: #fff; }
+.spt-phone-ring-dialog .form-footer button[data-action="decline"],
+.spt-phone-ring-dialog .form-footer button[data-action="hangup"] { background: #b4443a; border-color: #8e3229; color: #fff; }
+.spt-phone-ring-dialog .form-footer button[data-action]:hover { filter: brightness(1.15); }
+.spt-player-phone.spt-skin-modern .spt-dialer .spt-incoming-row .spt-decline { color: #fff; }
+.spt-live-state.dialing { color: #9aa; }
+/* GM: calls list. */
+.spt-call-list { list-style: none; margin: 0; padding: 0; }
+.spt-call-row { display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-bottom: 1px solid rgba(0, 0, 0, 0.12); }
+.spt-call-icon { width: 1.2em; text-align: center; opacity: 0.5; }
+.spt-call-row.answered .spt-call-icon { color: #2e9e4f; opacity: 1; }
+.spt-call-who { flex: 1; min-width: 0; }
+.spt-call-res { font-size: 0.85em; opacity: 0.75; white-space: nowrap; }
+.spt-call-dur { font-variant-numeric: tabular-nums; margin-left: 4px; }
+.spt-call-live { color: #2e9e4f; opacity: 1; font-weight: 600; }
+.spt-call-live i { font-size: 0.6em; vertical-align: middle; animation: spt-live-pulse 1.6s infinite; }
+.spt-call-live .spt-live-timer { color: inherit; margin-left: 2px; }
+.spt-incoming .spt-ring-face { width: 96px; height: 96px; margin: 0 auto 8px; border: 3px solid #7bd88f; }
+/* GM Messages tab: NPCs / between agents. */
+.spt-subtabs { display: flex; gap: 4px; margin: 0 0 8px; border-bottom: 1px solid rgba(0, 0, 0, 0.15); }
+.spt-subtab { padding: 3px 10px; border-radius: 4px 4px 0 0; opacity: 0.65; cursor: pointer; }
+.spt-subtab.active { opacity: 1; font-weight: 600; border-bottom: 2px solid currentColor; }
+.spt-incoming-keys .spt-dismiss { background: #3a3d44; }
+/* Device screens: the skin's button style must not win over the call keys (answer green, hang up red). */
+.spt-player-phone .window-content .spt-incoming-keys button { width: 56px; height: 56px; min-width: 56px; flex: 0 0 56px; padding: 0; border: none; border-radius: 50%; color: #fff; font-size: 1.4rem; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.spt-player-phone .window-content .spt-incoming-keys .spt-answer { background: #2e9e4f; }
+.spt-player-phone .window-content .spt-incoming-keys .spt-decline { background: #c0392b; }
+.spt-player-phone .window-content .spt-incoming-keys .spt-dismiss { background: #3a3d44; }
+.spt-player-phone .window-content .spt-dialer .spt-incoming-row .spt-answer { background: #2e9e4f; border-color: #237a3c; color: #fff; }
+.spt-player-phone .window-content .spt-dialer .spt-incoming-row .spt-decline { background: #b4443a; border-color: #8e3229; color: #fff; }
+/* Ringing: a soft halo pulses around the portrait of the agent whose phone rings. */
+@keyframes spt-ring-halo { 0% { box-shadow: 0 0 0 0 rgba(123, 216, 143, 0.7); } 100% { box-shadow: 0 0 0 16px rgba(123, 216, 143, 0); } }
+.spt-live-person.ringing .spt-live-face, .spt-incoming .spt-ring-face { animation: spt-ring-halo 1.3s ease-out infinite; }
+/* GM: compromised device on the line. */
+.spt-live-warn { margin-top: 4px; font-size: 0.75rem; color: #e0a040; }
+/* "Network busy": red signal icon. */
+.spt-device-notice .spt-busy { color: #e05a4a; }
+.spt-track-call { margin: 2px 0 4px 8px; font-size: 0.85em; opacity: 0.8; }
+.spt-track-call i { font-size: 0.85em; margin-right: 3px; }

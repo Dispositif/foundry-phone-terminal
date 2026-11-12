@@ -1,7 +1,9 @@
 import { MASKED, MODULE_ID, RESULT_LABELS, SOCKET } from "./constants.js";
-import { addLog, defaultDeviceFor, displayName, getPhoneData, hasSignal, holders, isFixed, isLandline, keyFor, modelOf, npcNumber, phoneLabel, phonesByNumber, skinOf, modeOf } from "./devices.js";
-import { esc, gmWhisper, maskedLabel, rerenderAll } from "./util.js";
+import { addLog, defaultDeviceFor, displayName, findContact, getPhoneData, hasSignal, holders, isFixed, isLandline, keyFor, modelOf, npcNumber, phoneLabel, phonesByNumber, skinOf, modeOf } from "./devices.js";
+import { maskedLabel, rerenderAll } from "./util.js";
 import { t } from "./i18n.js";
+import { agentSide, closeDial, lineBusy, npcSide, openGmRing, startLive } from "./live-call.js";
+import { gmIncoming } from "./gm-actions.js";
 /* -------------------------------------------- */
 /*  Calls ringing at players                    */
 /* -------------------------------------------- */
@@ -13,8 +15,15 @@ export const pendingCalls = new Map();
  * Rings a device (target = "phone:<number>") or a player ("user:<id>").
  * origin = { userId, itemUuid, callId, key, name } when the call comes from another PC.
  */
+/** The network takes one call at a time: one ringing or in progress, anywhere. */
+export function networkBusy() {
+  return pendingCalls.size > 0 || gmIncoming.size > 0 || lineBusy();
+}
+
 export async function ring(target, { caller = MASKED, origin = null, callId = foundry.utils.randomID() } = {}) {
   if (!game.user.isGM) return ui.notifications.warn(t("Warn.GmOnlyCall"));
+  // GM calling while another call rings or is in progress: the network is busy.
+  if (!origin && networkBusy()) return ui.notifications.warn(t("Warn.NetworkBusy"));
   const [kind, value] = String(target).split(/:(.*)/s);
   const timeout = game.settings.get(MODULE_ID, "ringTimeout");
   // A directory name rings as its number, so the agent's own contact name shows on their device.
@@ -52,10 +61,9 @@ export async function ring(target, { caller = MASKED, origin = null, callId = fo
         call.lastResult = result;
         if (!origin) {
           ui.notifications.warn(`📱 ${phoneLabel(p)} : ${RESULT_LABELS[result]}.`);
-          gmWhisper(`<p><strong>📞 ${esc(phoneLabel(p))}</strong> : ${RESULT_LABELS[result]}</p><p><em>${t("Caller")} : ${esc(maskedLabel(caller))}</em></p>`);
         }
         // Without signal, the missed call only shows when signal returns.
-        addLog(p.item, { kind: "call", dir: "in", with: keyFor(p.phone, call.from), result: "missed", pending: result === "nosignal" || result === "off" });
+        addLog(p.item, { kind: "call", call: callId, dir: "in", with: keyFor(p.phone, call.from), result: "missed", read: false, pending: result === "nosignal" || result === "off" });
         continue;
       }
       for (const u of users) {
@@ -63,6 +71,7 @@ export async function ring(target, { caller = MASKED, origin = null, callId = fo
         emitRing(u.id, {
           caller: modelOf(p.phone).callerId ? displayName(p.phone, call.from) : null,
           callerNumber: landlineNumber(p, call.from),
+          callerImg: knownCallerFace(p, call.from, origin),
           itemUuid: p.item.uuid,
           phoneLabel: isLandline(p.phone) ? `${p.phone.label} (${game.scenes.get(p.phone.sceneId)?.name ?? ""})` : p.phone.label,
           silent: mode === "silent",
@@ -72,7 +81,7 @@ export async function ring(target, { caller = MASKED, origin = null, callId = fo
       // Narration: every other player hears a carried phone ring (ring mode only), softer.
       if (mode === "on" && !isFixed(p.phone) && p.actor) {
         call.nearby = true;
-        game.socket.emit(SOCKET, { type: "ringNearby", callId, exclude: users.map((u) => u.id), name: p.actor.name, ringSrc: modelOf(p.phone).ring, timeout });
+        game.socket.emit(SOCKET, { type: "ringNearby", callId, exclude: users.map((u) => u.id), name: p.actor.name, img: p.actor.img, ringSrc: modelOf(p.phone).ring, timeout });
       }
     }
   }
@@ -82,7 +91,11 @@ export async function ring(target, { caller = MASKED, origin = null, callId = fo
     return;
   }
   pendingCalls.set(callId, call);
-  if (!origin) ui.notifications.info(`📱 ${t("Info.Calling", { label: call.label, caller: maskedLabel(caller) })}`);
+  // GM calling as an NPC: the call window, ringing (NPC and the agent called, hang-up button).
+  if (!origin) {
+    const [userId, itemUuid] = call.open.entries().next().value;
+    openGmRing(callId, npcSide(call.from, "", maskedLabel(caller)), agentSide(fromUuidSync(itemUuid), userId));
+  }
   rerenderAll();
   return callId;
 }
@@ -92,13 +105,14 @@ export function hangUp(callId, { notifyOrigin = true } = {}) {
   if (!call) return;
   pendingCalls.delete(callId);
   stopNearby(call, callId);
+  closeDial(callId);
   const logged = new Set();
   for (const [userId, itemUuid] of call.open) {
     game.socket.emit(SOCKET, { type: "cancel", targetUserId: userId, callId });
     if (itemUuid && !logged.has(itemUuid)) {
       logged.add(itemUuid);
       const item = fromUuidSync(itemUuid);
-      if (item) addLog(item, { kind: "call", dir: "in", with: keyFor(getPhoneData(item), call.from), result: "missed" });
+      if (item) addLog(item, { kind: "call", call: callId, dir: "in", with: keyFor(getPhoneData(item), call.from), result: "missed", read: false });
     }
   }
   if (call.origin && notifyOrigin) finishOrigin(call.origin, "noanswer");
@@ -118,24 +132,25 @@ export function onResponse({ callId, result, userId }) {
   call.lastResult = result;
   const user = game.users.get(userId);
   const item = itemUuid ? fromUuidSync(itemUuid) : null;
-  if (item) addLog(item, { kind: "call", dir: "in", with: keyFor(getPhoneData(item), call.from), result });
+  if (item) addLog(item, { kind: "call", call: callId, dir: "in", with: keyFor(getPhoneData(item), call.from), result, ...(result === "missed" ? { read: false } : {}) });
 
   if (!call.origin) {
     const where = item ? ` (${getPhoneData(item)?.label ?? item.name})` : "";
     const text = `${user?.name ?? "?"}${where} ${RESULT_LABELS[result] ?? result} — ${t("Caller").toLowerCase()} : ${maskedLabel(call.caller)}`;
-    if (result === "answer") ui.notifications.info(`📱 ${text}`);
-    else ui.notifications.warn(`📱 ${text}`);
-    gmWhisper(`<p><strong>📞 ${esc(user?.name)}${esc(where)}</strong> ${RESULT_LABELS[result] ?? esc(result)}</p><p><em>${t("Caller")} : ${esc(maskedLabel(call.caller))}</em></p>`);
+    // Answered: the call window says it. Otherwise a short notice.
+    if (result !== "answer") ui.notifications.warn(`📱 ${text}`);
   }
 
   if (result === "answer") {
     // Someone picked up: stop ringing for the others (shared number, co-owners).
     for (const otherId of call.open.keys()) game.socket.emit(SOCKET, { type: "cancel", targetUserId: otherId, callId });
     call.open.clear();
+    if (item) startLive(callId, ...liveSides(call, item, userId));
   }
   if (!call.open.size) {
     pendingCalls.delete(callId);
     stopNearby(call, callId);
+    closeDial(callId); // GM ringing window (answered: it is now the call window and stays)
     if (call.origin) finishOrigin(call.origin, result === "answer" ? "answer" : result === "off" ? "voicemail" : "noanswer");
   }
   rerenderAll();
@@ -144,13 +159,33 @@ export function onResponse({ callId, result, userId }) {
 /** Closes a call placed by a player: history + outcome shown to them. */
 export function finishOrigin(origin, result) {
   const item = fromUuidSync(origin.itemUuid);
-  if (item) addLog(item, { kind: "call", dir: "out", with: origin.key, result });
+  if (item) addLog(item, { kind: "call", call: origin.callId, dir: "out", with: origin.key, result });
   game.socket.emit(SOCKET, { type: "callResult", targetUserId: origin.userId, callId: origin.callId, result, name: origin.name });
-  if (result === "answer") {
-    gmWhisper(`<p>📞 ${t("Gm.OnLine", { who: `<strong>${esc(item?.parent?.name ?? "?")}</strong>`, name: `<strong>${esc(origin.name)}</strong>` })}</p>`);
-  }
 }
 
+
+/** The two ends of an answered call: the calling agent (or the GM's NPC) and the agent who picked up. */
+function liveSides(call, item, userId) {
+  const phone = getPhoneData(item);
+  const b = agentSide(item, userId);
+  if (call.origin) {
+    const a = agentSide(fromUuidSync(call.origin.itemUuid), call.origin.userId);
+    a.seen = displayName(phone, keyFor(phone, call.from));
+    b.seen = call.origin.name;
+    return [a, b];
+  }
+  return [npcSide(call.from, displayName(phone, keyFor(phone, call.from)), maskedLabel(call.caller)), b];
+}
+
+/**
+ * Smartphone: the face of the agent who calls, if they are in this device's contacts.
+ * NPC portraits: not yet (no face).
+ */
+function knownCallerFace(p, from, origin) {
+  if (p.phone.model !== "smartphone" || !origin || !findContact(p.phone, from)) return null;
+  const actor = fromUuidSync(origin.itemUuid)?.parent;
+  return actor instanceof Actor ? actor.img : null;
+}
 
 /**
  * Modern landline: the ringing popup shows the caller's number, only when it looks like one (digits).

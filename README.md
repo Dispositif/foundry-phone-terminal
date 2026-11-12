@@ -9,7 +9,7 @@ A Foundry VTT module that gives your characters phones, laptops and room termina
 - **One shortcut: Ctrl+Shift+P** opens the GM panel, or the player's phone. Players get a floating phone button, the GM a telecom one with the unread count.
 - **No setup needed:** the GM can ring a player or send them a message right away, from the GM panel. It lands on their character's phone: if the character carries none, one is created automatically (smartphone or mobile, **Default device** setting).
 - **Devices are optional extras.** A device is an item in a character's inventory (phone, laptop), or is installed in a place: a landline or a terminal tied to a Foundry scene, used by whoever stands there. Devices bring history, contacts, replies, sharing and looks.
-- **Agents talk to each other too.** With devices, characters call and text one another directly, without the GM stepping in; the GM gets a discreet copy of the messages.
+- **Agents talk to each other too.** With devices, characters call and text one another directly, without the GM stepping in. Nothing ever goes to the chat.
 - **NPC directory:** list your NPCs once, name and number. You see at a glance who the agents are calling, and public numbers (pizzeria, taxi, hospital) work as yellow pages for the players.
 - Foundry VTT v13 and v14. Any game system.
 - Interface in English and French.
@@ -70,7 +70,7 @@ game.modules.get("soren-phones-computers").api.removeDemo()
 
 ### Without any device
 
-The GM can ring a player or send them a message (choose the player in **Recipient**). The call window or the message reaches only that player, in a small window on their screen (never in the chat). No history, no reply: to let players write back and keep a history, give them a device.
+The GM can ring a player or send them a message (choose the player in **Recipient**; only players with an assigned character are listed). The call or message lands on their character's smartphone, otherwise their mobile; if they carry none, one is created with the model of the **Default device** setting.
 
 ### A device is an item
 
@@ -149,14 +149,15 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 ### Sharing
 
-- **Show the screen** (eye icon, on a message or at the top of a conversation): the agent hands the device to the agents on the same scene. They see the image, the journal page (its content, without needing read permission) or the conversation, in a "X shows you their screen" window. Nothing remains once it is closed. Works without network. The GM is notified.
-- **Forward** (arrow icon, on a message): the message and its attachment go out over the network to a contact or a number, like a real message (network needed, kept in the history, copy to the GM). An agent recipient automatically gets permission to read the attached journal; an NPC recipient lands in the **Messages** tab of the GM panel. The message is marked "Forwarded". An old mobile forwards text only.
+- **Show the screen** (eye icon, on a message or at the top of a conversation): the agent hands the device to the agents on the same scene. They see the image, the journal page (its content, without needing read permission) or the conversation, in a "X shows you their screen" window. Nothing remains once it is closed. Works without network.
+- **Forward** (arrow icon, on a message): the message and its attachment go out over the network to a contact or a number, like a real message (network needed, kept in the history). An agent recipient automatically gets permission to read the attached journal; an NPC recipient lands in the **Messages** tab of the GM panel. The message is marked "Forwarded". An old mobile forwards text only.
 
 ### Calls
 
 - An incoming call shows the caller with **Answer** / **Decline**; a Modern landline shows only a number, a Vintage one nothing. Distinct sounds for the ring (per model), pick-up and hang-up.
-- When an agent's phone rings (ring mode), every other player hears it softly, with a small notice ("Reyes's phone is ringing"). Narration over realism: the whole table knows.
-- When an agent places a call, they hear a ringback tone; every other player hears it too, softly, with a notice ("Reyes has an ear to the phone"). Between two agents, everyone just hears the ringing phone.
+- On a smartphone or a mobile, incoming and outgoing calls show on the device itself (with the portrait of an agent who is in the contacts, on a smartphone).
+- **The whole table sees the call.** As soon as an agent dials, the other players get a call window with the agent's portrait ("Calling…"), then the portrait of the agent whose phone rings (ring mode). Once answered, it shows who is on the line (an NPC stays "Unknown") with a running timer, and closes for everyone on hang-up ("Call ended", timer stopped). Every other player also hears the ring and the ringback tone, softly. Narration over realism: the whole table knows.
+- The GM gets the same window, with both ends, a **Hang up** button for the NPC and **Cut the line** (skull) to cut any call: network failure, an enemy who controls the network. For the players, a cut looks like a plain hang-up.
 - No answer within the GM's delay: missed call.
 - The **landline** is only a keypad (or a rotary dial in Vintage). Click to dial a digit (in Vintage, the dial turns), or type the number. Enter places the call. No history, no call list, no contacts.
 
@@ -189,7 +190,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 ### Agent to agent
 
 - Calls ring the other agent's phone directly, without the GM.
-- Messages are delivered directly, with a discreet copy to the GM.
+- Messages are delivered directly. The GM follows them in the **Messages** tab (read only).
 
 ### Contacts
 

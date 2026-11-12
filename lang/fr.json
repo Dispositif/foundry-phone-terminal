@@ -15,7 +15,6 @@
       "nosignal": "injoignable (pas de réseau)"
     },
     "Masked": "Numéro masqué",
-    "PhoneAlias": "Téléphone",
     "Unread": {
       "one": "{n} message non lu",
       "other": "{n} messages non lus"
@@ -60,11 +59,11 @@
       "GmOnlyPanel": "Panneau réservé au MJ.",
       "PagerCut": "message de bipeur coupé à {n} caractères.",
       "NoCalls": "cet appareil ne reçoit pas d'appels.",
-      "NoCharacter": "{name} n'a pas de personnage assigné : rien n'est envoyé. Assignez-lui un personnage (configuration de l'utilisateur), ou envoyez à un appareil."
+      "NoCharacter": "{name} n'a pas de personnage assigné : rien n'est envoyé. Assignez-lui un personnage (configuration de l'utilisateur), ou envoyez à un appareil.",
+      "NetworkBusy": "Réseau encombré : un appel sonne ou est déjà en cours."
     },
     "Caller": "Appelant",
     "Info": {
-      "Calling": "Appel en cours vers {label} ({caller})…",
       "CallInterrupted": "Appel interrompu.",
       "SmsPending": "pas de réseau, message en attente.",
       "SmsPendingOff": "éteint, message en attente.",
@@ -74,7 +73,6 @@
       "DefaultCreated": "« {label} » créé pour {name}."
     },
     "Gm": {
-      "OnLine": "{who} est en ligne avec {name}.",
       "WritesTo": "{who} écrit à {name}.",
       "AgentCalling": "Un agent appelle",
       "EmptyLandlineCall": "Appel vers un fixe vide",
@@ -132,7 +130,10 @@
       "Shared": "Accès partagé",
       "Compromised": "Compromis (sur écoute, connu de l'ennemi…)",
       "NotCompromised": "Marquer comme compromis",
-      "CompromisedDevice": "Appareil compromis : {label}"
+      "CompromisedDevice": "Appareil compromis : {label}",
+      "BetweenAgents": "Entre PJ (lecture seule)",
+      "InboxNpc": "PNJ",
+      "InboxAgents": "Entre PJ"
     },
     "Document": "Document",
     "RemoveAttachment": "Retirer la pièce jointe",
@@ -144,7 +145,6 @@
       "ShowScreen": "Montrer l'écran",
       "ShowTo": "Montrer à :",
       "Show": "Montrer",
-      "GmCopy": "{from} montre son écran ({title}) à {names}.",
       "YouShow": "Vous montrez votre écran à {names}.",
       "ShowsYou": "{from} vous montre son écran",
       "GiveBack": "Rendre le téléphone",
@@ -182,9 +182,7 @@
       "Outgoing": "Appel en cours",
       "Calling": "Appel en cours…",
       "HangUp": "Raccrocher",
-      "Call": "Appeler",
-      "NearbyRinging": "Le téléphone de {name} sonne",
-      "NearbyCalling": "{name} a l'oreille sur son téléphone"
+      "Call": "Appeler"
     },
     "Net": {
       "GmAbsent": "Pas de réseau téléphonique [MJ absent]",
@@ -199,11 +197,11 @@
       "NoSignalShort": "Pas de réseau"
     },
     "CallerResult": {
-      "answer": "{name} a décroché.",
       "voicemail": "Vous êtes sur la messagerie de {name}.",
       "unassigned": "Le numéro que vous avez demandé n'est pas attribué.",
       "unreachable": "Votre correspondant n'est pas joignable pour le moment.",
-      "noanswer": "{name} ne répond pas."
+      "noanswer": "{name} ne répond pas.",
+      "busy": "Réseau encombré. Réessayez plus tard."
     },
     "Form": {
       "Model": "Modèle",
@@ -295,7 +293,8 @@
         "unassigned": "Numéro non attribué",
         "unreachable": "Injoignable",
         "cancelled": "Appel annulé",
-        "noanswer": "Sans réponse"
+        "noanswer": "Sans réponse",
+        "busy": "Réseau encombré"
       },
       "in": {
         "answer": "Appel reçu",
@@ -398,7 +397,10 @@
         "wifi": "Wi-Fi",
         "gsm": "GSM"
       },
-      "DeadZone": "Zone blanche"
+      "DeadZone": "Zone blanche",
+      "LastCall": "Dernier appel (30 dernières minutes)",
+      "MinAgo": "il y a {n} min",
+      "JustNow": "à l'instant"
     },
     "Scene": {
       "DeadZone": "Zone blanche",
@@ -426,6 +428,30 @@
       "Change": "Changer",
       "Create": "Créer",
       "CreateOpen": "Créer et ouvrir"
+    },
+    "Live": {
+      "Title": "Appel en cours",
+      "OnLine": "En ligne",
+      "Unknown": "Inconnu",
+      "Ended": "Appel terminé",
+      "Cut": "Communication coupée",
+      "CutLine": "Couper la communication",
+      "CutHint": "Coupe l'appel des deux côtés : panne de réseau, zone morte, ennemi qui contrôle le réseau…",
+      "Tapped": "Appareil compromis"
+    },
+    "Calls": {
+      "Tab": "Appels",
+      "None": "Aucun appel pour l'instant.",
+      "FromGm": "Appel du MJ (PNJ)",
+      "answer": "Décroché",
+      "noanswer": "Sans réponse",
+      "decline": "Refusé",
+      "missed": "Manqué",
+      "voicemail": "Messagerie",
+      "unreachable": "Injoignable",
+      "unassigned": "Non attribué",
+      "cancelled": "Annulé",
+      "busy": "Réseau encombré"
     }
   }
 }

@@ -16,6 +16,7 @@
   <nav class="spt-tabs" role="tablist">
     <a class="spt-tab {{#if (eq tab "send")}}active{{/if}}" data-action="switchTab" data-tab="send" role="tab"><i class="fas fa-paper-plane"></i> {{spt "Gm.TabSend"}}</a>
     <a class="spt-tab {{#if (eq tab "inbox")}}active{{/if}}" data-action="switchTab" data-tab="inbox" role="tab"><i class="fas fa-inbox"></i> {{spt "Gm.TabInbox"}}{{#if inboxUnread}} <span class="spt-badge">{{inboxUnread}}</span>{{/if}}</a>
+    <a class="spt-tab {{#if (eq tab "calls")}}active{{/if}}" data-action="switchTab" data-tab="calls" role="tab"><i class="fas fa-phone"></i> {{spt "Calls.Tab"}}</a>
     <a class="spt-tab {{#if (eq tab "devices")}}active{{/if}}" data-action="switchTab" data-tab="devices" role="tab"><i class="fas fa-mobile-screen"></i> {{spt "Gm.TabDevices"}} <span class="spt-count">{{deviceCount}}</span></a>
     <a class="spt-tab {{#if (eq tab "tracking")}}active{{/if}}" data-action="switchTab" data-tab="tracking" role="tab" title="{{spt "Track.Hint"}}"><i class="fas fa-location-crosshairs"></i> {{spt "Gm.TabTracking"}}</a>
   </nav>
@@ -66,24 +67,30 @@
 
   {{#if (eq tab "inbox")}}
     <section class="spt-gm-inbox">
+      <nav class="spt-subtabs">
+        <a class="spt-subtab {{#if (eq inboxView "npc")}}active{{/if}}" data-action="switchInbox" data-view="npc"><i class="fas fa-user-secret"></i> {{spt "Gm.InboxNpc"}}{{#if inboxUnread}} <span class="spt-badge">{{inboxUnread}}</span>{{/if}}</a>
+        <a class="spt-subtab {{#if (eq inboxView "agents")}}active{{/if}}" data-action="switchInbox" data-view="agents"><i class="fas fa-user-group"></i> {{spt "Gm.InboxAgents"}} <span class="spt-count">{{agentThreadCount}}</span></a>
+      </nav>
       {{#if inbox.length}}
       <div class="spt-gthreads">
         {{#each inbox}}
-        <div class="spt-gthread {{#if unread}}unread{{/if}}" data-thread="{{id}}" data-uuid="{{uuid}}" data-key="{{key}}">
-          <div class="spt-gthread-head"><strong>{{who}}</strong>{{#if compromised}} <i class="fas fa-triangle-exclamation spt-compromised" title="{{spt "Gm.Compromised"}}"></i>{{/if}} <i class="fas fa-arrow-right" aria-hidden="true"></i> {{to}}{{#if unknown}} <small class="spt-dim">({{spt "Directory.Unknown"}})</small>{{/if}}{{#if unread}} <span class="spt-badge">{{unread}}</span>{{/if}}</div>
+        <div class="spt-gthread {{#if unread}}unread{{/if}} {{#if agents}}agents{{/if}}" data-thread="{{id}}" data-uuid="{{uuid}}" data-key="{{key}}">
+          <div class="spt-gthread-head">{{#if agents}}<i class="fas fa-user-group spt-dim" title="{{spt "Gm.BetweenAgents"}}"></i> {{/if}}<strong>{{who}}</strong>{{#if compromised}} <i class="fas fa-triangle-exclamation spt-compromised" title="{{spt "Gm.Compromised"}}"></i>{{/if}} <i class="fas fa-arrow-right" aria-hidden="true"></i> {{to}}{{#if unknown}} <small class="spt-dim">({{spt "Directory.Unknown"}})</small>{{/if}}{{#if unread}} <span class="spt-badge">{{unread}}</span>{{/if}}</div>
           {{#if more}}<div class="spt-gthread-more">…</div>{{/if}}
           {{#each bubbles}}
           <div class="spt-bb {{dir}} {{#if pending}}pending{{/if}}">{{#if fwd}}<span class="spt-bb-fwd"><i class="fas fa-share"></i> {{spt "Fwd.Forwarded"}}</span>{{/if}}{{{att}}}{{#if text}}<div>{{{text}}}</div>{{/if}}</div>
           {{/each}}
+          {{#unless agents}}
           <div class="spt-gthread-reply">
             <input type="text" data-draft="{{id}}" value="{{draft}}" placeholder="{{spt "Gm.ReplyAs" name=to}}" aria-label="{{spt "Gm.ReplyAs" name=to}}">
             <button type="button" data-action="sendReply" aria-label="{{spt "Send"}}" data-tooltip="{{spt "Send"}}"><i class="fas fa-paper-plane"></i></button>
             {{#if canCall}}<button type="button" data-action="callBack" aria-label="{{spt "Gm.CallBack"}}" data-tooltip="{{spt "Gm.CallBack"}}"><i class="fas fa-phone"></i></button>{{/if}}
           </div>
+          {{/unless}}
         </div>
         {{/each}}
       </div>
-      {{#if inboxUnread}}<a class="spt-mark-all" data-action="markAllSeen">{{spt "Gm.MarkAllSeen"}}</a>{{/if}}
+      {{#if showMarkAll}}<a class="spt-mark-all" data-action="markAllSeen">{{spt "Gm.MarkAllSeen"}}</a>{{/if}}
       {{else}}
       <p class="spt-phone-status">{{spt "Gm.NoInbox"}}</p>
       {{/if}}
@@ -130,6 +137,27 @@
       {{/each}}
     </section>
   {{/if}}
+  {{#if (eq tab "calls")}}
+    <section class="spt-gm-calls">
+      {{#if calls.length}}
+      <ul class="spt-call-list">
+        {{#each calls}}
+        <li class="spt-call-row {{#if answered}}answered{{/if}} {{#if live}}live{{/if}}">
+          <i class="fas {{#if answered}}fa-phone{{else}}fa-phone-slash{{/if}} spt-call-icon"></i>
+          <span class="spt-call-who">{{#unless fromAgent}}<i class="fas fa-user-secret spt-dim" title="{{spt "Calls.FromGm"}}"></i> {{/unless}}{{from}} <i class="fas fa-arrow-right" aria-hidden="true"></i> {{to}}{{#if compromised}} <i class="fas fa-triangle-exclamation spt-compromised" title="{{spt "Gm.Compromised"}}"></i>{{/if}}</span>
+          {{#if live}}
+          <span class="spt-call-res spt-call-live"><i class="fas fa-circle"></i> {{spt "Live.OnLine"}} {{{live}}}</span>
+          {{else}}
+          <span class="spt-call-res">{{result}}{{#if dur}} <span class="spt-call-dur">{{dur}}</span>{{/if}}</span>
+          {{/if}}
+        </li>
+        {{/each}}
+      </ul>
+      {{else}}
+      <p class="spt-phone-status">{{spt "Calls.None"}}</p>
+      {{/if}}
+    </section>
+  {{/if}}
   {{#if (eq tab "tracking")}}
     <section class="spt-gm-tracking">
       <p class="spt-track-hint"><span class="spt-exp-tag"><i class="fas fa-flask"></i> {{spt "Track.Experimental"}}</span> {{spt "Track.Hint"}}</p>
@@ -141,6 +169,7 @@
           {{#if location}}<span class="spt-track-scene"><i class="fas fa-question"></i> {{location}}</span>{{/if}}
           <span class="spt-track-level spt-track-{{level}}">{{levelLabel}}</span>
         </header>
+        {{#if lastCall}}<div class="spt-track-call" title="{{spt "Track.LastCall"}}"><i class="fas fa-phone"></i> {{lastCall}}</div>{{/if}}
         {{#if devices.length}}
         <ul class="spt-dev-list">
           {{#each devices}}

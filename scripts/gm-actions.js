@@ -1,10 +1,11 @@
 import { MODULE_ID, RING_SRC, SMS_SRC } from "./constants.js";
 import { addLog, displayName, getPhoneData, holderName, holders, isLandline, keyFor, modelOf, phonesByNumber, gmName, isUnknownNumber } from "./devices.js";
-import { deliverToPhone, smsHtml } from "./messages.js";
+import { deliverToPhone } from "./messages.js";
 import { RingDialog } from "./player-calls.js";
-import { finishOrigin, hangUp, pendingCalls, ring } from "./ring.js";
-import { esc, gmWhisper, playLocal, rerenderAll } from "./util.js";
+import { finishOrigin, hangUp, networkBusy, pendingCalls, ring } from "./ring.js";
+import { esc, playLocal, rerenderAll } from "./util.js";
 import { labels, t } from "./i18n.js";
+import { agentSide, npcSide, startLive } from "./live-call.js";
 /* -------------------------------------------- */
 /*  GM: handling player actions                 */
 /* -------------------------------------------- */
@@ -40,15 +41,13 @@ export async function onPlayerSms({ fromItemUuid, to, text, att = null, fwd = fa
   warnCompromised(fromPhone, ...targets.map((p) => p.phone));
 
   if (targets.length) {
-    // Between PCs: delivered directly, copy to the GM.
+    // Between PCs: delivered directly (nothing in the chat).
     await addLog(from, { kind: "sms", dir: "out", with: key, text, pj: true, ...extra });
     for (const p of targets) await deliverToPhone(p, fromPhone.number, text, att, { fwd });
-    gmWhisper(`<p class="spt-gm-copy">📱 <strong>${esc(who)}</strong>${fwd ? ` ${t("Fwd.Verb")}` : ""} → ${esc(targets.map((p) => holderName(p.item, p.phone)).join(", "))}</p>${smsHtml(who, text, null, att)}`);
   } else {
     // To an NPC: lands with the GM.
     await addLog(from, { kind: "sms", dir: "out", with: key, text, seen: false, ...extra });
     const toName = displayName(fromPhone, key);
-    gmWhisper(`<p class="spt-gm-copy">📱 <strong>${esc(who)}</strong>${fwd ? ` ${t("Fwd.Verb")}` : ""} → <strong>${esc(toName)}</strong></p>${smsHtml(who, text, null, att)}`);
     ui.notifications.info(`📱 ${t("Gm.WritesTo", { who, name: toName })}`);
     playLocal(SMS_SRC);
   }
@@ -73,6 +72,8 @@ export async function onPlayerCall({ fromItemUuid, to, callId, userId }) {
   if (!fromPhone || !to?.trim()) return;
   const key = keyFor(fromPhone, to);
   const origin = { userId, itemUuid: fromItemUuid, callId, key, name: displayName(fromPhone, key) };
+  // One call at a time on the network: a second one gets "network busy".
+  if (networkBusy()) return finishOrigin(origin, "busy");
   const number = phonesByNumber(key).length ? key : to;
   const targets = phonesByNumber(number).filter((p) => p.item !== from);
   // A landline with nobody in the room: the GM answers in place of whoever is there (NPC).
@@ -96,7 +97,8 @@ export async function onPlayerCall({ fromItemUuid, to, callId, userId }) {
     gmIncoming.delete(callId);
     if (call.dialog?.rendered) call.dialog.close();
     if (result !== "cancelled") finishOrigin(origin, result);
-    else addLog(from, { kind: "call", dir: "out", with: key, result: "cancelled" });
+    if (result === "answer") startLive(callId, agentSide(from, userId), npcSide(key, origin.name, gmName(fromPhone, key)));
+    else addLog(from, { kind: "call", call: callId, dir: "out", with: key, result: "cancelled" });
   };
   const dialog = new RingDialog({
     window: { title: emptyRooms ? t("Gm.EmptyLandlineCall") : t("Gm.AgentCalling"), icon: emptyRooms ? "fas fa-phone" : "fas fa-mobile-screen" },
@@ -133,6 +135,6 @@ export function onPlayerHangup({ callId }) {
 
 export function finishOriginLogOnly(origin, result) {
   const item = fromUuidSync(origin.itemUuid);
-  if (item) addLog(item, { kind: "call", dir: "out", with: origin.key, result });
+  if (item) addLog(item, { kind: "call", call: origin.callId, dir: "out", with: origin.key, result });
 }
 

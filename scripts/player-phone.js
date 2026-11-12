@@ -6,7 +6,8 @@ import { addContactDialog, contactsDialog } from "./dialogs.js";
 import { loadLastDevice, myPhones, saveLastDevice } from "./fab.js";
 import { bindDrop, bindIconSelects, deviceSelect } from "./gm-panel.js";
 import { grantAttachments } from "./messages.js";
-import { activeCall, endCall, playerCall, playerSendSms } from "./player-calls.js";
+import { activeCall, endCall, outgoing, playerCall, playerSendSms } from "./player-calls.js";
+import { dismissEnded, hangUpLive, liveOn, otherEnd, phoneClosed, statusHtml } from "./live-call.js";
 import { attShowHtml, findEntry, forwardEntry, showScreen } from "./share.js";
 import { deviceNotice, esc, isMasked, nl2br } from "./util.js";
 import { openPager } from "./pager.js";
@@ -94,6 +95,15 @@ export class PlayerPhone extends ApplicationV2 {
       },
       answer: function () { if (activeCall?.screen) endCall("answer", activeCall); },
       decline: function () { if (activeCall?.screen) endCall("decline", activeCall); },
+      outHangup: function () { if (outgoing?.screen) outgoing.hangup(); },
+      liveDismiss: function () {
+        const live = liveOn(this._current()?.item.uuid);
+        if (live) dismissEnded(live.callId);
+      },
+      liveHangup: function () {
+        const live = liveOn(this._current()?.item.uuid);
+        if (live) hangUpLive(live.callId);
+      },
       powerOn: function () { this._current()?.item.update({ [`flags.${MODULE_ID}.phone.mode`]: "on" }); },
       gmItemSheet: function () { const p = this._current(); if (p) openSystemSheet(p.item); },
       showEntry: async function (event, target) {
@@ -264,6 +274,11 @@ export class PlayerPhone extends ApplicationV2 {
     this._state.phoneUuid = p.item.uuid;
 
     const incoming = !this.gm && activeCall?.screen && !activeCall.done && activeCall.itemUuid === p.item.uuid ? activeCall.screen : null;
+    // On the line: the device shows who is on the other end and a hang-up key.
+    const live = !this.gm ? liveOn(p.item.uuid) : null;
+    if (live && isLandline(p.phone) && !live.ended) return this._renderDialer(p, mine, null, live);
+    if (live && !isLandline(p.phone)) return this._renderLive(p, mine, live);
+    if (!this.gm && outgoing?.screen && !outgoing.done && outgoing.itemUuid === p.item.uuid) return this._renderOutgoing(p, mine, outgoing.screen);
     if (incoming && isLandline(p.phone)) return this._renderDialer(p, mine, incoming);
     if (incoming) return this._renderIncoming(p, mine, incoming);
     if (!this.gm && modeOf(p.phone) === "off") return this._renderOff(p, mine);
@@ -276,17 +291,58 @@ export class PlayerPhone extends ApplicationV2 {
   }
 
   /** Incoming call on a smartphone or mobile: shown on its own screen, even when locked. */
-  _renderIncoming(p, mine, { caller, known, silent }) {
+  _renderIncoming(p, mine, { caller, known, silent, img }) {
     return `${this._renderHeader(p, mine)}
       <div class="spt-lockscreen spt-incoming">
         <div class="spt-phone-ring ${silent ? "silent" : ""}">
-          <i class="fas fa-phone-volume"></i>
+          ${img ? `<div class="spt-live-face spt-ring-face" style="background-image:url('${esc(img)}')"></div>` : `<i class="fas fa-phone-volume"></i>`}
           <p class="spt-caller">${caller ? esc(caller) : t("Call.Ringing")}</p>
           ${known ? `<p>${t("Call.IsCalling")}</p>` : ""}
         </div>
         <div class="spt-incoming-keys">
           <button type="button" class="spt-decline" data-action="decline" title="${t("Call.Decline")}"><i class="fas fa-phone-slash"></i></button>
           <button type="button" class="spt-answer" data-action="answer" title="${t("Call.Answer")}"><i class="fas fa-phone"></i></button>
+        </div>
+      </div>`;
+  }
+
+  /** Call in progress on a smartphone or mobile: the other end (face on a smartphone), the time on the line. */
+  _renderLive(p, mine, live) {
+    const o = otherEnd(live);
+    const face = p.phone.model !== "smartphone" ? `<i class="fas fa-phone"></i>`
+      : o.img ? `<div class="spt-live-face" style="background-image:url('${esc(o.img)}')"></div>`
+      : `<div class="spt-live-face unknown"><i class="fas fa-user"></i></div>`;
+    return `${this._renderHeader(p, mine)}
+      <div class="spt-lockscreen spt-incoming spt-live-screen">
+        <div class="spt-phone-ring">
+          <p class="spt-live-status">${statusHtml(live)}</p>
+          ${face}
+          <p class="spt-caller">${esc(o.name)}</p>
+          ${o.sub ? `<p class="spt-live-sub">${esc(o.sub)}</p>` : ""}
+        </div>
+        <div class="spt-incoming-keys">
+          ${live.ended
+            ? `<button type="button" class="spt-dismiss" data-action="liveDismiss" title="${t("Close")}"><i class="fas fa-xmark"></i></button>`
+            : `<button type="button" class="spt-decline" data-action="liveHangup" title="${t("Call.HangUp")}"><i class="fas fa-phone-slash"></i></button>`}
+        </div>
+      </div>`;
+  }
+
+  /** Outgoing call on a smartphone or mobile: who is called, and a hang-up key. */
+  _renderOutgoing(p, mine, { name, img, face }) {
+    // Smartphone: the face of who is called if the agent knows them, otherwise an empty portrait.
+    const pic = !face ? `<i class="fas fa-phone"></i>`
+      : img ? `<div class="spt-live-face" style="background-image:url('${esc(img)}')"></div>`
+      : `<div class="spt-live-face unknown"><i class="fas fa-user"></i></div>`;
+    return `${this._renderHeader(p, mine)}
+      <div class="spt-lockscreen spt-incoming spt-live-screen">
+        <div class="spt-phone-ring outgoing">
+          <p class="spt-live-status"><span class="spt-live-state dialing"><i class="fas fa-circle"></i> ${t("Call.Calling")}</span></p>
+          ${pic}
+          <p class="spt-caller">${esc(name)}</p>
+        </div>
+        <div class="spt-incoming-keys">
+          <button type="button" class="spt-decline" data-action="outHangup" title="${t("Call.HangUp")}"><i class="fas fa-phone-slash"></i></button>
         </div>
       </div>`;
   }
@@ -413,9 +469,14 @@ export class PlayerPhone extends ApplicationV2 {
 
   /** Landline on the player side: a plain dial, no history or contacts. */
   /** Landline dialer. While it rings (modern look), the display shows the caller's number and the keys answer or hang up. */
-  _renderDialer(p, mine, incoming = null) {
+  _renderDialer(p, mine, incoming = null, live = null) {
     this._state.view = "new";
-    const strip = incoming
+    const strip = live
+      ? `<div class="spt-dial-strip spt-lcd-ringing spt-lcd-live">
+          <input type="text" value="${esc(skinOf(p.phone) === "modern" ? otherEnd(live).name : "")}" placeholder="${t("Live.OnLine")}" readonly tabindex="-1">
+          <i class="fas fa-phone"></i>
+        </div>`
+      : incoming
       ? `<div class="spt-dial-strip spt-lcd-ringing">
           <input type="text" value="${esc(incoming.caller ?? "")}" placeholder="${t("Call.Ringing")}" readonly tabindex="-1">
           <i class="fas fa-phone-volume"></i>
@@ -425,7 +486,11 @@ export class PlayerPhone extends ApplicationV2 {
           <datalist id="spt-yellow">${publicOptions()}</datalist>
           <button type="button" data-action="dialBack" title="${t("Delete")}"><i class="fas fa-delete-left"></i></button>
         </div>`;
-    const keys = incoming
+    const keys = live
+      ? `<div class="spt-phone-row spt-incoming-row">
+          <button type="button" class="spt-decline" data-action="liveHangup"><i class="fas fa-phone-slash"></i> ${t("Call.HangUp")}</button>
+        </div>`
+      : incoming
       ? `<div class="spt-phone-row spt-incoming-row">
           <button type="button" class="spt-answer" data-action="answer"><i class="fas fa-phone"></i> ${t("Call.Answer")}</button>
           <button type="button" class="spt-decline" data-action="decline"><i class="fas fa-phone-slash"></i> ${t("Call.HangUp")}</button>
@@ -511,6 +576,13 @@ export class PlayerPhone extends ApplicationV2 {
     content?.insertAdjacentHTML("afterend", frame.after ?? "");
     const size = (this.gm && frame.gm) || frame;
     this.setPosition({ width: size.width, height: size.height });
+  }
+
+  _onClose(options) {
+    super._onClose?.(options);
+    // Closed during a call: the call window takes over. Closed while dialing: the call is dropped (as closing the window did).
+    if (!this.gm) phoneClosed();
+    if (!this.gm && outgoing?.screen && !outgoing.done) outgoing.hangup();
   }
 
   _onRender(context, options) {
@@ -627,7 +699,7 @@ export const GM_ENTRY_TYPES = {
 
 export function callLabel(e) {
   if (e.dir === "out") {
-    const out = ["answer", "voicemail", "unassigned", "unreachable", "cancelled"];
+    const out = ["answer", "voicemail", "unassigned", "unreachable", "cancelled", "busy"];
     return t(`CallLog.out.${out.includes(e.result) ? e.result : "noanswer"}`);
   }
   return t(`CallLog.in.${["answer", "decline"].includes(e.result) ? e.result : "missed"}`);

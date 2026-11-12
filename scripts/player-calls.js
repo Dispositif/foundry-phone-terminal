@@ -1,9 +1,10 @@
 import { DialogV2, HANGUP_SRC, MODULE_ID, PICKUP_SRC, RINGBACK_SRC, RING_SRC, SOCKET, VIBRATE_SRC } from "./constants.js";
-import { displayName, getPhoneData, hasSignal, keyFor, modelOf, msgOn, skinOf, modeOf } from "./devices.js";
+import { displayName, findContact, getPhoneData, hasSignal, keyFor, modelOf, msgOn, phonesByNumber, skinOf, modeOf } from "./devices.js";
 import { updateFab } from "./fab.js";
 import { deviceNotice, esc, isMasked, maskedLabel, playLocal, rerenderAll } from "./util.js";
 import { PlayerPhone } from "./player-phone.js";
 import { t } from "./i18n.js";
+import { calledOn, lineBusy } from "./live-call.js";
 /* -------------------------------------------- */
 /*  Player: incoming calls                      */
 /* -------------------------------------------- */
@@ -17,8 +18,9 @@ export class RingDialog extends DialogV2 {
   }
 }
 
-export async function receiveRing({ callId, caller, callerNumber, timeout, phoneLabel: label, silent, ringSrc, itemUuid }) {
+export async function receiveRing({ callId, caller, callerNumber, callerImg, timeout, phoneLabel: label, silent, ringSrc, itemUuid }) {
   if (activeCall) endCall("decline"); // already on a call: drop the old call
+  calledOn(callId); // called: no spectator window for this call
 
   const call = { callId, itemUuid, caller: caller ? maskedLabel(caller) : t("Call.Incoming"), done: false, sound: null, dialog: null, timer: null };
   activeCall = call;
@@ -29,7 +31,7 @@ export async function receiveRing({ callId, caller, callerNumber, timeout, phone
   const onScreen = ["smartphone", "mobile"].includes(ringing?.model) || (ringing?.model === "landline" && skinOf(ringing) === "modern");
   if (!game.user.isGM && onScreen) {
     // Smartphone, mobile and modern landline show the call on the device itself: open it (or bring it forward).
-    call.screen = { caller: caller ? maskedLabel(caller) : callerNumber || null, known: !!caller, silent };
+    call.screen = { caller: caller ? maskedLabel(caller) : callerNumber || null, known: !!caller, silent, img: callerImg ?? null };
     const app = PlayerPhone.instance ?? new PlayerPhone();
     app._state.phoneUuid = itemUuid;
     app._skipRead = true;
@@ -109,7 +111,7 @@ export function playerSendSms(item, to, text, { att = null, fwd = false } = {}) 
   return true;
 }
 
-export let outgoing = null; // { callId, dialog, done }
+export let outgoing = null; // { callId, dialog, done, screen?, itemUuid, hangup }
 
 export function playerCall(item, to) {
   to = to?.trim();
@@ -120,10 +122,12 @@ export function playerCall(item, to) {
   if (phone?.locked) return deviceNotice(t("Warn.Locked"), { warn: true });
   if (modeOf(phone) === "off") return deviceNotice(t("Warn.PhoneOff"), { warn: true });
   if (outgoing) return deviceNotice(t("Warn.AlreadyCalling"), { warn: true });
+  // A call already rings or is in progress at the table: the network is busy (checked again by the GM).
+  if (activeCall || lineBusy({ ringing: true })) return deviceNotice(t("CallerResult.busy"), { warn: true, icon: "fa-signal spt-busy" });
   if (!networkUp(phone)) return;
 
   const callId = foundry.utils.randomID();
-  const call = { callId, done: false, dialog: null, sound: null };
+  const call = { callId, done: false, dialog: null, sound: null, itemUuid: item.uuid };
   outgoing = call;
   const name = displayName(phone, keyFor(phone, to));
   const hangup = () => {
@@ -131,8 +135,40 @@ export function playerCall(item, to) {
     call.done = true;
     outgoing = null;
     stopOutgoingSound(call);
+    if (call.screen) rerenderAll();
     game.socket.emit(SOCKET, { type: "playerHangup", callId });
   };
+  call.hangup = hangup;
+  if (["smartphone", "mobile"].includes(phone.model)) {
+    // Smartphone and mobile: the call shows on the device itself, not in a window.
+    call.screen = { name, img: knownFace(phone, to), face: phone.model === "smartphone" };
+    const app = PlayerPhone.instance ?? new PlayerPhone();
+    app._state.phoneUuid = item.uuid;
+    app.render({ force: true }).then(() => app.bringToFront?.());
+  } else showOutgoingDialog(call, name, hangup);
+  game.socket.emit(SOCKET, { type: "playerCall", fromItemUuid: item.uuid, to, callId, userId: game.user.id });
+  // Narration: the whole table hears the ringback tone and knows who is on the phone.
+  const agent = item.parent?.name ?? game.user.character?.name ?? game.user.name;
+  const img = item.parent?.img ?? game.user.character?.img ?? null;
+  game.socket.emit(SOCKET, { type: "callNearby", callId, exclude: [game.user.id], name: agent, img, timeout: game.settings.get(MODULE_ID, "ringTimeout") });
+  playLocal(RINGBACK_SRC, { loop: true }).then((sound) => {
+    call.sound = sound;
+    if (call.done || call.ringing) sound?.stop();
+  });
+}
+
+/**
+ * Portrait of who is called, only if the agent knows them (saved in their contacts) and it is
+ * another agent's device. NPC portraits: not yet (silhouette).
+ */
+function knownFace(phone, to) {
+  if (!findContact(phone, to)) return null;
+  const target = phonesByNumber(keyFor(phone, to)).find((p) => p.actor?.hasPlayerOwner);
+  return target?.actor.img ?? null;
+}
+
+/** Landlines and terminals: the outgoing call in a small window. */
+function showOutgoingDialog(call, name, hangup) {
   const dialog = new RingDialog({
     window: { title: t("Call.Outgoing"), icon: "fas fa-mobile-screen" },
     classes: ["spt-phone-ring-dialog"],
@@ -147,14 +183,6 @@ export function playerCall(item, to) {
   dialog.onClosed = hangup;
   call.dialog = dialog;
   dialog.render({ force: true });
-  game.socket.emit(SOCKET, { type: "playerCall", fromItemUuid: item.uuid, to, callId, userId: game.user.id });
-  // Narration: the whole table hears the ringback tone and knows who is on the phone.
-  const agent = item.parent?.name ?? game.user.character?.name ?? game.user.name;
-  game.socket.emit(SOCKET, { type: "callNearby", callId, exclude: [game.user.id], name: agent, timeout: game.settings.get(MODULE_ID, "ringTimeout") });
-  playLocal(RINGBACK_SRC, { loop: true }).then((sound) => {
-    call.sound = sound;
-    if (call.done || call.ringing) sound?.stop();
-  });
 }
 
 /** Stops the ringback tone, here and for the other players. */
@@ -164,11 +192,11 @@ function stopOutgoingSound(call) {
 }
 
 export const CALLER_RESULTS = {
-  answer: (name) => t("CallerResult.answer", { name }),
   voicemail: (name) => t("CallerResult.voicemail", { name }),
   unassigned: () => t("CallerResult.unassigned"),
   unreachable: () => t("CallerResult.unreachable"),
-  noanswer: (name) => t("CallerResult.noanswer", { name })
+  noanswer: (name) => t("CallerResult.noanswer", { name }),
+  busy: () => t("CallerResult.busy")
 };
 
 export function onCallResult({ callId, result, name }) {
@@ -178,28 +206,30 @@ export function onCallResult({ callId, result, name }) {
   outgoing = null;
   stopOutgoingSound(call);
   if (call.dialog?.rendered) call.dialog.close();
-  if (result === "answer") playLocal(PICKUP_SRC);
+  if (call.screen) rerenderAll();
+  // Answered: the device shows the call, no notice. Otherwise, a notice on the device.
+  if (result === "answer") return playLocal(PICKUP_SRC);
   const msg = (CALLER_RESULTS[result] ?? CALLER_RESULTS.noanswer)(name);
-  deviceNotice(msg, { warn: result !== "answer" });
+  deviceNotice(msg, { warn: true, icon: result === "busy" ? "fa-signal spt-busy" : null });
 }
 
 
-/* Narration: every other player hears another agent's phone ring, or their ringback tone, with a small notice. */
+/* Narration: every other player hears another agent's phone ring, or their ringback tone (the call window shows who). */
 const nearby = new Map(); // "kind:callId" -> { sound, timer, done } (a call between agents has both kinds)
 
-async function playNearby({ kind, callId, exclude = [], text, src, timeout }) {
+async function playNearby({ kind, callId, exclude = [], src, timeout }) {
   const id = `${kind}:${callId}`;
   if (game.user.isGM || exclude.includes(game.user.id) || nearby.has(id)) return;
   const entry = { sound: null, timer: null, done: false };
   nearby.set(id, entry);
-  ui.notifications.info(text);
+  // No notice: the call window shows who calls and whose phone rings.
   // Safety net if the stop message is lost: the ring duration, or 5 minutes when it rings until answered.
   entry.timer = setTimeout(() => stopNearbyRing({ callId }), (timeout > 0 ? timeout + 2 : 300) * 1000);
   entry.sound = await playLocal(src, { loop: true, gain: 0.7 });
   if (entry.done) entry.sound?.stop();
 }
 
-export function receiveNearbyRing({ callId, exclude, name, ringSrc, timeout }) {
+export function receiveNearbyRing({ callId, exclude, ringSrc, timeout }) {
   // Call between agents: everyone hears only the ringing phone, not the ringback tone.
   if (nearby.has(`call:${callId}`)) stopEntry(`call:${callId}`);
   else stopEntry(`call:${callId}`, { tombstone: true }); // ringback notice not arrived yet: block it
@@ -208,11 +238,11 @@ export function receiveNearbyRing({ callId, exclude, name, ringSrc, timeout }) {
     outgoing.sound?.stop();
   }
   const src = ringSrc ? `modules/${MODULE_ID}/sounds/${ringSrc}` : RING_SRC;
-  return playNearby({ kind: "ring", callId, exclude, timeout, src, text: `📱 ${t("Call.NearbyRinging", { name })}` });
+  return playNearby({ kind: "ring", callId, exclude, timeout, src });
 }
 
-export function receiveNearbyCall({ callId, exclude, name, timeout }) {
-  return playNearby({ kind: "call", callId, exclude, timeout, src: RINGBACK_SRC, text: `📞 ${t("Call.NearbyCalling", { name })}` });
+export function receiveNearbyCall({ callId, exclude, timeout }) {
+  return playNearby({ kind: "call", callId, exclude, timeout, src: RINGBACK_SRC });
 }
 
 export function stopNearbyRing({ callId }) {

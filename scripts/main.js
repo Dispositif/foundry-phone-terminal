@@ -17,6 +17,7 @@ import { myPhones, updateFab } from "./fab.js";
 import { PhonePanel } from "./gm-panel.js";
 import { registerEnrichers, runJournalLink } from "./journal-links.js";
 import { flushAll, flushPending, grantAttachments, sendSms } from "./messages.js";
+import { restoreLive } from "./live-call.js";
 import { PlayerPhone } from "./player-phone.js";
 import { hangUp, ring } from "./ring.js";
 import { onSocket } from "./socket.js";
@@ -138,6 +139,8 @@ Hooks.once("init", () => {
     default: true,
     onChange: () => updateFab()
   });
+  // Calls in progress (GM writes): found again after a reload.
+  game.settings.register(MODULE_ID, "liveCalls", { scope: "world", config: false, type: Object, default: {} });
   game.settings.register(MODULE_ID, "networkDown", {
     scope: "world",
     config: false,
@@ -255,6 +258,7 @@ Hooks.once("ready", async () => {
   await migrateLegacy();
   if (game.user === game.users.activeGM) ensureDeviceItems();
   updateFab();
+  restoreLive();
   game.modules.get(MODULE_ID).api = { openPanel, openPhone, ring, hangUp, sendSms, allPhones, createPhone, markPhone, transferPhone, demo: createDemo, removeDemo };
 });
 

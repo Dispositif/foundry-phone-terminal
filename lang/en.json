@@ -15,7 +15,6 @@
       "nosignal": "unreachable (no signal)"
     },
     "Masked": "Hidden number",
-    "PhoneAlias": "Phone",
     "Unread": {
       "one": "{n} unread message",
       "other": "{n} unread messages"
@@ -60,11 +59,11 @@
       "GmOnlyPanel": "GM only panel.",
       "PagerCut": "pager message cut to {n} characters.",
       "NoCalls": "this device does not take calls.",
-      "NoCharacter": "{name} has no assigned character: nothing sent. Assign them a character (User configuration), or send to a device."
+      "NoCharacter": "{name} has no assigned character: nothing sent. Assign them a character (User configuration), or send to a device.",
+      "NetworkBusy": "Network busy: a call is already ringing or in progress."
     },
     "Caller": "Caller",
     "Info": {
-      "Calling": "Calling {label} ({caller})…",
       "CallInterrupted": "Call interrupted.",
       "SmsPending": "no signal, message pending.",
       "SmsPendingOff": "switched off, message pending.",
@@ -74,7 +73,6 @@
       "DefaultCreated": "Created \"{label}\" for {name}."
     },
     "Gm": {
-      "OnLine": "{who} is on the line with {name}.",
       "WritesTo": "{who} writes to {name}.",
       "AgentCalling": "An agent is calling",
       "EmptyLandlineCall": "Call to an empty landline",
@@ -132,7 +130,10 @@
       "Shared": "Shared access",
       "Compromised": "Compromised (tapped, known to the enemy…)",
       "NotCompromised": "Mark as compromised",
-      "CompromisedDevice": "Compromised device: {label}"
+      "CompromisedDevice": "Compromised device: {label}",
+      "BetweenAgents": "Between PCs (read only)",
+      "InboxNpc": "NPCs",
+      "InboxAgents": "Between PCs"
     },
     "Document": "Document",
     "RemoveAttachment": "Remove attachment",
@@ -144,7 +145,6 @@
       "ShowScreen": "Show the screen",
       "ShowTo": "Show to:",
       "Show": "Show",
-      "GmCopy": "{from} shows their screen ({title}) to {names}.",
       "YouShow": "You show your screen to {names}.",
       "ShowsYou": "{from} shows you their screen",
       "GiveBack": "Hand it back",
@@ -182,9 +182,7 @@
       "Outgoing": "Calling",
       "Calling": "Calling…",
       "HangUp": "Hang up",
-      "Call": "Call",
-      "NearbyRinging": "{name}'s phone is ringing",
-      "NearbyCalling": "{name} has an ear to the phone"
+      "Call": "Call"
     },
     "Net": {
       "GmAbsent": "No phone network [GM away]",
@@ -199,11 +197,11 @@
       "NoSignalShort": "No signal"
     },
     "CallerResult": {
-      "answer": "{name} picked up.",
       "voicemail": "You've reached {name}'s voicemail.",
       "unassigned": "The number you have dialed is not in service.",
       "unreachable": "The person you are calling cannot be reached at the moment.",
-      "noanswer": "{name} does not answer."
+      "noanswer": "{name} does not answer.",
+      "busy": "Network busy. Try again later."
     },
     "Form": {
       "Model": "Model",
@@ -295,7 +293,8 @@
         "unassigned": "Number not in service",
         "unreachable": "Unreachable",
         "cancelled": "Call cancelled",
-        "noanswer": "No answer"
+        "noanswer": "No answer",
+        "busy": "Network busy"
       },
       "in": {
         "answer": "Incoming call",
@@ -398,7 +397,10 @@
         "wifi": "Wi-Fi",
         "gsm": "GSM"
       },
-      "DeadZone": "Dead zone"
+      "DeadZone": "Dead zone",
+      "LastCall": "Last call (past 30 minutes)",
+      "MinAgo": "{n} min ago",
+      "JustNow": "just now"
     },
     "Scene": {
       "DeadZone": "Dead zone",
@@ -426,6 +428,30 @@
       "Change": "Change",
       "Create": "Create",
       "CreateOpen": "Create and open"
+    },
+    "Live": {
+      "Title": "Call in progress",
+      "OnLine": "On the line",
+      "Unknown": "Unknown",
+      "Ended": "Call ended",
+      "Cut": "Line cut",
+      "CutLine": "Cut the line",
+      "CutHint": "Cuts the call for both ends: network failure, dead zone, an enemy who controls the network…",
+      "Tapped": "Compromised device"
+    },
+    "Calls": {
+      "Tab": "Calls",
+      "None": "No calls yet.",
+      "FromGm": "Called by the GM (NPC)",
+      "answer": "Answered",
+      "noanswer": "No answer",
+      "decline": "Declined",
+      "missed": "Missed",
+      "voicemail": "Voicemail",
+      "unreachable": "Unreachable",
+      "unassigned": "Not assigned",
+      "cancelled": "Cancelled",
+      "busy": "Network busy"
     }
   }
 }

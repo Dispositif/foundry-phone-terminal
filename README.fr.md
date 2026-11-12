@@ -9,7 +9,7 @@ Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateur
 - **Un raccourci : Ctrl+Shift+P** ouvre le panneau MJ, ou le téléphone du joueur. Les joueurs ont un bouton flottant de téléphone, le MJ un bouton télécom avec le nombre de non-lus.
 - **Rien à configurer :** le MJ peut tout de suite appeler un joueur ou lui envoyer un message, depuis le panneau MJ. Cela arrive sur le téléphone de son personnage : s'il n'en porte pas, il est créé automatiquement (smartphone ou mobile, réglage **Appareil par défaut**).
 - **Les appareils sont un plus.** Un appareil est un objet dans l'inventaire d'un personnage (téléphone, portable), ou il est installé dans un lieu : fixe ou terminal rattaché à une scène Foundry, utilisé par ceux qui s'y trouvent. Les appareils apportent l'historique, les contacts, les réponses, le partage et les habillages.
-- **Les agents communiquent aussi entre eux.** Avec des appareils, les personnages s'appellent et s'envoient des messages directement, sans intervention du MJ, qui reçoit une copie discrète des messages.
+- **Les agents communiquent aussi entre eux.** Avec des appareils, les personnages s'appellent et s'envoient des messages directement, sans intervention du MJ. Rien ne passe jamais par le chat.
 - **Annuaire PNJ :** listez vos PNJ une fois, nom et numéro. Vous voyez d'un coup d'œil qui les agents appellent, et les numéros publics (pizzeria, taxi, hôpital) servent de pages jaunes aux joueurs.
 - Foundry VTT v13 et v14. N'importe quel système de jeu.
 - Interface en français et en anglais.
@@ -70,7 +70,7 @@ game.modules.get("soren-phones-computers").api.removeDemo()
 
 ### Sans appareil
 
-Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans **Destinataire**). L'appel ou le message n'arrive qu'à ce joueur, dans une petite fenêtre à son écran (jamais dans le chat). Ni historique ni réponse : pour que les joueurs puissent répondre et garder une trace, donnez-leur un appareil.
+Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans **Destinataire**, seuls les joueurs avec un personnage assigné sont proposés). L'appel ou le message arrive sur le smartphone de son personnage, sinon sur son mobile ; s'il n'en porte aucun, un appareil est créé avec le modèle du réglage **Appareil par défaut**.
 
 ### Un appareil, c'est un objet
 
@@ -149,14 +149,15 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 ### Partager
 
-- **Montrer l'écran** (icône œil, sur un message ou en haut d'une conversation) : l'agent tend son appareil aux agents présents sur la même scène, cochés par défaut. Ils voient l'image, la page de journal (son contenu, sans avoir besoin du droit de lecture) ou la conversation, dans une fenêtre « X vous montre son écran ». Une fois fermée, il ne leur reste rien. Fonctionne sans réseau. Le MJ est prévenu.
-- **Transférer** (icône flèche, sur un message) : le message et sa pièce jointe repartent par le réseau vers un contact ou un numéro, comme un vrai message (réseau nécessaire, trace dans l'historique, copie au MJ). Un agent destinataire reçoit automatiquement le droit de lire le journal joint ; un PNJ le reçoit dans l'onglet **Messages** du panneau MJ. Le message porte la mention « Transféré ». Un vieux mobile ne transfère que le texte.
+- **Montrer l'écran** (icône œil, sur un message ou en haut d'une conversation) : l'agent tend son appareil aux agents présents sur la même scène, cochés par défaut. Ils voient l'image, la page de journal (son contenu, sans avoir besoin du droit de lecture) ou la conversation, dans une fenêtre « X vous montre son écran ». Une fois fermée, il ne leur reste rien. Fonctionne sans réseau.
+- **Transférer** (icône flèche, sur un message) : le message et sa pièce jointe repartent par le réseau vers un contact ou un numéro, comme un vrai message (réseau nécessaire, trace dans l'historique). Un agent destinataire reçoit automatiquement le droit de lire le journal joint ; un PNJ le reçoit dans l'onglet **Messages** du panneau MJ. Le message porte la mention « Transféré ». Un vieux mobile ne transfère que le texte.
 
 ### Appels
 
 - Un appel entrant affiche l'appelant avec **Répondre** / **Refuser** ; un fixe Moderne n'affiche qu'un numéro, un Vintage rien. Sons distincts pour la sonnerie (selon le modèle), le décroché et le refus.
-- Quand le téléphone d'un agent sonne (mode sonnerie), tous les autres joueurs l'entendent plus doucement, avec une petite notification (« Le téléphone de Reyes sonne »). La narration avant le réalisme : toute la table le sait.
-- Quand un agent passe un appel, il entend la tonalité d'appel ; tous les autres joueurs l'entendent aussi, plus doucement, avec une notification (« Reyes a l'oreille sur son téléphone »). Entre deux agents, tout le monde entend seulement la sonnerie.
+- Sur smartphone et mobile, les appels entrants et sortants s'affichent sur l'appareil lui-même (avec, sur smartphone, le portrait d'un agent présent dans les contacts).
+- **Toute la table voit l'appel.** Dès qu'un agent compose, les autres joueurs reçoivent une fenêtre d'appel avec son portrait (« Appel en cours… »), puis le portrait de l'agent dont le téléphone sonne (mode sonnerie). Une fois décroché, elle montre qui est en ligne (un PNJ reste « Inconnu ») avec un chrono, et se ferme chez tous au raccrochage (« Appel terminé », chrono arrêté). Les autres joueurs entendent aussi la sonnerie et la tonalité, plus doucement. La narration avant le réalisme : toute la table le sait.
+- Le MJ a la même fenêtre, avec les deux bouts, un bouton **Raccrocher** pour le PNJ et **Couper la communication** (tête de mort) pour couper n'importe quel appel : panne de réseau, ennemi qui contrôle le réseau. Pour les joueurs, une coupure ressemble à un simple raccrochage.
 - Sans réponse au bout du délai réglé par le MJ : appel manqué.
 - Le **téléphone fixe** n'est qu'un clavier (ou un cadran rotatif en Vintage) : un clic compose le chiffre (en Vintage, le disque tourne), ou on tape le numéro au clavier. Entrée appelle. Ni historique, ni liste d'appels, ni contacts.
 
@@ -189,7 +190,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 ### Entre agents
 
 - Un agent appelle un autre agent : le téléphone de l'autre sonne, sans intervention du MJ.
-- Les messages entre agents sont livrés directement, avec une copie discrète au MJ.
+- Les messages entre agents sont livrés directement. Le MJ les suit dans l'onglet **Messages** (lecture seule).
 
 ### Contacts
 

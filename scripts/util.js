@@ -47,14 +47,6 @@ export function isActiveGM() {
   return game.user.isGM && game.users.activeGM?.id === game.user.id;
 }
 
-export function gmWhisper(content, alias = `📱 ${t("PhoneAlias")}`) {
-  return ChatMessage.create({
-    content,
-    whisper: ChatMessage.getWhisperRecipients("GM").map((u) => u.id),
-    speaker: { alias }
-  });
-}
-
 /** Random number <prefix>0xxx for a new device (555-0xxx by default); <prefix>02xx is kept for the NPC directory. */
 export function randomNumber() {
   let n = Math.floor(Math.random() * 900);
@@ -75,7 +67,7 @@ export function randomEmail() {
  * Short feedback shown on the device screen (players never get Foundry notifications,
  * except the nearby ringing/calling ones). The GM gets a regular notification.
  */
-export function deviceNotice(text, { warn = false } = {}) {
+export function deviceNotice(text, { warn = false, icon = null } = {}) {
   if (game.user.isGM) return void ui.notifications[warn ? "warn" : "info"](text);
   const el = PlayerPhone.instance?.rendered ? PlayerPhone.instance.element : null;
   if (!el) return;
@@ -83,6 +75,11 @@ export function deviceNotice(text, { warn = false } = {}) {
   const div = document.createElement("div");
   div.className = `spt-device-notice${warn ? " warn" : ""}`;
   div.textContent = text;
+  if (icon) {
+    const i = document.createElement("i");
+    i.className = `fas ${icon}`;
+    div.prepend(i, " ");
+  }
   el.append(div);
   div.addEventListener("click", () => div.remove());
   setTimeout(() => div.remove(), 10000);

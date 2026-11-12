@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.38.0
+- **Call in progress window.** Once a call is answered, a black window opens in the middle of every screen, with a running timer (MM:SS) since the answer. The rest of the table sees the agent's portrait (character sheet) and the other end: both portraits between two agents, a silhouette named "Unknown" for an NPC; the window's cross closes it. The agent on the line sees only the other end, as their device names it (contact or number), with a **Hang up** button. The GM sees both ends, hangs up for an NPC, and has **Cut the line** (skull) to cut any call: network failure, dead zone, an enemy who controls the network.
+- As soon as an agent dials, the rest of the table gets the window with "Calling…": the agent's portrait and an unknown end. It turns into the call when someone answers, and closes if nobody does.
+- While it rings, the window replaces the old notices: the rest of the table sees the agent who dials ("Calling…"), then the portrait of the agent whose phone rings ("The phone is ringing…", not in silent mode); an agent called by an NPC shows with an unknown caller. The GM calling as an NPC gets the window too, with the NPC and the agent called, and can hang up. The notices "X has their ear to the phone", "X's phone is ringing", "Calling…" and "X answered" are gone.
+- **Nothing in the chat any more**: the GM's copies of messages between agents, of messages to NPCs, of call results and of shared screens are removed (the GM panel and its notices cover them).
+- The **Messages** tab has two sub-tabs: **NPCs** (as before, you answer) and **Between PCs** (the agents' conversations, one per pair, read only: no reply, no badge).
+- **One call at a time**: while a call rings or is in progress, anyone else who dials (agent or GM) gets "Network busy" (red signal icon on the device; a notice for the GM). Logged as such in the history and the Calls tab.
+- Calls in progress **survive a reload** (player or GM): the device screen or the window comes back with the hang-up button, and every timer runs on the server clock, so they all agree. A call more than an hour old is forgotten.
+- While a phone rings, a soft halo pulses around the portrait of the agent called (call window, and the caller's portrait on a ringing smartphone).
+- The GM's call window shows "Compromised device" under an agent whose device is compromised.
+- **Missed calls** count as unread: badge on the floating button and on the conversation, until the agent opens it.
+- The rest of the table hears the hang-up softer (70 %), like a phone ringing nearby.
+- **Tracking** tab: under each agent, their last call in the past 30 minutes (table time), on a device they carry: "12 min ago · → Marlin Hunt · 02:47" (or the outcome, or "On the line"). A trace on the network.
+- **End of call**: everyone hears the hang-up sound, and the window shows "Call ended" with the stopped timer for 10 seconds (a click closes it sooner). On a smartphone or mobile, a close key hides it right away.
+- The caller no longer gets a "X picked up" notice, nor the spectators' window: their own device shows the call. A line cut by the GM looks exactly like a hang-up to the players; only the GM sees "Line cut".
+- **Calls tab** in the GM panel: every call, answered or not, agents' calls between themselves included, most recent first (40 lines): who called whom, the outcome and, once hung up, the duration. A call in progress shows "On the line" with its running timer. The two ends of a call make one line (calls made before this version stay one line per device).
+- Answer buttons are green, decline and hang-up buttons red, in the ringing windows, on the device screens (the device's look no longer greys them out) and on the landlines.
+- On a **smartphone**, an incoming call from another agent who is in the contacts shows their portrait on the ringing screen.
+- On a **smartphone** or a **mobile**, an outgoing call shows on the device itself while it rings ("Calling…", who is called, a hang-up key; on a smartphone, the portrait of the agent called if they are in the contacts, otherwise an empty portrait) instead of a window; closing the device hangs up.
+- On a **smartphone**, the call shows on the device itself instead of the window: status and timer, the other end's portrait, name and number, and a hang-up key. If the agent closes their smartphone during the call, the call window opens, so they do not forget they are still on the line. The mobile does the same, without the portrait. The landlines show "On the line" with a hang-up key, next to the window.
+
 ## 0.37.0
 - **Messages and calls sent to a player** (not to a device) now land on their character's phone instead of a popup window: the smartphone they carry, otherwise their mobile; if they carry none, one is created with the model of the new **Default device** setting (smartphone or mobile, default look). The message gets a history, the floating button badge and the in-device call screen like any other. The popup window is gone.
 - In the GM panel recipients, **Players (direct)** now come first, and only players with an assigned character are listed; a direct send to a player without a character is refused with a warning.
