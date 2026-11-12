@@ -15,7 +15,7 @@ Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateur
 - Interface en français et en anglais.
 - **URL du manifeste :** `https://github.com/Dispositif/foundry-phones-computers/releases/latest/download/module.json`
 
-<img src="docs/player.webp" alt="Vue joueur" width="560">
+<img src="docs/call-screen-en.webp" alt="Appel en cours : le smartphone de l'agent et la fenêtre du reste de la table" width="760">
 
 > **Le MJ doit être connecté.** Son navigateur fait office de réseau : sans MJ en ligne, les joueurs voient « Pas de réseau téléphonique [MJ absent] ». Ils peuvent relire leurs messages, mais ni écrire ni appeler.
 
@@ -156,9 +156,11 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 - Un appel entrant affiche l'appelant avec **Répondre** / **Refuser** ; un fixe Moderne n'affiche qu'un numéro, un Vintage rien. Sons distincts pour la sonnerie (selon le modèle), le décroché et le refus.
 - Sur smartphone et mobile, les appels entrants et sortants s'affichent sur l'appareil lui-même (avec, sur smartphone, le portrait d'un agent présent dans les contacts).
-- **Toute la table voit l'appel.** Dès qu'un agent compose, les autres joueurs reçoivent une fenêtre d'appel avec son portrait (« Appel en cours… »), puis le portrait de l'agent dont le téléphone sonne (mode sonnerie). Une fois décroché, elle montre qui est en ligne (un PNJ reste « Inconnu ») avec un chrono, et se ferme chez tous au raccrochage (« Appel terminé », chrono arrêté). Les autres joueurs entendent aussi la sonnerie et la tonalité, plus doucement. La narration avant le réalisme : toute la table le sait.
+- **Toute la table voit l'appel.** Dès qu'un agent compose, les autres joueurs reçoivent une fenêtre d'appel avec son portrait (« Appel en cours… »), puis le portrait de l'agent dont le téléphone sonne (mode sonnerie). Une fois décroché, elle montre qui est en ligne (un PNJ reste « Inconnu ») avec un chrono, et au raccrochage affiche « Appel terminé » avec le chrono arrêté pendant 10 secondes. Les autres joueurs entendent aussi la sonnerie et la tonalité, plus doucement. La narration avant le réalisme : toute la table le sait.
 - Le MJ a la même fenêtre, avec les deux bouts, un bouton **Raccrocher** pour le PNJ et **Couper la communication** (tête de mort) pour couper n'importe quel appel : panne de réseau, ennemi qui contrôle le réseau. Pour les joueurs, une coupure ressemble à un simple raccrochage.
-- Sans réponse au bout du délai réglé par le MJ : appel manqué.
+- Sans réponse au bout du délai réglé par le MJ : appel manqué. Il compte comme non lu (badge) jusqu'à ce que l'agent ouvre la conversation.
+- **Un appel à la fois.** Tant qu'un appel sonne ou est en cours, quiconque compose, agent ou MJ, obtient « Réseau encombré ».
+- Un appel en cours survit à un rechargement : l'écran de l'appareil ou la fenêtre revient, et le chrono continue.
 - Le **téléphone fixe** n'est qu'un clavier (ou un cadran rotatif en Vintage) : un clic compose le chiffre (en Vintage, le disque tourne), ou on tape le numéro au clavier. Entrée appelle. Ni historique, ni liste d'appels, ni contacts.
 
 ### Modes
@@ -169,7 +171,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 ### Ce que le joueur voit selon l'état de l'appareil
 
-- **Pas de réseau** : ni écrire ni appeler. Les messages et appels manqués attendent et arrivent tous au retour du réseau, avec un récapitulatif.
+- **Pas de réseau** : ni écrire ni appeler. Aussi sur une scène cochée **Zone blanche** (configuration de la scène, onglet Général), pour les appareils que portent les agents qui s'y trouvent. Les messages et appels manqués attendent et arrivent tous au retour du réseau, avec un récapitulatif.
 - **Verrouillé** : écran de verrouillage avec le nombre de non-lus. Les messages arrivent avec leur expéditeur, mais leur texte reste masqué. Les appels sonnent normalement.
 
 ---
@@ -190,7 +192,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 ### Entre agents
 
 - Un agent appelle un autre agent : le téléphone de l'autre sonne, sans intervention du MJ.
-- Les messages entre agents sont livrés directement. Le MJ les suit dans l'onglet **Messages** (lecture seule).
+- Les messages entre agents sont livrés directement. Le MJ les suit dans le sous-onglet **Entre PJ** de **Messages** (lecture seule).
 
 ### Contacts
 
@@ -210,11 +212,15 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 - Le **bouton flottant télécom** du MJ l'ouvre (sur **Messages** s'il y a des messages d'agents non lus) et affiche leur nombre. Il a son propre réglage.
 - Barre du haut : état du réseau, messages en attente, et bascule **Couper le réseau** mobile.
 - Onglet **Envoyer** : destinataire (avec l'icône du modèle), expéditeur affiché (texte libre, numéro masqué si vide, avec suggestions : contacts du destinataire, expéditeurs récents, numéros des autres appareils), puis **Message** ou **Appel**. Seul ce que le destinataire sait faire est proposé (pas de message vers une ligne fixe, pas d'appel vers un terminal). **Envoyer** ou **Faire sonner**, pièce jointe, et **Copier en lien** pour un journal.
-- Onglet **Messages** : un fil par agent et par PNJ, en bulles. Réponse directement sous le fil (Entrée envoie), ou rappel de l'agent.
+- Onglet **Messages**, deux sous-onglets :
+  - **PNJ** : un fil par agent et par PNJ, en bulles. Réponse directement sous le fil (Entrée envoie), ou rappel de l'agent.
+  - **Entre PJ** : les conversations des agents, une par paire, en lecture seule.
+- Onglet **Appels** : tous les appels, décrochés ou non, entre agents compris, du plus récent au plus ancien : qui a appelé qui, l'issue et la durée. Un appel en cours affiche « En ligne » avec son chrono.
 - Onglet **Appareils**, groupés par porteur (portrait du personnage) ou par lieu (vignette de la scène). Un clic sur un appareil le choisit comme destinataire. Pour chacun :
   - icône du modèle, mode, nombre de messages non lus par le joueur ;
-  - signalements : numéro partagé, verrouillé, pas de réseau ;
+  - signalements : numéro partagé, verrouillé, pas de réseau, **compromis** (marque réservée au MJ pour un appareil sur écoute : le MJ est averti quand il appelle ou écrit à un autre agent) ;
   - actions au survol : ouvrir et préparer l'historique, contacts, verrouiller, pas de réseau et donner à… (appareils portés), modifier, retirer (supprime l'objet, ou le garde comme objet ordinaire).
+- Onglet **Traçage** (expérimental) : avec quelle précision le réseau peut localiser chaque agent (GPS, Wi-Fi, GSM, ou rien en zone blanche), et son dernier appel des 30 dernières minutes. Pour juger à quel point les agents sont exposés à un ennemi qui a accès au réseau.
 
 ### Annuaire PNJ
 

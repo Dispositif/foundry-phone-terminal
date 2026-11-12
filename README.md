@@ -15,7 +15,7 @@ A Foundry VTT module that gives your characters phones, laptops and room termina
 - Interface in English and French.
 - **Manifest URL:** `https://github.com/Dispositif/foundry-phones-computers/releases/latest/download/module.json`
 
-<img src="docs/player.webp" alt="Player view" width="560">
+<img src="docs/call-screen-en.webp" alt="Call in progress: the agent's smartphone and the window for the rest of the table" width="760">
 
 > **The GM must be connected.** The GM's browser acts as the network. Without a GM online, players see "No phone network [GM away]". They can read their messages but cannot write or call.
 
@@ -156,9 +156,11 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 - An incoming call shows the caller with **Answer** / **Decline**; a Modern landline shows only a number, a Vintage one nothing. Distinct sounds for the ring (per model), pick-up and hang-up.
 - On a smartphone or a mobile, incoming and outgoing calls show on the device itself (with the portrait of an agent who is in the contacts, on a smartphone).
-- **The whole table sees the call.** As soon as an agent dials, the other players get a call window with the agent's portrait ("Calling…"), then the portrait of the agent whose phone rings (ring mode). Once answered, it shows who is on the line (an NPC stays "Unknown") with a running timer, and closes for everyone on hang-up ("Call ended", timer stopped). Every other player also hears the ring and the ringback tone, softly. Narration over realism: the whole table knows.
+- **The whole table sees the call.** As soon as an agent dials, the other players get a call window with the agent's portrait ("Calling…"), then the portrait of the agent whose phone rings (ring mode). Once answered, it shows who is on the line (an NPC stays "Unknown") with a running timer, and on hang-up shows "Call ended" with the stopped timer for 10 seconds. Every other player also hears the ring and the ringback tone, softly. Narration over realism: the whole table knows.
 - The GM gets the same window, with both ends, a **Hang up** button for the NPC and **Cut the line** (skull) to cut any call: network failure, an enemy who controls the network. For the players, a cut looks like a plain hang-up.
-- No answer within the GM's delay: missed call.
+- No answer within the GM's delay: missed call. It counts as unread (badge) until the agent opens the conversation.
+- **One call at a time.** While a call rings or is in progress, anyone else who dials, agent or GM, gets "Network busy".
+- A call in progress survives a reload: the device screen or the window comes back, and the timer runs on.
 - The **landline** is only a keypad (or a rotary dial in Vintage). Click to dial a digit (in Vintage, the dial turns), or type the number. Enter places the call. No history, no call list, no contacts.
 
 ### Modes
@@ -169,7 +171,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 ### Device states
 
-- **No signal:** no writing or calling. Messages and missed calls wait and all arrive when the signal comes back, with a summary.
+- **No signal:** no writing or calling. Also on a scene marked **Dead zone** (scene configuration, Basics tab), for the devices the agents there carry. Messages and missed calls wait and all arrive when the signal comes back, with a summary.
 - **Locked:** a lock screen with the unread count. Messages arrive with their sender, but their text stays hidden. Calls ring normally.
 
 ---
@@ -190,7 +192,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 ### Agent to agent
 
 - Calls ring the other agent's phone directly, without the GM.
-- Messages are delivered directly. The GM follows them in the **Messages** tab (read only).
+- Messages are delivered directly. The GM follows them in the **Between PCs** sub-tab of **Messages** (read only).
 
 ### Contacts
 
@@ -210,11 +212,15 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 - The GM's **floating telecom button** opens it (on **Messages** when agents' messages are unread) and shows their count. It has its own setting.
 - Top bar: network status, pending messages, and a **Cut network** toggle for the whole mobile network.
 - **Send** tab: recipient (with the model's icon), displayed sender (free text, hidden number when empty, with suggestions: the recipient's contacts, recent senders, other devices' numbers), then **Message** or **Call**. Only what the recipient can do is offered (no message to a landline, no call to a terminal). **Send** or **Ring**, attachment, and **Copy as a link** to paste into a journal.
-- **Messages** tab: one thread per agent and NPC, as chat bubbles. Reply right under the thread (Enter sends), or call the agent back.
+- **Messages** tab, two sub-tabs:
+  - **NPCs**: one thread per agent and NPC, as chat bubbles. Reply right under the thread (Enter sends), or call the agent back.
+  - **Between PCs**: the agents' conversations, one per pair, read only.
+- **Calls** tab: every call, answered or not, between agents included, most recent first: who called whom, the outcome and the duration. A call in progress shows "On the line" with its timer.
 - **Devices** tab, grouped by holder (character portrait) or place (scene thumbnail). Click a device to make it the recipient. For each one:
   - model icon, mode, number of messages the player hasn't read;
-  - flags: shared number, locked, no signal;
+  - flags: shared number, locked, no signal, **compromised** (a GM-only mark for a tapped device: the GM is warned when it calls or texts another agent);
   - actions on hover: open and prepare history, contacts, lock, no signal and give to… (carried devices), edit, remove (deletes the item, or keeps it as an ordinary item).
+- **Tracking** tab (experimental): how precisely the network can locate each agent (GPS, Wi-Fi, GSM, or nothing in a dead zone), and their last call in the past 30 minutes. A way to judge how exposed the agents are to an enemy with access to the network.
 
 ### NPC directory
 
