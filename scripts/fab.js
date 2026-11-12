@@ -62,8 +62,9 @@ export function updateFab() {
   let fab = document.getElementById("spt-phone-fab");
   const mine = myPhones();
   const personal = mine.filter((p) => !isFixed(p.phone));
-  // Room buttons only for installed devices in the room where the agent is (not a shared one used from afar).
-  const rooms = mine.filter((p) => isFixed(p.phone) && landlineUsers(p.phone).some((u) => u.id === game.user.id));
+  // Room buttons: installed devices in the room where the agent is, and shared ones with no place
+  // (reached over the network from anywhere, e.g. a case file database). Not a room device used from afar.
+  const rooms = mine.filter((p) => isFixed(p.phone) && (!game.scenes.get(p.phone.sceneId) || landlineUsers(p.phone).some((u) => u.id === game.user.id)));
   const wanted = !game.user.isGM && game.settings.get(MODULE_ID, "floatingButton") && personal.length + rooms.length > 0;
   if (!wanted) return fab?.remove();
   if (!fab) fab = createFab();
@@ -154,7 +155,8 @@ function roomButtons(fab, rooms, { unread, ringing = () => false, live = () => n
     setFabBadge(b, u);
     b.classList.toggle("ringing", ringing(p));
     setOnLine(b, live(p));
-    b.title = `${p.phone.label} — ${game.scenes.get(p.phone.sceneId)?.name ?? ""}${u ? ` (${tn("Unread", u)})` : ""}`;
+    const place = game.scenes.get(p.phone.sceneId)?.name ?? t("NoPlace");
+    b.title = `${p.phone.label} — ${place}${u ? ` (${tn("Unread", u)})` : ""}`;
   }
 }
 

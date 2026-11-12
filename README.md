@@ -36,7 +36,7 @@ A Foundry VTT module that gives your characters phones, laptops and room termina
 - **A terminal in a room.** Anyone standing there reads its mail. Attach journal pages to simulate files: archives, logs, case reports.
 - **A hack, a stolen phone.** Lock a device, unlock it when the roll succeeds. Hand it to another character with its whole history.
 - **A ready-to-play scenario.** `@SMS` and `@Call` links in a journal send a message or ring a phone in one click.
-- **A remote case file.** A terminal in the Items sidebar, with "Observer" permission for several players: they reach its mail from anywhere, like a secure FBI database. Put journal pages in its Files tab, and lock the sensitive ones until the agents find the password.
+- **A remote case file.** A terminal with no location in the Items sidebar, with "Observer" permission for several players: they reach its mail from anywhere, like a secure FBI database. Put journal pages in its Files tab, and lock the sensitive ones until the agents find the password.
 - **A prepared clue.** Write a device's history in advance: messages, photos, missed calls.
 - **Show, don't tell.** A player shows their screen to the agents in the same room, or forwards the photo.
 
@@ -117,7 +117,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
 
 - **Carried device:** the player whose assigned character carries it; otherwise the character's owners. Assign a character to each player, or a player who owns several characters would see their devices too.
 - **Installed device:** every agent with a token on the scene; otherwise the players viewing the scene. The device appears and disappears from their window as they move.
-- **Shared access:** a device in the Items sidebar is held by the players you give it to (Observer or Owner), wherever they are. An installed one stays usable on its scene too.
+- **Shared access:** a device in the Items sidebar is held by the players you give it to (Observer or Owner), wherever they are. An installed one stays usable on its scene too. A terminal or landline can also have **no location** (network access only): shared this way, it is a database several agents consult from anywhere, like an FBI case file.
 - **Held by nobody** (world item given to no one, or NPC): nobody picks up. Handy to prepare a phone in advance.
 - **Landline in an empty room:** an agent's call rings the GM instead ("Call to an empty landline", with the place), who answers for whoever is there.
 
@@ -138,7 +138,7 @@ The GM can ring a player or send them a message (choose the player in **Recipien
   - red badge with the number of unread messages;
   - shakes when the phone rings;
   - opens the last personal device used.
-- In a room with a landline or a terminal, a **small room button** appears under the phone, with its own unread count. It shakes when the landline rings, opens the room's device, and disappears when the agent leaves. A shared device used from elsewhere gets no button: open it with Ctrl+Shift+P or from the Items sidebar.
+- In a room with a landline or a terminal, a **small room button** appears under the phone, with its own unread count. It shakes when the landline rings, opens the room's device, and disappears when the agent leaves. A shared device with no location gets a button too, wherever the agent is. A room device shared and used from elsewhere gets none: open it with Ctrl+Shift+P or from the Items sidebar.
 - With several devices, the window reopens on the **last device used**. If it is out of reach (room left, device given away), it falls back to a personal device and says so.
 
 ### Messages

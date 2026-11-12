@@ -4,6 +4,7 @@
 - **Floating button on the line**: while an agent is on a call, the button of the device in use turns green with the call's timer under it; a click goes back to the call (device screen, or the landline in the room).
 - **Switched-off device**: the player's button is greyed; a click still opens the dark screen and its power button.
 - **GM button orange** while an agent is calling you (it shakes); a click brings the incoming call window back to the front instead of opening the panel.
+- **Installed devices without a location**: a terminal or landline can have no scene ("No location (network access)", last choice of the place in New device; empty place in Edit device). Shared from the Items sidebar (Observer), it is reached from anywhere, like a case-file database several agents consult: each sharing player gets a small button for it under their phone. GM panel: grouped under "No location". A place name that matches no scene is still refused.
 - **Layout**: near the bottom of the screen, the room buttons line up to the right of the main button instead of stacking down (players and GM). It follows the button when you move it.
 
 ## 0.39.0

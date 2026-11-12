@@ -36,7 +36,7 @@ Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateur
 - **Un terminal dans une pièce.** Quiconque s'y trouve lit son courrier. Joignez des pages de journal pour simuler des fichiers : archives, journaux système, rapports d'enquête.
 - **Un piratage, un téléphone volé.** Verrouillez un appareil, déverrouillez-le quand le jet réussit. Remettez-le à un autre personnage avec tout son historique.
 - **Un scénario prêt à jouer.** Les liens `@SMS` et `@Call` dans un journal envoient un message ou font sonner un téléphone d'un clic.
-- **Un dossier à distance.** Un terminal dans la barre latérale Objets, avec le droit de lecture « Observateur » à plusieurs joueurs : ils consultent son courrier de n'importe où, comme une base de données sécurisée du FBI. Placez des pages de journal dans son onglet Fichiers, et verrouillez les plus sensibles jusqu'à ce que les agents trouvent le mot de passe.
+- **Un dossier à distance.** Un terminal sans lieu dans la barre latérale Objets, avec le droit de lecture « Observateur » à plusieurs joueurs : ils consultent son courrier de n'importe où, comme une base de données sécurisée du FBI. Placez des pages de journal dans son onglet Fichiers, et verrouillez les plus sensibles jusqu'à ce que les agents trouvent le mot de passe.
 - **Un indice préparé.** Écrivez à l'avance l'historique d'un appareil : messages, photos, appels manqués.
 - **Montrer plutôt que raconter.** Un joueur montre son écran aux agents dans la même pièce, ou transfère la photo.
 
@@ -117,7 +117,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
 
 - **Appareil porté** : le joueur dont c'est le personnage assigné ; à défaut, les joueurs propriétaires du personnage. Pensez à assigner son personnage à chaque joueur, sinon un joueur propriétaire de plusieurs PJ verrait les appareils des autres.
 - **Appareil installé** : tous les agents dont un jeton est sur la scène ; à défaut, les joueurs qui regardent la scène. L'appareil apparaît et disparaît de leur fenêtre au fil de leurs déplacements.
-- **Accès partagé** : un appareil de la barre latérale Objets est entre les mains des joueurs à qui vous le donnez (Observateur ou Propriétaire), où qu'ils soient. S'il est installé, il reste aussi utilisable sur sa scène.
+- **Accès partagé** : un appareil de la barre latérale Objets est entre les mains des joueurs à qui vous le donnez (Observateur ou Propriétaire), où qu'ils soient. S'il est installé, il reste aussi utilisable sur sa scène. Un terminal ou un fixe peut aussi n'avoir **aucun lieu** (accès réseau seulement) : partagé ainsi, c'est une base que plusieurs agents consultent de n'importe où, comme un dossier du FBI.
 - **Porté par personne** (objet du monde donné à personne, ou PNJ) : personne ne décroche. Pratique pour préparer un téléphone à l'avance.
 - **Fixe dans une pièce vide** : l'appel d'un agent sonne chez le MJ (« Appel vers un fixe vide », avec le lieu), qui répond pour qui se trouve là.
 
@@ -138,7 +138,7 @@ Le MJ peut appeler un joueur ou lui envoyer un message (choisir le joueur dans *
   - pastille rouge avec le nombre de messages non lus ;
   - vibre quand le téléphone sonne ;
   - ouvre le dernier appareil personnel choisi.
-- Dans une pièce équipée d'un fixe ou d'un terminal, un **petit bouton de lieu** apparaît sous le téléphone, avec ses propres non-lus. Il vibre quand le fixe sonne, ouvre directement l'appareil de la pièce et disparaît quand l'agent s'en va. Un appareil partagé utilisé à distance n'a pas de bouton : on l'ouvre avec Ctrl+Shift+P ou depuis la barre latérale Objets.
+- Dans une pièce équipée d'un fixe ou d'un terminal, un **petit bouton de lieu** apparaît sous le téléphone, avec ses propres non-lus. Il vibre quand le fixe sonne, ouvre directement l'appareil de la pièce et disparaît quand l'agent s'en va. Un appareil partagé sans lieu a aussi son bouton, où que soit l'agent. Un appareil de pièce partagé et utilisé à distance n'en a pas : on l'ouvre avec Ctrl+Shift+P ou depuis la barre latérale Objets.
 - Avec plusieurs appareils, la fenêtre rouvre sur le **dernier appareil choisi**. S'il n'est plus à portée (pièce quittée, appareil donné), elle revient à un appareil personnel et le signale.
 
 ### Messages

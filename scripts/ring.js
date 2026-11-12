@@ -73,7 +73,7 @@ export async function ring(target, { caller = MASKED, origin = null, callId = fo
           callerNumber: landlineNumber(p, call.from),
           callerImg: knownCallerFace(p, call.from, origin),
           itemUuid: p.item.uuid,
-          phoneLabel: isLandline(p.phone) ? `${p.phone.label} (${game.scenes.get(p.phone.sceneId)?.name ?? ""})` : p.phone.label,
+          phoneLabel: isLandline(p.phone) && game.scenes.get(p.phone.sceneId) ? `${p.phone.label} (${game.scenes.get(p.phone.sceneId).name})` : p.phone.label,
           silent: mode === "silent",
           ringSrc: model.ring
         });

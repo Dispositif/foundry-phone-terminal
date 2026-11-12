@@ -383,7 +383,8 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     const groupOf = (p) => {
       if (isFixed(p.phone)) {
         const scene = game.scenes.get(p.phone.sceneId);
-        return { key: `s:${p.phone.sceneId}`, order: 1, name: scene?.name ?? t("NoPlace"), img: scene?.thumb ?? null, icon: "fa-location-dot" };
+        if (!scene) return { key: "s:none", order: 1.5, name: t("NoPlace"), img: null, icon: "fa-network-wired" };
+        return { key: `s:${p.phone.sceneId}`, order: 1, name: scene.name, img: scene.thumb ?? null, icon: "fa-location-dot" };
       }
       if (p.actor) return { key: `a:${p.actor.id}`, order: 0, name: p.actor.name, img: p.actor.img, icon: "fa-user" };
       const shared = sharedUsers(p.item);

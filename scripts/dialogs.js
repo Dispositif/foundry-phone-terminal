@@ -23,7 +23,8 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
     .map((k) => `<option value="${k}" data-models="${k === DEFAULT_THEME ? notLandline : THEMES[k].models.join(" ")}" ${k === shown ? "selected" : ""}>${t(`Theme.${k}`)}</option>`)
     .join("");
   const scenes = game.scenes.map((sc) => `<option value="${esc(sc.name)}">`).join("");
-  const sceneName = game.scenes.get(sceneId)?.name ?? canvas?.scene?.name ?? "";
+  // An installed device without a place keeps none; a device becoming installed defaults to the current scene.
+  const sceneName = sceneId ? game.scenes.get(sceneId)?.name ?? "" : MODELS[model]?.fixed ? "" : canvas?.scene?.name ?? "";
   return DialogV2.wait({
     window: { title, icon: "fas fa-mobile-screen" },
     position: { width: 400 },
@@ -31,7 +32,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
         ${withModel ? `<div class="form-group"><label>${t("Form.Model")}</label><select name="model">${modelOpts}</select></div>` : ""}
         <div class="spt-if-mobile">${selectHtml}</div>
         <div class="form-group spt-if-landline"><label>${t("Form.Place")}</label>
-          <input type="text" name="scene" list="spt-scenes" value="${esc(sceneName)}" placeholder="${t("Form.SceneName")}">
+          <input type="text" name="scene" list="spt-scenes" value="${esc(sceneName)}" placeholder="${t("Form.NoPlace")}">
           <datalist id="spt-scenes">${scenes}</datalist></div>
         <div class="form-group"><label>${t("Form.DeviceName")}</label><input type="text" name="label" value="${esc(label)}" placeholder="${t("Form.DeviceNameHint")}"></div>
         <div class="form-group"><label>${t("Form.Number")}</label><input type="text" name="number" value="${esc(number)}"></div>
@@ -186,7 +187,8 @@ function kindForm(kind) {
   const holderRow = fixed
     ? `<div class="form-group"><label>${t("Form.Place")}</label><select name="scene">${game.scenes
         .map((sc) => `<option value="${sc.id}" ${sc.id === canvas?.scene?.id ? "selected" : ""}>${esc(sc.name)}</option>`)
-        .join("")}</select></div>`
+        .join("")}<option value="">${t("Form.NoPlace")}</option></select></div>
+      <p class="hint">${t("Form.NoPlaceHint")}</p>`
     : `<div class="spt-row"><label>${t("Form.HeldBy")}</label><div class="spt-chips">
         ${pcs.map((a, i) => chip(a.id, `<img src="${esc(a.img)}" alt="">${esc(a.name)}`, i === 0)).join("")}
         ${chip("npc", `<i class="fas fa-user"></i> ${t("NewDev.Npc")}`)}
@@ -275,7 +277,7 @@ export async function newPhoneDialog() {
     if (!res || typeof res !== "object") return;
     if (res.actor === undefined) return ui.notifications.warn(t("Warn.ActorNotFound", { name: res.npcName }));
     if (MODELS[res.model]?.fixed) {
-      if (!res.sceneId) return ui.notifications.warn(t("Warn.SceneNotFound", { name: "" }));
+      // No scene: a device reached over the network only (shared from the Items sidebar).
       const item = await createPhone(null, res);
       ui.notifications.info(`📍 ${t("Info.Installed", { model: kindLabel(kind), label: res.label })}`);
       return { item, open: res.open };
@@ -328,7 +330,8 @@ export async function editPhoneDialog(item) {
     inbox: phone.inbox ?? "on"
   });
   if (!res) return;
-  if (MODELS[res.model]?.fixed && !res.sceneId) return ui.notifications.warn(t("Warn.SceneNotFound", { name: res.sceneName ?? "" }));
+  // An empty place is allowed (network access only); a name that matches no scene is not.
+  if (MODELS[res.model]?.fixed && !res.sceneId && res.sceneName) return ui.notifications.warn(t("Warn.SceneNotFound", { name: res.sceneName }));
   await markPhone(item, res);
 }
 

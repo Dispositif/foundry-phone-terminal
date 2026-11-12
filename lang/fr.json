@@ -28,7 +28,7 @@
       "computer": "Ordinateur",
       "desktop": "Terminal"
     },
-    "NoPlace": "Sans lieu",
+    "NoPlace": "Sans lieu (accès réseau)",
     "NoHolder": "Sans possesseur",
     "Warn": {
       "GmOnlyCall": "Seul le MJ peut passer un appel.",
@@ -222,7 +222,9 @@
       "Inbox": "Messagerie",
       "Inbox_on": "Disponible",
       "Inbox_locked": "Verrouillée",
-      "Inbox_none": "Aucune (fichiers seulement)"
+      "Inbox_none": "Aucune (fichiers seulement)",
+      "NoPlace": "Sans lieu (accès réseau)",
+      "NoPlaceHint": "Sans lieu, l'appareil n'est accessible que par le réseau : donnez-y accès aux joueurs depuis la barre latérale Objets (Observateur). Pratique pour une base de dossiers partagée."
     },
     "Ok": "Valider",
     "NewDevice": "Nouvel appareil",

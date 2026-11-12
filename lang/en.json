@@ -28,7 +28,7 @@
       "computer": "Laptop",
       "desktop": "Terminal"
     },
-    "NoPlace": "No location",
+    "NoPlace": "No location (network access)",
     "NoHolder": "No holder",
     "Warn": {
       "GmOnlyCall": "Only the GM can place a call.",
@@ -222,7 +222,9 @@
       "Inbox": "Mailbox",
       "Inbox_on": "Available",
       "Inbox_locked": "Locked",
-      "Inbox_none": "None (files only)"
+      "Inbox_none": "None (files only)",
+      "NoPlace": "No location (network access)",
+      "NoPlaceHint": "Without a location, the device is reached over the network only: give players access to it from the Items sidebar (Observer). Handy for a shared case-file database."
     },
     "Ok": "OK",
     "NewDevice": "New device",
