@@ -59,9 +59,7 @@ A device is an item carried by a character, or installed in a place (a scene) an
 | **Terminal** | installed | no | emails and files |
 | **Landline** | installed | yes | no |
 
-<img src="docs/frames-mobile.webp" alt="Phones and laptop" width="640">
-
-<img src="docs/frames-fixed.webp" alt="Terminals and landlines" width="800">
+<img src="docs/devices.webp" alt="The six device models: smartphone, mobile phone, pager, landline, laptop and terminal" width="900">
 
 - **Looks:** each model has its own, plus a few alternatives: vintage rotary phone, green text console, military, FBI workstation.
 - **Files** (laptop, terminal): drop journal pages or images on the device. Players read them inside the screen, without access to your Foundry journals. Lock or hide each file.

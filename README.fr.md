@@ -59,9 +59,7 @@ Un appareil est un objet porté par un personnage, ou installé dans un lieu (un
 | **Terminal** | installé | non | mails et fichiers |
 | **Téléphone fixe** | installé | oui | non |
 
-<img src="docs/frames-mobile.webp" alt="Téléphones et portable" width="640">
-
-<img src="docs/frames-fixed.webp" alt="Terminaux et fixes" width="800">
+<img src="docs/devices.webp" alt="Les six modèles d'appareils : smartphone, mobile, bipeur, fixe, portable et terminal" width="900">
 
 - **Habillages :** chaque modèle a le sien, plus quelques variantes : téléphone vintage à cadran, console texte verte, militaire, poste du FBI.
 - **Fichiers** (portable, terminal) : glissez des pages de journal ou des images sur l'appareil. Les joueurs les lisent dans l'écran, sans accès à vos journaux Foundry. Chaque fichier peut être verrouillé ou masqué.

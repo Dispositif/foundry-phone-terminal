@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0
+- **First public release** on the Foundry package list. Same features as 0.41.0, tested in Foundry.
+- README: a picture of the six device models.
+
 ## 0.41.0
 - **GM panel, Files tab**: every file of every laptop and terminal in one list. Each file has a three-way switch, **Visible / Locked / Hidden**, and a click on its name previews it. Filters by state with their counts, and a search box.
 - Two groupings: **by computer** (with the device lock, the mailbox (click to cycle Mail, Mail locked, No mail) and its GM view), or **by source journal**, handy with one journal per scenario: each row names its computer, and **Show all** / **Hide all** switch a whole journal at once. Images and files whose journal was deleted get their own groups.
