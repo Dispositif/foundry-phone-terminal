@@ -90,11 +90,13 @@ export async function onPlayerCall({ fromItemUuid, to, callId, userId }) {
   const who = `${holderName(from, fromPhone)} (${fromPhone.label})`;
   const call = { done: false, sound: null, dialog: null, origin };
   gmIncoming.set(callId, call);
+  rerenderAll(); // GM floating button turns orange
   const finish = (result) => {
     if (call.done) return;
     call.done = true;
     call.sound?.stop();
     gmIncoming.delete(callId);
+    rerenderAll();
     if (call.dialog?.rendered) call.dialog.close();
     if (result !== "cancelled") finishOrigin(origin, result);
     if (result === "answer") startLive(callId, agentSide(from, userId), npcSide(key, origin.name, gmName(fromPhone, key)));

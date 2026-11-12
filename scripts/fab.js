@@ -1,6 +1,8 @@
 import { MODULE_ID } from "./constants.js";
 import { t, tn } from "./i18n.js";
-import { allPhones, getLog, getPhoneData, holders, isFixed, isPager, landlineUsers, modelOf, playerUnread } from "./devices.js";
+import { allPhones, getLog, getPhoneData, holders, isFixed, isPager, landlineUsers, modeOf, modelOf, playerUnread } from "./devices.js";
+import { gmIncoming } from "./gm-actions.js";
+import { elapsed, liveCalls, liveOn } from "./live-call.js";
 import { openPanel, openPhone } from "./main.js";
 import { activeCall } from "./player-calls.js";
 /* -------------------------------------------- */
@@ -68,22 +70,76 @@ export function updateFab() {
   const ringingUuid = activeCall?.itemUuid ?? null;
   const ringsHere = (p) => !!activeCall && p.item.uuid === ringingUuid;
 
+  // On the line: the button of the device in use turns green with the call's timer.
+  const onLine = (p) => {
+    const d = liveOn(p.item.uuid);
+    return d && !d.ended && !d.dialing ? d : null;
+  };
+  const livePersonal = personal.find(onLine);
+
   // Main button: personal devices.
   let main = fab.querySelector(".spt-fab-main");
   if (!main) fab.prepend((main = fabButton("spt-fab-main")));
   main.hidden = !personal.length;
-  const pIcon = modelOf(mainDevice(personal)?.phone).icon;
+  const shown = livePersonal ?? mainDevice(personal);
+  const pIcon = modelOf(shown?.phone).icon;
   main.querySelector("i").className = `fas ${pIcon}`;
+  setOnLine(main, livePersonal ? onLine(livePersonal) : null);
+  main.dataset.liveUuid = livePersonal?.item.uuid ?? "";
+  // Switched off: greyed (a click still opens the dark screen and its power button).
+  main.classList.toggle("off", !livePersonal && !!shown && modeOf(shown.phone) === "off");
   const n = personal.reduce((sum, p) => sum + playerUnread(p.phone), 0);
   setFabBadge(main, n);
   main.classList.toggle("ringing", !!activeCall && !rooms.some(ringsHere));
   main.title = n ? tn("Unread", n) : t("MyPhone");
 
-  roomButtons(fab, rooms, { unread: (p) => playerUnread(p.phone), ringing: ringsHere });
+  roomButtons(fab, rooms, { unread: (p) => playerUnread(p.phone), ringing: ringsHere, live: onLine });
+  orient(fab);
+}
+
+/** Green button and running timer while on the line. */
+function setOnLine(btn, data) {
+  btn.classList.toggle("online", !!data);
+  let timer = btn.querySelector(".spt-fab-timer");
+  if (!data) return timer?.remove();
+  if (!timer) {
+    timer = document.createElement("span");
+    timer.className = "spt-fab-timer";
+    btn.appendChild(timer);
+  }
+  timer.dataset.call = data.callId;
+  timer.textContent = elapsed(data);
+  startFabTicker();
+}
+
+let fabTicker = null;
+function startFabTicker() {
+  if (fabTicker) return;
+  fabTicker = setInterval(() => {
+    const timers = document.querySelectorAll("#spt-phone-fab .spt-fab-timer");
+    if (!timers.length) {
+      clearInterval(fabTicker);
+      fabTicker = null;
+      return;
+    }
+    for (const el of timers) {
+      const data = liveCalls.get(el.dataset.call);
+      if (data && !data.ended) el.textContent = elapsed(data);
+    }
+  }, 1000);
+}
+
+/** Near the bottom of the screen, the buttons line up to the right of the main one instead of stacking down. */
+function orient(fab) {
+  const r = fab.getBoundingClientRect();
+  // The edge the group is anchored by stays put when the layout changes, so the choice is stable.
+  const anchoredTop = fab.style.top && fab.style.top !== "auto";
+  const y = anchoredTop ? r.top : r.bottom;
+  fab.classList.toggle("spt-fab-row", y > window.innerHeight * 0.6);
 }
 
 /** Small buttons under the main one, one per installed device (landline, terminal). */
-function roomButtons(fab, rooms, { unread, ringing = () => false }) {
+function roomButtons(fab, rooms, { unread, ringing = () => false, live = () => null }) {
   const keep = new Set(rooms.map((p) => p.item.uuid));
   for (const b of fab.querySelectorAll(".spt-fab-room")) if (!keep.has(b.dataset.uuid)) b.remove();
   for (const p of rooms) {
@@ -97,6 +153,7 @@ function roomButtons(fab, rooms, { unread, ringing = () => false }) {
     const u = unread(p);
     setFabBadge(b, u);
     b.classList.toggle("ringing", ringing(p));
+    setOnLine(b, live(p));
     b.title = `${p.phone.label} — ${game.scenes.get(p.phone.sceneId)?.name ?? ""}${u ? ` (${tn("Unread", u)})` : ""}`;
   }
 }
@@ -121,11 +178,24 @@ function updateGmFab() {
   main.querySelector("i").className = "fas fa-tower-cell";
   const n = gmUnread();
   setFabBadge(main, n);
-  main.title = n ? tn("Unread", n) : t("Gm.PanelTitle");
+  // An agent is calling you: orange, and a click brings the call window back.
+  const calling = gmIncoming.size > 0;
+  main.classList.toggle("calling", calling);
+  main.title = calling ? t("Gm.AgentCalling") : n ? tn("Unread", n) : t("Gm.PanelTitle");
   // Devices installed on the scene the GM is viewing: one click opens their GM view.
   const sceneId = canvas?.scene?.id ?? game.user.viewedScene;
   const rooms = sceneId ? allPhones().filter((p) => isFixed(p.phone) && p.phone.sceneId === sceneId) : [];
   roomButtons(fab, rooms, { unread: (p) => gmUnread([p]) });
+  orient(fab);
+}
+
+/** GM: the incoming call window comes forward (closing it would mean "no answer"). */
+function showGmCall() {
+  const call = [...gmIncoming.values()].find((c) => c.dialog);
+  if (!call) return false;
+  call.dialog.maximize?.();
+  call.dialog.bringToFront?.();
+  return true;
 }
 
 export function createFab() {
@@ -156,10 +226,12 @@ export function createFab() {
       try {
         localStorage.setItem(FAB_POS_KEY, JSON.stringify({ left: fab.offsetLeft, top: fab.offsetTop }));
       } catch {}
+      orient(fab);
     } else if (drag.btn?.dataset.gm) {
-      openPanel(gmUnread() ? { tab: "inbox" } : {});
+      if (!showGmCall()) openPanel(gmUnread() ? { tab: "inbox" } : {});
     } else if (drag.btn) {
-      let uuid = drag.btn.dataset.uuid;
+      // On the line: back to the device in use.
+      let uuid = drag.btn.dataset.uuid || drag.btn.dataset.liveUuid;
       if (!uuid) {
         // Main phone: the last personal device chosen.
         const personal = myPhones().filter((p) => !isFixed(p.phone));

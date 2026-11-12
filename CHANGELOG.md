@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.40.0
+- **Floating button on the line**: while an agent is on a call, the button of the device in use turns green with the call's timer under it; a click goes back to the call (device screen, or the landline in the room).
+- **Switched-off device**: the player's button is greyed; a click still opens the dark screen and its power button.
+- **GM button orange** while an agent is calling you (it shakes); a click brings the incoming call window back to the front instead of opening the panel.
+- **Layout**: near the bottom of the screen, the room buttons line up to the right of the main button instead of stacking down (players and GM). It follows the button when you move it.
+
 ## 0.39.0
 - **Files on computers.** Laptops and terminals get two tabs, **Mail** and **Files**. The GM drops journal pages or images into the Files tab of the device (GM view), or adds an image with the image button; nothing is notified. Players see a plain list (icon, name, Document or Image) and open a file **inside the screen**: the journal's text and images (secret blocks hidden), never the Foundry journal sheet, and no read permission is needed (the GM's browser renders the content). On hover: Show the screen and Forward.
 - Per file, in the GM view: **Lock** (listed with a padlock, "Access denied" when opened), **Hide** (not listed for the players until revealed), Rename and Delete.
