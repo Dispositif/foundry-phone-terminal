@@ -18,6 +18,7 @@
     <a class="spt-tab {{#if (eq tab "inbox")}}active{{/if}}" data-action="switchTab" data-tab="inbox" role="tab"><i class="fas fa-inbox"></i> {{spt "Gm.TabInbox"}}{{#if inboxUnread}} <span class="spt-badge">{{inboxUnread}}</span>{{/if}}</a>
     <a class="spt-tab {{#if (eq tab "calls")}}active{{/if}}" data-action="switchTab" data-tab="calls" role="tab"><i class="fas fa-phone"></i> {{spt "Calls.Tab"}}</a>
     <a class="spt-tab {{#if (eq tab "devices")}}active{{/if}}" data-action="switchTab" data-tab="devices" role="tab"><i class="fas fa-mobile-screen"></i> {{spt "Gm.TabDevices"}} <span class="spt-count">{{deviceCount}}</span></a>
+    <a class="spt-tab {{#if (eq tab "files")}}active{{/if}}" data-action="switchTab" data-tab="files" role="tab"><i class="fas fa-folder-tree"></i> {{spt "Files.Tab"}}{{#if fileCount}} <span class="spt-count">{{fileCount}}</span>{{/if}}</a>
     <a class="spt-tab {{#if (eq tab "tracking")}}active{{/if}}" data-action="switchTab" data-tab="tracking" role="tab" title="{{spt "Track.Hint"}}"><i class="fas fa-location-crosshairs"></i> {{spt "Gm.TabTracking"}}</a>
   </nav>
 
@@ -141,8 +142,10 @@
   {{#if (eq tab "calls")}}
     <section class="spt-gm-calls">
       {{#if calls.length}}
+      {{#each calls}}
+      <h4 class="spt-call-when">{{label}}</h4>
       <ul class="spt-call-list">
-        {{#each calls}}
+        {{#each rows}}
         <li class="spt-call-row {{#if answered}}answered{{/if}} {{#if live}}live{{/if}}">
           <i class="fas {{#if answered}}fa-phone{{else}}fa-phone-slash{{/if}} spt-call-icon"></i>
           <span class="spt-call-who">{{#unless fromAgent}}<i class="fas fa-user-secret spt-dim" title="{{spt "Calls.FromGm"}}"></i> {{/unless}}{{from}} <i class="fas fa-arrow-right" aria-hidden="true"></i> {{to}}{{#if compromised}} <i class="fas fa-triangle-exclamation spt-compromised" title="{{spt "Gm.Compromised"}}"></i>{{/if}}</span>
@@ -154,8 +157,65 @@
         </li>
         {{/each}}
       </ul>
+      {{/each}}
       {{else}}
       <p class="spt-phone-status">{{spt "Calls.None"}}</p>
+      {{/if}}
+    </section>
+  {{/if}}
+  {{#if (eq tab "files")}}
+    <section class="spt-gm-files">
+      {{#if files.hasComputers}}
+      <div class="spt-segmented spt-fx-view" role="radiogroup" aria-label="{{spt "Files.GroupBy"}}">
+        <a data-action="filesView" data-view="device" class="{{#if (eq files.view "device")}}active{{/if}}" role="radio"><i class="fas fa-desktop"></i> {{spt "Files.ByDevice"}}</a>
+        <a data-action="filesView" data-view="journal" class="{{#if (eq files.view "journal")}}active{{/if}}" role="radio"><i class="fas fa-book"></i> {{spt "Files.ByJournal"}}</a>
+      </div>
+      <div class="spt-fx-bar">
+        <span class="spt-fx-pick">
+          {{#each files.filters}}<a data-action="filesFilter" data-filter="{{key}}" class="{{#if active}}active{{/if}}" title="{{label}}" aria-label="{{label}}">{{#if icon}}<i class="fas {{icon}}"></i>{{else}}{{label}}{{/if}} <small>{{n}}</small></a>{{/each}}
+        </span>
+        <input type="search" name="filesQuery" value="{{files.query}}" placeholder="{{spt "Files.Search"}}" aria-label="{{spt "Files.Search"}}" autocomplete="off">
+      </div>
+      {{#each files.groups}}
+      <div class="spt-dev-group spt-fx-group" {{#if journal}}data-refs="{{refs}}"{{/if}}>
+        <header class="spt-dev-group-head">
+          {{#if img}}<img src="{{img}}" alt="">{{else}}<span class="spt-dev-avatar"><i class="fas {{icon}}"></i></span>{{/if}}
+          <span class="spt-fx-title"><strong>{{name}}</strong><small>{{sub}}</small></span>
+          {{#if journal}}{{#if bulk}}
+          <a class="spt-fx-pill" data-action="groupState" data-state="visible" title="{{spt "Files.RevealAll"}}"><i class="fas fa-eye"></i> {{spt "Files.All"}}</a>
+          <a class="spt-fx-pill" data-action="groupState" data-state="hidden" title="{{spt "Files.HideAll"}}"><i class="fas fa-eye-slash"></i> {{spt "Files.All"}}</a>
+          {{/if}}{{else}}
+          <a class="spt-fx-pill {{#if locked}}warn{{/if}}" data-action="toggleLock" data-uuid="{{uuid}}" title="{{#if locked}}{{spt "Gm.Locked"}}{{else}}{{spt "Gm.Unlocked"}}{{/if}}"><i class="fas {{#if locked}}fa-lock{{else}}fa-lock-open{{/if}}"></i> {{#if locked}}{{spt "Files.DevLocked"}}{{else}}{{spt "Files.DevOpen"}}{{/if}}</a>
+          <a class="spt-fx-pill {{#unless (eq inbox "on")}}warn{{/unless}}" data-action="cycleInbox" data-uuid="{{uuid}}" data-inbox="{{inbox}}" title="{{spt "Form.Inbox"}}"><i class="fas {{inboxIcon}}"></i> {{inboxLabel}}</a>
+          <a class="spt-fx-open" data-action="openPhone" data-uuid="{{uuid}}" title="{{spt "Gm.OpenPrepare"}}" aria-label="{{spt "Gm.OpenPrepare"}}"><i class="fas fa-pen-to-square"></i></a>
+          {{/if}}
+        </header>
+        <ul class="spt-fx-files">
+          {{#each files}}
+          <li class="spt-fx-file spt-fx-{{state}}" data-file="{{id}}" data-uuid="{{uuid}}" {{#if mail}}data-mail="1"{{/if}} data-search="{{name}} {{device}} {{who}}">
+            <i class="fas {{icon}} spt-fx-ic"></i>
+            <a class="spt-fx-name" data-action="previewFile" title="{{spt "Files.Open"}}">{{name}}{{#if who}} <small>{{who}}</small>{{/if}}</a>
+            {{#if device}}<span class="spt-fx-on"><i class="fas {{deviceIcon}}"></i> {{device}}</span>{{/if}}
+            {{#if mail}}
+            <span class="spt-fx-follow spt-fx-st-{{state}}" title="{{stateTitle}}"><i class="fas {{stateIcon}}"></i></span>
+            {{else}}
+            <span class="spt-fx-seg" role="radiogroup">
+                <a data-action="fileState" data-state="visible" class="{{#if (eq state "visible")}}on visible{{/if}}" role="radio" title="{{spt "Files.State_visible"}}" aria-label="{{spt "Files.State_visible"}}"><i class="fas fa-eye"></i></a>
+                <a data-action="fileState" data-state="locked" class="{{#if (eq state "locked")}}on locked{{/if}}" role="radio" title="{{spt "Files.State_locked"}}" aria-label="{{spt "Files.State_locked"}}"><i class="fas fa-lock"></i></a>
+                <a data-action="fileState" data-state="hidden" class="{{#if (eq state "hidden")}}on off{{/if}}" role="radio" title="{{spt "Files.State_hidden"}}" aria-label="{{spt "Files.State_hidden"}}"><i class="fas fa-eye-slash"></i></a>
+              </span>
+            {{/if}}
+          </li>
+          {{else}}
+          <li class="spt-fx-empty">{{spt "Files.Empty"}}</li>
+          {{/each}}
+        </ul>
+      </div>
+      {{else}}
+      <p class="spt-phone-status">{{spt "Files.NoMatch"}}</p>
+      {{/each}}
+      {{else}}
+      <p class="spt-phone-status">{{spt "Files.NoComputers"}}</p>
       {{/if}}
     </section>
   {{/if}}

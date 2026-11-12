@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.41.0
+- **GM panel, Files tab**: every file of every laptop and terminal in one list. Each file has a three-way switch, **Visible / Locked / Hidden**, and a click on its name previews it. Filters by state with their counts, and a search box.
+- Two groupings: **by computer** (with the device lock, the mailbox (click to cycle Mail, Mail locked, No mail) and its GM view), or **by source journal**, handy with one journal per scenario: each row names its computer, and **Show all** / **Hide all** switch a whole journal at once. Images and files whose journal was deleted get their own groups.
+- **Emails carrying a journal page** are listed too, with an @ and their correspondent. Their access follows the mailbox (shown, not switched per email).
+- **Calls tab** grouped by real time: **Last hour of play**, **Last 24 hours**, **Before** (calls in progress go with the last hour).
+- The GM panel opens a little wider (580 px) for its six tabs, with an opaque background for easier reading over the map.
+
 ## 0.40.0
 - **Floating button on the line**: while an agent is on a call, the button of the device in use turns green with the call's timer under it; a click goes back to the call (device screen, or the landline in the room).
 - **Switched-off device**: the player's button is greyed; a click still opens the dark screen and its power button.

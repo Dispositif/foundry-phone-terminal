@@ -462,7 +462,10 @@
       "unreachable": "Unreachable",
       "unassigned": "Not assigned",
       "cancelled": "Cancelled",
-      "busy": "Network busy"
+      "busy": "Network busy",
+      "LastHour": "Last hour of play",
+      "Today": "Last 24 hours",
+      "Before": "Before"
     },
     "Files": {
       "Tab": "Files",
@@ -482,7 +485,32 @@
       "Unavailable": "File unavailable",
       "PickImage": "or choose an image",
       "Open": "Open",
-      "Enlarge": "Enlarge"
+      "Enlarge": "Enlarge",
+      "All": "All",
+      "State_visible": "Visible",
+      "State_locked": "Locked",
+      "State_hidden": "Hidden from players",
+      "Search": "Search a file…",
+      "GroupBy": "Group by",
+      "ByDevice": "By computer",
+      "ByJournal": "By source journal",
+      "RevealAll": "Show all to players",
+      "HideAll": "Hide all from players",
+      "DevLocked": "Locked",
+      "DevOpen": "Open",
+      "Mail_on": "Mail",
+      "Mail_locked": "Mail locked",
+      "Mail_none": "No mail",
+      "CarriedBy": "Carried by {name}",
+      "SharedWith": "Shared with {n} player(s)",
+      "Images": "Images",
+      "Missing": "Deleted journals",
+      "OnDevices": "{n} file(s) on {d} computer(s)",
+      "NoMatch": "No files.",
+      "NoComputers": "No laptop or terminal yet.",
+      "MailFrom": "from {name}",
+      "MailTo": "to {name}",
+      "FollowsMailbox": "Email attachment: follows the mailbox ({state})"
     }
   }
 }

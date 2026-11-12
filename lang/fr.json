@@ -462,7 +462,10 @@
       "unreachable": "Injoignable",
       "unassigned": "Non attribué",
       "cancelled": "Annulé",
-      "busy": "Réseau encombré"
+      "busy": "Réseau encombré",
+      "LastHour": "Dernière heure de jeu",
+      "Today": "Dernières 24 heures",
+      "Before": "Avant"
     },
     "Files": {
       "Tab": "Fichiers",
@@ -482,7 +485,32 @@
       "Unavailable": "Fichier indisponible",
       "PickImage": "ou choisir une image",
       "Open": "Ouvrir",
-      "Enlarge": "Agrandir"
+      "Enlarge": "Agrandir",
+      "All": "Tous",
+      "State_visible": "Visible",
+      "State_locked": "Verrouillé",
+      "State_hidden": "Masqué aux joueurs",
+      "Search": "Chercher un fichier…",
+      "GroupBy": "Regrouper par",
+      "ByDevice": "Par ordinateur",
+      "ByJournal": "Par journal d'origine",
+      "RevealAll": "Tout montrer aux joueurs",
+      "HideAll": "Tout masquer aux joueurs",
+      "DevLocked": "Verrouillé",
+      "DevOpen": "Ouvert",
+      "Mail_on": "Mail",
+      "Mail_locked": "Mail verrouillé",
+      "Mail_none": "Pas de mail",
+      "CarriedBy": "Porté par {name}",
+      "SharedWith": "Partagé avec {n} joueur(s)",
+      "Images": "Images",
+      "Missing": "Journaux supprimés",
+      "OnDevices": "{n} fichier(s) sur {d} ordinateur(s)",
+      "NoMatch": "Aucun fichier.",
+      "NoComputers": "Aucun portable ni terminal pour l'instant.",
+      "MailFrom": "de {name}",
+      "MailTo": "à {name}",
+      "FollowsMailbox": "Pièce jointe d'un mail : suit la messagerie ({state})"
     }
   }
 }

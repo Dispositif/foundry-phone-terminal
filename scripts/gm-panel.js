@@ -1,6 +1,7 @@
 import { attChipHtml, attFromDrop, pickImage } from "./attachments.js";
 import { ApplicationV2, DialogV2, HandlebarsApplicationMixin, MASKED, MODES, MODULE_ID } from "./constants.js";
-import { allPhones, phonesByNumber, holders, sharedUsers, displayName, getLog, getPhoneData, hasSignal, holderName, inDeadZone, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc } from "./devices.js";
+import { filesOverview, previewEntry, previewFile, setFileStates } from "./files.js";
+import { allPhones, phonesByNumber, holders, sharedUsers, displayName, getLog, getPhoneData, hasSignal, holderName, inDeadZone, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc, isComputer } from "./devices.js";
 import { contactsDialog, directoryDialog, editPhoneDialog, giveDialog, newPhoneDialog } from "./dialogs.js";
 import { copyJournalLink } from "./journal-links.js";
 import { openPhone } from "./main.js";
@@ -44,6 +45,7 @@ function callRows(phones) {
     const live = liveCalls.get(c.id);
     const dur = all.find((x) => x.e.dur != null)?.e.dur;
     return {
+      t: c.t,
       from,
       to,
       fromAgent: !!out,
@@ -54,6 +56,18 @@ function callRows(phones) {
       dur: dur != null ? clock(dur) : ""
     };
   });
+}
+
+/** Calls by real time of play: the last hour, the last 24 hours, before (empty groups left out). */
+function callGroups(rows) {
+  const hour = Date.now() - 3600 * 1000;
+  const day = Date.now() - 24 * 3600 * 1000;
+  const groups = [
+    { label: t("Calls.LastHour"), rows: rows.filter((r) => r.live || r.t >= hour) },
+    { label: t("Calls.Today"), rows: rows.filter((r) => !r.live && r.t < hour && r.t >= day) },
+    { label: t("Calls.Before"), rows: rows.filter((r) => !r.live && r.t < day) }
+  ];
+  return groups.filter((g) => g.rows.length);
 }
 
 /** Drop zone for an attachment. */
@@ -185,6 +199,20 @@ function trackingRows(phones) {
     .sort((a, b) => TRACK_ORDER[a.level] - TRACK_ORDER[b.level] || a.agent.localeCompare(b.agent));
 }
 
+/** Files tab search: hides non-matching rows (and groups left empty) without re-rendering. */
+function filterFiles(root, query) {
+  const q = norm(query);
+  for (const g of root.querySelectorAll(".spt-fx-group")) {
+    let any = false;
+    for (const row of g.querySelectorAll("[data-file]")) {
+      const match = !q || norm(row.dataset.search).includes(q);
+      row.style.display = match ? "" : "none";
+      any ||= match;
+    }
+    g.style.display = any || !q ? "" : "none";
+  }
+}
+
 export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
   static instance = null;
 
@@ -193,7 +221,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     tag: "form",
     classes: ["spt-phone-panel"],
     window: { title: "Phones & Computers", icon: "fas fa-tower-cell", resizable: true },
-    position: { width: 460, height: 620 },
+    position: { width: 580, height: 640 },
     form: { handler: () => {}, submitOnChange: false, closeOnSubmit: false },
     actions: {
       switchInbox: function (event, target) { this._setState({ inboxView: target.dataset.view }); },
@@ -272,6 +300,26 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
         const item = await fromUuid(target.dataset.uuid);
         await item.update({ [`flags.${MODULE_ID}.phone.noSignal`]: !getPhoneData(item)?.noSignal });
       },
+      filesView: function (event, target) { this._setState({ filesView: target.dataset.view }); },
+      filesFilter: function (event, target) { this._setState({ filesFilter: target.dataset.filter }); },
+      fileState: function (event, target) {
+        const row = target.closest("[data-file]");
+        setFileStates([{ uuid: row.dataset.uuid, id: row.dataset.file }], target.dataset.state);
+      },
+      groupState: function (event, target) {
+        setFileStates(JSON.parse(target.closest("[data-refs]").dataset.refs), target.dataset.state);
+      },
+      previewFile: function (event, target) {
+        const row = target.closest("[data-file]");
+        if (row.dataset.mail) previewEntry(row.dataset.uuid, row.dataset.file);
+        else previewFile(row.dataset.uuid, row.dataset.file);
+      },
+      cycleInbox: async function (event, target) {
+        // Mailbox: available → locked → none → available.
+        const item = await fromUuid(target.dataset.uuid);
+        const next = { on: "locked", locked: "none", none: "on" }[target.dataset.inbox] ?? "on";
+        await item.update({ [`flags.${MODULE_ID}.phone.inbox`]: next });
+      },
       markAllSeen: async function () {
         for (const p of allPhones()) await patchLog(p.item, (e) => e.dir === "out" && e.seen === false, { seen: true });
       }
@@ -284,7 +332,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static recentSenders = [];
 
-  _state = { target: null, sender: "", text: "", att: null, tab: "send", mode: "message", drafts: {}, inboxView: "npc" };
+  _state = { target: null, sender: "", text: "", att: null, tab: "send", mode: "message", drafts: {}, inboxView: "npc", filesView: "device", filesFilter: "all", filesQuery: "" };
 
   /** Changes the state (tab, mode, recipient…) while keeping the current input. */
   _setState(patch) {
@@ -304,6 +352,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     this._state.target = el.querySelector("[name=target]")?.value ?? this._state.target;
     this._state.sender = el.querySelector("[name=sender]")?.value ?? this._state.sender;
     this._state.text = el.querySelector("[name=text]")?.value ?? this._state.text;
+    this._state.filesQuery = el.querySelector("[name=filesQuery]")?.value ?? this._state.filesQuery;
     for (const input of el.querySelectorAll("[data-draft]")) this._state.drafts[input.dataset.draft] = input.value;
   }
 
@@ -447,7 +496,9 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       groups: sortedGroups,
       deviceCount: phones.length,
       tracking: this._state.tab === "tracking" ? trackingRows(phones) : [],
-      calls: this._state.tab === "calls" ? callRows(phones) : []
+      calls: this._state.tab === "calls" ? callGroups(callRows(phones)) : [],
+      files: this._state.tab === "files" ? this._filesContext(phones) : null,
+      fileCount: phones.reduce((n, p) => n + (isComputer(p.phone) ? (p.phone.files ?? []).length + getLog(p.phone, { includePending: true }).filter((e) => e.att?.type === "doc").length : 0), 0)
     };
   }
 
@@ -455,6 +506,11 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     super._onRender?.(context, options);
     PhonePanel.instance = this;
     bindIconSelects(this.element);
+    const search = this.element.querySelector("[name=filesQuery]");
+    if (search) {
+      search.addEventListener("input", () => filterFiles(this.element, search.value));
+      filterFiles(this.element, search.value);
+    }
     this.element.querySelector("select[name=target]")?.addEventListener("change", (ev) => {
       this._focusSend = true;
       this._setState({ target: ev.target.value });
@@ -497,6 +553,28 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!this._state.target) return ui.notifications.warn(t("Warn.NoRecipient"));
     this._rememberSender();
     ring(this._state.target, { caller: this._normSender() });
+  }
+
+  /** Files tab: every computer file, by device or by source journal. */
+  _filesContext(phones) {
+    const where = (p) => {
+      if (isFixed(p.phone)) return game.scenes.get(p.phone.sceneId)?.name ?? t("NoPlace");
+      if (p.actor) return t("Files.CarriedBy", { name: p.actor.name });
+      const n = sharedUsers(p.item).length;
+      return n ? t("Files.SharedWith", { n }) : t("Gm.Nobody");
+    };
+    const computers = phones
+      .filter((p) => isComputer(p.phone))
+      .map((p) => ({ item: p.item, phone: p.phone, label: p.phone.label || p.item.name, icon: modelOf(p.phone).icon, img: p.actor?.img ?? null, where: where(p) }));
+    const { view, filter } = { view: this._state.filesView, filter: this._state.filesFilter };
+    const { groups, counts } = filesOverview(computers, { view, filter });
+    const filters = [
+      { key: "all", label: t("Files.All"), icon: null },
+      { key: "visible", label: t("Files.State_visible"), icon: "fa-eye" },
+      { key: "locked", label: t("Files.State_locked"), icon: "fa-lock" },
+      { key: "hidden", label: t("Files.State_hidden"), icon: "fa-eye-slash" }
+    ].map((f) => ({ ...f, n: counts[f.key], active: f.key === filter }));
+    return { groups, filters, view, query: this._state.filesQuery, hasComputers: computers.length > 0 };
   }
 
   /**
