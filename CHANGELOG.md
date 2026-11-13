@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+- Requires Foundry v14.
+- README: a "For developers" section (data stored on each device, the GM as the network, the API).
+
 ## 1.0.0
 - **First public release** on the Foundry package list. Same features as 0.41.0, tested in Foundry.
 - README: a picture of the six device models.

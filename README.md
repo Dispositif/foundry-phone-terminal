@@ -10,7 +10,7 @@ A Foundry VTT module that gives your characters phones, laptops and room termina
 - **No setup needed:** the GM can ring a player or text them right away; a phone is created for their character if needed.
 - **Agents talk to each other** directly, without the GM. Nothing ever goes to the chat.
 - **No clock:** no date or time is ever shown, so nothing contradicts your fiction.
-- Foundry VTT v13 and v14. Any game system. English and French.
+- Foundry VTT v14. Any game system. English and French.
 
 <img src="docs/call-screen-en.webp" alt="Call in progress: the agent's smartphone and the window for the rest of the table" width="760">
 
@@ -95,3 +95,31 @@ The **Network** panel (Ctrl+Shift+P, or the telecom button):
 **NPC directory:** list your NPCs once, one per line (`Marlin Hunt | 555-0242`). You see who the agents call, and `public` numbers (pizzeria, taxi, hospital) work as yellow pages for the players.
 
 **Journal links:** `@SMS[recipient|sender]{text}` and `@Call[recipient|sender]` become buttons in your scenario notes. The panel's link button writes them for you. Players see only the text.
+
+---
+
+## For developers
+
+Each device is an ordinary Foundry item carrying one flag, `flags["soren-phones-computers"].phone`. History, contacts and files live there, so the item can be duplicated, moved or put in a compendium with its data. A burner mobile, for instance:
+
+```json
+{
+  "model": "mobile", "label": "Burner", "number": "555-0177", "theme": "default",
+  "mode": "on", "locked": false, "compromised": false, "noSignal": false, "sceneId": null,
+  "contacts": [{ "name": "Marlin Hunt", "number": "555-0242" }],
+  "log": [
+    { "id": "k3Fq9aZ1", "t": 1762981200000, "kind": "sms", "dir": "in", "with": "555-0242", "text": "Not over the phone.", "read": false },
+    { "id": "pL8wX2cD", "t": 1762980900000, "kind": "call", "call": "c7Hn2", "dir": "out", "with": "555-0242", "result": "answer", "dur": 74 }
+  ]
+}
+```
+
+- `model`: smartphone, mobile, pager, computer (laptop), desktop (terminal), landline. Laptops and terminals add `files` and `inbox`.
+- `log` is newest first, 200 entries max (GM-prepared ones, `prep: true`, are always kept). `t` only orders entries; it is never shown.
+- `with` is the other end's number: names come from contacts or the NPC directory when displayed.
+- Attachments and files hold a reference (`uuid` for a journal page, `src` for an image), not the content.
+- World settings hold the rest: NPC directory, number prefix, network cut, calls in progress.
+
+**The GM's browser is the network.** Players never write to devices directly: every message, call and read receipt goes through the module socket to the active GM, who checks and writes. Journal content shown on a device is rendered by the GM and sent as HTML, so players need no journal permission.
+
+**API** (`game.modules.get("soren-phones-computers").api`): `openPanel({ tab })`, `openPhone(itemUuid)`, `ring(target, { caller })`, `sendSms(target, text, { sender, att })`, `hangUp(callId)`, `allPhones()`, `createPhone(actor, { label, number, model, sceneId })`, `markPhone(item, { label, number, model })`, `transferPhone(item, actor)`, `demo()`, `removeDemo()`. A target is `"phone:555-0142"` or `"user:<userId>"`.

@@ -10,7 +10,7 @@ Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateur
 - **Rien à configurer :** le MJ peut tout de suite appeler un joueur ou lui écrire ; un téléphone est créé pour son personnage si besoin.
 - **Les agents communiquent entre eux** directement, sans le MJ. Rien ne passe jamais par le chat.
 - **Pas d'horloge :** aucune date ni heure n'est affichée, pour ne jamais contredire la fiction.
-- Foundry VTT v13 et v14. N'importe quel système de jeu. Français et anglais.
+- Foundry VTT v14. N'importe quel système de jeu. Français et anglais.
 
 <img src="docs/call-screen-en.webp" alt="Appel en cours : le smartphone de l'agent et la fenêtre du reste de la table" width="760">
 
@@ -95,3 +95,31 @@ Le panneau **Réseau** (Ctrl+Shift+P, ou le bouton télécom) :
 **Annuaire PNJ :** listez vos PNJ une fois, un par ligne (`Marlin Hunt | 555-0242`). Vous voyez qui les agents appellent, et les numéros `public` (pizzeria, taxi, hôpital) servent de pages jaunes aux joueurs.
 
 **Liens dans les journaux :** `@SMS[destinataire|expéditeur]{texte}` et `@Call[destinataire|expéditeur]` deviennent des boutons dans vos notes de scénario. Le bouton lien du panneau les écrit pour vous. Les joueurs ne voient que le texte.
+
+---
+
+## Pour les développeurs
+
+Chaque appareil est un objet Foundry ordinaire qui porte un seul flag, `flags["soren-phones-computers"].phone`. L'historique, les contacts et les fichiers y sont stockés : l'objet peut être dupliqué, déplacé ou placé dans un compendium avec ses données. Par exemple, un mobile jetable :
+
+```json
+{
+  "model": "mobile", "label": "Burner", "number": "555-0177", "theme": "default",
+  "mode": "on", "locked": false, "compromised": false, "noSignal": false, "sceneId": null,
+  "contacts": [{ "name": "Marlin Hunt", "number": "555-0242" }],
+  "log": [
+    { "id": "k3Fq9aZ1", "t": 1762981200000, "kind": "sms", "dir": "in", "with": "555-0242", "text": "Not over the phone.", "read": false },
+    { "id": "pL8wX2cD", "t": 1762980900000, "kind": "call", "call": "c7Hn2", "dir": "out", "with": "555-0242", "result": "answer", "dur": 74 }
+  ]
+}
+```
+
+- `model` : smartphone, mobile, pager, computer (portable), desktop (terminal), landline. Portables et terminaux ajoutent `files` et `inbox`.
+- `log` va du plus récent au plus ancien, 200 entrées au plus (celles préparées par le MJ, `prep: true`, sont toujours gardées). `t` sert seulement à l'ordre, il n'est jamais affiché.
+- `with` est le numéro du correspondant : le nom vient des contacts ou de l'annuaire PNJ à l'affichage.
+- Pièces jointes et fichiers gardent une référence (`uuid` d'une page de journal, `src` d'une image), pas le contenu.
+- Les réglages du monde contiennent le reste : annuaire PNJ, préfixe des numéros, coupure du réseau, appels en cours.
+
+**Le navigateur du MJ est le réseau.** Les joueurs n'écrivent jamais directement dans les appareils : chaque message, appel ou accusé de lecture passe par le socket du module vers le MJ actif, qui vérifie et écrit. Le contenu d'un journal affiché sur un appareil est rendu par le MJ et envoyé en HTML : les joueurs n'ont besoin d'aucun droit sur le journal.
+
+**API** (`game.modules.get("soren-phones-computers").api`) : `openPanel({ tab })`, `openPhone(itemUuid)`, `ring(target, { caller })`, `sendSms(target, text, { sender, att })`, `hangUp(callId)`, `allPhones()`, `createPhone(actor, { label, number, model, sceneId })`, `markPhone(item, { label, number, model })`, `transferPhone(item, actor)`, `demo()`, `removeDemo()`. Une cible s'écrit `"phone:555-0142"` ou `"user:<userId>"`.
