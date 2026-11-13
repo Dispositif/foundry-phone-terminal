@@ -342,9 +342,14 @@
         "name": "Phone number prefix",
         "hint": "Start of the numbers given to new devices (555- by default): 555-0123. Numbers ending in 02xx (555-0200 to 555-0299) are never given out: keep them for the NPC directory."
       },
+      "universe": {
+        "name": "Universe",
+        "hint": "Era or genre of the game: sets the devices offered, their default looks and some words. Any era: everything, as before."
+      },
       "defaultDevice": {
         "name": "Default device",
-        "hint": "A message or call sent to a player (not to a device) lands on their character's phone. If the character carries none, one of this model is created."
+        "hint": "A message or call sent to a player (not to a device) lands on their character's phone. If the character carries none, one of this model is created (Universe's choice: a mobile in the 1980s-1990s, a smartphone otherwise).",
+        "auto": "Universe's choice"
       }
     },
     "Migrated": "{n} device(s) recovered from the previous version.",
@@ -356,8 +361,18 @@
       "Created": "{n} demo device(s) created.",
       "Removed": "{n} demo device(s) removed."
     },
+    "UniverseName": {
+      "all": "Any era",
+      "retro": "Vintage (1980s-1990s)",
+      "modern": "Modern"
+    },
+    "Universe": {
+      "retro": {},
+      "modern": {}
+    },
     "Theme": {
       "default": "Model default",
+      "standard": "Standard",
       "console": "Text console",
       "military": "Secure (military)",
       "Classified": "Classified",

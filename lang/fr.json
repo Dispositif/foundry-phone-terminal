@@ -342,9 +342,14 @@
         "name": "Préfixe des numéros",
         "hint": "Début des numéros donnés aux nouveaux appareils (555- par défaut) : 555-0123. Les numéros en 02xx (555-0200 à 555-0299) ne sont jamais attribués : gardez-les pour l'annuaire PNJ."
       },
+      "universe": {
+        "name": "Univers",
+        "hint": "Époque ou genre de la partie : fixe les appareils proposés, leurs habillages par défaut et certains mots. Toutes époques : tout, comme avant."
+      },
       "defaultDevice": {
         "name": "Appareil par défaut",
-        "hint": "Un message ou un appel envoyé à un joueur (et non à un appareil) arrive sur le téléphone de son personnage. S'il n'en porte pas, un appareil de ce modèle est créé."
+        "hint": "Un message ou un appel envoyé à un joueur (et non à un appareil) arrive sur le téléphone de son personnage. S'il n'en porte pas, un appareil de ce modèle est créé (selon l'univers : un mobile dans les années 80-90, sinon un smartphone).",
+        "auto": "Selon l'univers"
       }
     },
     "Migrated": "{n} appareil(s) repris de l'ancienne version.",
@@ -356,8 +361,18 @@
       "Created": "{n} appareil(s) de démo créé(s).",
       "Removed": "{n} appareil(s) de démo retiré(s)."
     },
+    "UniverseName": {
+      "all": "Toutes époques",
+      "retro": "Vintage (années 80-90)",
+      "modern": "Moderne"
+    },
+    "Universe": {
+      "retro": {},
+      "modern": {}
+    },
     "Theme": {
       "default": "Celui du modèle",
+      "standard": "Standard",
       "console": "Console texte",
       "military": "Sécurisé (militaire)",
       "Classified": "Confidentiel défense",

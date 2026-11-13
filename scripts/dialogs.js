@@ -1,5 +1,6 @@
 import { DialogV2, MODULE_ID } from "./constants.js";
-import { DEFAULT_THEME, MODELS, directoryText, THEMES, createPhone, newTheme, getPhoneData, markPhone, randomAddress } from "./devices.js";
+import { DEFAULT_THEME, MODELS, directoryText, createPhone, newTheme, getPhoneData, markPhone, randomAddress, shownTheme, themeChoices } from "./devices.js";
+import { modelAllowed } from "./universes.js";
 import { esc, norm } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
@@ -12,15 +13,19 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
   label ??= MODELS[model]?.label ?? MODELS.smartphone.label;
   const autoNumber = number === null;
   number ??= randomAddress(model);
+  // Models of the universe (plus the device's own, kept even if the universe does not offer it).
   const modelOpts = Object.entries(MODELS)
+    .filter(([k]) => k === model || modelAllowed(k))
     .map(([k, m]) => `<option value="${k}" ${k === model ? "selected" : ""}>${m.label}</option>`)
     .join("");
-  // A landline has no "default" choice: modern (new devices) or vintage (rotary dial, also the old "default").
-  const notLandline = Object.keys(MODELS).filter((k) => k !== "landline").join(" ");
-  const current = theme ?? newTheme(model);
-  const shown = model === "landline" && current === DEFAULT_THEME ? "vintage" : current;
-  const themeOpts = [DEFAULT_THEME, ...Object.keys(THEMES)]
-    .map((k) => `<option value="${k}" data-models="${k === DEFAULT_THEME ? notLandline : THEMES[k].models.join(" ")}" ${k === shown ? "selected" : ""}>${t(`Theme.${k}`)}</option>`)
+  // Looks: every look offered for some model, tagged with the models it is offered for.
+  const choices = Object.fromEntries(Object.keys(MODELS).map((m) => [m, themeChoices(m)]));
+  const shown = shownTheme(theme ?? newTheme(model), model);
+  const themeOpts = [...new Set(Object.values(choices).flat())]
+    .map((k) => {
+      const models = Object.keys(choices).filter((m) => choices[m].includes(k));
+      return `<option value="${k}" data-models="${models.join(" ")}" ${k === shown ? "selected" : ""}>${t(`Theme.${k}`)}</option>`;
+    })
     .join("");
   const scenes = game.scenes.map((sc) => `<option value="${esc(sc.name)}">`).join("");
   // An installed device without a place keeps none; a device becoming installed defaults to the current scene.
@@ -36,7 +41,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
           <datalist id="spt-scenes">${scenes}</datalist></div>
         <div class="form-group"><label>${t("Form.DeviceName")}</label><input type="text" name="label" value="${esc(label)}" placeholder="${t("Form.DeviceNameHint")}"></div>
         <div class="form-group"><label>${t("Form.Number")}</label><input type="text" name="number" value="${esc(number)}"></div>
-        <div class="form-group"><label>${t("Form.Theme")}</label><select name="theme">${themeOpts}</select></div>
+        <div class="form-group spt-if-themes"><label>${t("Form.Theme")}</label><select name="theme">${themeOpts}</select></div>
         <div class="form-group spt-if-computer"><label>${t("Form.Inbox")}</label><select name="inbox">${["on", "locked", "none"].map((k) => `<option value="${k}" ${k === inbox ? "selected" : ""}>${t(`Form.Inbox_${k}`)}</option>`).join("")}</select></div>
       </div>`,
     render: (event, x) => {
@@ -70,6 +75,8 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
           o.hidden = o.disabled = !ok;
           if (!ok && o.selected) themeSel.value = newTheme(m);
         }
+        // A single look: nothing to choose.
+        root.querySelector(".spt-if-themes")?.classList.toggle("hidden", (choices[m]?.length ?? 0) < 2);
       };
       select?.addEventListener("change", sync);
       sync();
@@ -148,6 +155,8 @@ async function pickKind() {
   const tile = (k) => `<button type="button" class="spt-kind" data-kind="${k.key}">
       <img src="modules/${MODULE_ID}/icons/${k.icon ?? k.model}.svg" alt="">
       <b>${esc(kindLabel(k))}</b><small>${t(`NewDev.Caps.${k.key}`)}</small></button>`;
+  // Only the models (and landline looks) of the world's universe.
+  const kinds = NEW_KINDS.filter((k) => modelAllowed(k.model) && (!k.theme || themeChoices(k.model).includes(k.theme)));
   let picked = null;
   // DialogV2.wait wires the render callback (a plain constructor ignores it); a tile click closes it.
   await DialogV2.wait({
@@ -155,8 +164,8 @@ async function pickKind() {
     classes: ["spt-new-device"],
     position: { width: 500 },
     content: `<div class="spt-kinds">
-        <h4>${t("NewDev.Carried")}</h4><div class="spt-kind-grid">${NEW_KINDS.filter((k) => k.carried).map(tile).join("")}</div>
-        <h4>${t("NewDev.Installed")}</h4><div class="spt-kind-grid three">${NEW_KINDS.filter((k) => !k.carried).map(tile).join("")}</div>
+        <h4>${t("NewDev.Carried")}</h4><div class="spt-kind-grid">${kinds.filter((k) => k.carried).map(tile).join("")}</div>
+        <h4>${t("NewDev.Installed")}</h4><div class="spt-kind-grid three">${kinds.filter((k) => !k.carried).map(tile).join("")}</div>
       </div>`,
     buttons: [{ action: "cancel", label: t("Cancel"), icon: "fas fa-xmark", callback: () => false }],
     render: (event, x) => {
@@ -197,8 +206,8 @@ function kindForm(kind) {
       <div class="spt-npc hidden"><input type="text" name="npc" list="spt-npcs" placeholder="${t("NewDev.NpcName")}"><datalist id="spt-npcs">${npcs
         .map((a) => `<option value="${esc(a.name)}">`)
         .join("")}</datalist></div></div>`;
-  // Looks: only when the model has a choice (a landline's look is its tile).
-  const looks = fixed && kind.model === "landline" ? [] : [DEFAULT_THEME, ...Object.keys(THEMES).filter((k) => THEMES[k].models.includes(kind.model))];
+  // Looks: only when the model has a choice (a landline's look is its tile). The first one is the default.
+  const looks = kind.theme ? [] : themeChoices(kind.model);
   const lookRow =
     looks.length > 1
       ? `<div class="spt-row"><label>${t("Form.Theme")}</label><div class="spt-chips">${looks

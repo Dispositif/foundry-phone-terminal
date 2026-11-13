@@ -18,6 +18,7 @@ import { PhonePanel } from "./gm-panel.js";
 import { registerEnrichers, runJournalLink } from "./journal-links.js";
 import { flushAll, flushPending, sendSms } from "./messages.js";
 import { restoreLive } from "./live-call.js";
+import { UNIVERSES } from "./universes.js";
 import { PlayerPhone } from "./player-phone.js";
 import { hangUp, ring } from "./ring.js";
 import { onSocket } from "./socket.js";
@@ -69,6 +70,16 @@ Hooks.once("init", () => {
   Handlebars.registerHelper("spt", (key, options) => t(key, options?.hash ?? {}));
   Handlebars.registerHelper("sptn", (key, n) => tn(key, n));
   // Setting labels follow Foundry's language (translated by Foundry from lang/*.json).
+  game.settings.register(MODULE_ID, "universe", {
+    name: "SPT.Settings.universe.name",
+    hint: "SPT.Settings.universe.hint",
+    scope: "world",
+    config: true,
+    type: String,
+    choices: Object.fromEntries(Object.keys(UNIVERSES).map((k) => [k, `SPT.UniverseName.${k}`])),
+    default: "all",
+    requiresReload: true
+  });
   game.settings.register(MODULE_ID, "language", {
     name: "SPT.Settings.language.name",
     hint: "SPT.Settings.language.hint",
@@ -103,8 +114,8 @@ Hooks.once("init", () => {
     scope: "world",
     config: true,
     type: String,
-    choices: { smartphone: "SPT.Model.smartphone", mobile: "SPT.Model.mobile" },
-    default: "smartphone"
+    choices: { auto: "SPT.Settings.defaultDevice.auto", smartphone: "SPT.Model.smartphone", mobile: "SPT.Model.mobile" },
+    default: "auto"
   });
   game.settings.register(MODULE_ID, "floatingButton", {
     name: "SPT.Settings.floatingButton.name",

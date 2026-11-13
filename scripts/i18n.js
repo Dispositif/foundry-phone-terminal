@@ -1,4 +1,5 @@
 import { MODULE_ID } from "./constants.js";
+import { universeKey } from "./universes.js";
 
 /* -------------------------------------------- */
 /*  Module language (FR / EN)                   */
@@ -46,7 +47,10 @@ export function currentLang() {
 export function t(key, data = {}) {
   const k = key.startsWith("SPT.") ? key : `SPT.${key}`;
   const l = currentLang();
-  let s = dicts[l]?.[k] ?? dicts.en?.[k] ?? dicts.fr?.[k];
+  // The universe's vocabulary first ("Universe.<key>.<same key>"), then the usual text.
+  const u = universeKey();
+  const uk = u === "all" ? null : `SPT.Universe.${u}.${k.slice(4)}`;
+  let s = (uk && dicts[l]?.[uk]) ?? dicts[l]?.[k] ?? (uk && dicts.en?.[uk]) ?? dicts.en?.[k] ?? dicts.fr?.[k];
   if (s === undefined) s = game.i18n?.has?.(k) ? game.i18n.localize(k) : k;
   return String(s).replace(/\{(\w+)\}/g, (m, n) => (n in data ? String(data[n]) : m));
 }

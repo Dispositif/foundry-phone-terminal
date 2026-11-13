@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- **Universe** (world setting): the era or genre of the game sets the devices offered, their default looks and, later, some words. **Any era** (default) keeps everything as before; **Vintage (1980s-1990s)** (landline, pager, mobile, laptop and terminal as text consoles; no smartphone) and **Modern** (smartphone by default, pager too). A device whose look is not offered in the universe shows the universe's default look; its own look comes back with another universe.
+- Default device setting: new **Universe's choice** option (the default).
+
 ## 1.0.3
 - Minor UI fix on GM panel.
 - New icons and sounds (.ogg) from human authors. See CREDITS.md.

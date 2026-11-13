@@ -1,6 +1,7 @@
 import { LOG_MAX, MASKED, MODULE_ID, SHEET_ID } from "./constants.js";
 import { esc, maskedLabel, norm, randomEmail, randomNumber, isMasked } from "./util.js";
 import { t } from "./i18n.js";
+import { modelAllowed, universe } from "./universes.js";
 /* -------------------------------------------- */
 /*  Model: phones, contacts, history            */
 /* -------------------------------------------- */
@@ -67,6 +68,8 @@ export function modeOf(phone) {
  */
 const SCREENS = ["mobile", "smartphone", "computer", "desktop"];
 export const DEFAULT_THEME = "default";
+// The model's own look, picked explicitly (in a universe, "default" means the universe's default look).
+export const BASE_THEME = "standard";
 export const THEMES = {
   modern: { models: ["landline"] },
   vintage: { models: ["landline"], skin: "landline" },
@@ -80,21 +83,54 @@ export function themeFits(theme, model) {
   return !!THEMES[theme]?.models.includes(model);
 }
 
-/** Look a new device gets when none is chosen: a landline is modern unless "vintage" is picked. */
+/**
+ * Looks offered for a model: the universe's list (first = default), otherwise every look that fits.
+ * A landline has no "default" choice there: modern or vintage (rotary dial, also the old "default").
+ */
+export function themeChoices(model) {
+  const list = universe().themes[model];
+  if (list) return list.filter((k) => k === BASE_THEME || themeFits(k, model));
+  const fitting = Object.keys(THEMES).filter((k) => themeFits(k, model));
+  return model === "landline" ? fitting : [DEFAULT_THEME, ...fitting];
+}
+
+/** Look a new device gets when none is chosen: the universe's default; a landline is modern unless "vintage" is picked. */
 export function newTheme(model) {
+  if (universe().themes[model]) return themeChoices(model)[0];
   return model === "landline" ? "modern" : DEFAULT_THEME;
 }
 
 /** Look to store: the choice if it fits the model, otherwise "default". */
 export function cleanTheme(theme, model) {
-  return themeFits(theme, model) ? theme : DEFAULT_THEME;
+  return themeFits(theme, model) || theme === BASE_THEME ? theme : DEFAULT_THEME;
+}
+
+/**
+ * Look in effect: in a universe, "default" or a look it does not offer becomes the universe's default.
+ * The stored look is kept, so switching back to the previous universe brings it back.
+ */
+function effectiveTheme(theme, model) {
+  // A landline's old "default" is the rotary dial: it stays one.
+  if (model === "landline" && (!theme || theme === DEFAULT_THEME)) theme = "vintage";
+  const list = universe().themes[model] ? themeChoices(model) : null;
+  if (list && (theme === DEFAULT_THEME || !list.includes(theme))) return list[0];
+  return theme;
+}
+
+/** The look to select in a form for this device. */
+export function shownTheme(theme, model) {
+  const k = effectiveTheme(theme, model);
+  const list = themeChoices(model);
+  if (list.includes(k)) return k;
+  return model === "landline" ? "vintage" : list[0];
 }
 
 /** Look to display: the chosen one if it fits, otherwise the model's look (fallback). */
 export function skinOf(phone) {
   const model = MODELS[phone?.model] ? phone.model : "smartphone";
   // "default" keeps the model's look (rotary dial for a landline), so existing devices do not change.
-  return themeFits(phone?.theme, model) ? THEMES[phone.theme].skin ?? phone.theme : model;
+  const theme = effectiveTheme(phone?.theme, model);
+  return themeFits(theme, model) ? THEMES[theme].skin ?? theme : model;
 }
 
 /** Ringtone of a device: the modern landline has its own electronic ring, the rotary dial keeps the bell. */
@@ -487,7 +523,9 @@ export async function defaultDeviceFor(user) {
     .filter((p) => p.actor === actor && order.includes(p.phone.model))
     .sort((a, b) => order.indexOf(a.phone.model) - order.indexOf(b.phone.model));
   if (carried.length) return carried[0];
-  const model = game.settings.get(MODULE_ID, "defaultDevice") || "smartphone";
+  // "auto": the universe's choice; a model the universe does not offer falls back to it too.
+  const chosen = game.settings.get(MODULE_ID, "defaultDevice");
+  const model = MODELS[chosen] && modelAllowed(chosen) ? chosen : universe().defaultModel;
   const label = MODELS[model]?.label ?? MODELS.smartphone.label;
   const item = await createPhone(actor, { label, number: randomAddress(model), model, theme: DEFAULT_THEME });
   if (!item) return null;
