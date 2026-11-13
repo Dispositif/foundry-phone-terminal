@@ -1,7 +1,7 @@
 import { DialogV2, MODULE_ID } from "./constants.js";
 import { DEFAULT_THEME, MODELS, directoryText, createPhone, newTheme, getPhoneData, markPhone, randomAddress, shownTheme, themeChoices } from "./devices.js";
 import { modelAllowed } from "./universes.js";
-import { esc, norm } from "./util.js";
+import { esc, isMailAddress, norm } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
 /*  Dialogs (GM, and contacts for the player)    */
@@ -59,7 +59,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
       let lastNumber = autoNumber ? numberInput?.value : null;
       select?.addEventListener("change", () => {
         if (!numberInput || lastNumber === null || numberInput.value !== lastNumber) return;
-        if (!!MODELS[select.value]?.mail === lastNumber.includes("@")) return;
+        if (!!MODELS[select.value]?.mail === isMailAddress(lastNumber)) return;
         numberInput.value = lastNumber = randomAddress(select.value);
       });
       const sync = () => {

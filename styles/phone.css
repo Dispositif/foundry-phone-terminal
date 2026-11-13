@@ -1002,3 +1002,14 @@ body[data-spt-universe="retro"] #spt-phone-fab .spt-fab { border-radius: 10px; }
 .spt-player-phone.spt-skin-mobile .spt-live-screen .spt-live-state.dialing,
 .spt-player-phone.spt-skin-mobile .spt-live-screen .spt-live-state.ended,
 .spt-player-phone.spt-skin-mobile .spt-live-screen .spt-live-state.ended.cut { color: #1e2a17; }
+
+/* Pager, Neon look (Cyberpunk): black screen, cyan glowing text, dark case with a cyan edge */
+.spt-pager-window.spt-pager-neon .spt-pager-lcd { background: linear-gradient(#06080c, #0b0f16); color: #19f0ff; box-shadow: inset 0 0 10px rgba(25,240,255,0.18); }
+.spt-pager-window.spt-pager-neon .spt-pager-lcd.off { background: #030405; color: transparent; box-shadow: none; }
+.spt-pager-window.spt-pager-neon .spt-pager-line { text-shadow: 0 0 6px rgba(25,240,255,0.8); }
+.spt-pager-window.spt-pager-neon .spt-pager-status .spt-signal.off { color: #ff3b6b; }
+.application.spt-pager-window.spt-pager-neon.spt-framed:not(.minimized) {
+  background: linear-gradient(160deg, #1d2128, #0b0c10 60%, #050506);
+  box-shadow: 0 0 0 1px #19f0ff, 0 0 14px rgba(25,240,255,0.35), 0 22px 40px rgba(0,0,0,0.6);
+}
+.spt-pager-window.spt-pager-neon .spt-pager-led.on { background: #19f0ff; box-shadow: 0 0 8px #19f0ff; }

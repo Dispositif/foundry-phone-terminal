@@ -61,9 +61,18 @@ export function randomNumber() {
   return `${prefix}0${String(n).padStart(3, "0")}`;
 }
 
-/** Random email address for a laptop or a terminal: user33@mail.net */
+/** Random address for a laptop or a terminal: user33@mail.net, or the universe's ID (NX-4217). */
 export function randomEmail() {
+  const prefix = universe().mailPrefix;
+  if (prefix) return `${prefix}${Math.floor(Math.random() * 9000) + 1000}`;
   return `user${Math.floor(Math.random() * 90) + 10}@mail.net`;
+}
+
+/** Does this address look like a laptop's or terminal's (email, or the universe's ID)? */
+export function isMailAddress(address) {
+  const s = String(address ?? "");
+  const prefix = universe().mailPrefix;
+  return s.includes("@") || (!!prefix && s.startsWith(prefix));
 }
 
 /**

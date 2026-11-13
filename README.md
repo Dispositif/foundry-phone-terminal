@@ -59,11 +59,13 @@ A device is an item carried by a character, or installed in a place (a scene) an
 
 <img src="docs/devices.webp" alt="The six device models: smartphone, mobile phone, pager, landline, laptop and terminal" width="900">
 
-- **Looks:** each model has its own, plus a few alternatives: vintage rotary phone, green text console, military, FBI workstation.
+- **Universe** (world setting): Vintage, Modern or Cyberpunk sets the devices offered, their default looks.
 - **Files** (laptop, terminal): drop journal pages or images on the device. Players read them inside the screen, without access to your Foundry journals. Lock or hide each file.
 - **States:** silent or off, locked, no signal (also on scenes marked as dead zones), compromised (tapped, GM only).
 - **Shared devices:** give a device from the Items sidebar to several players. A terminal with no location becomes a database they reach from anywhere.
 - **Give to…** passes a device to another character with its number, contacts and history.
+
+<img src="docs/cyberpunk-univers.webp" alt="Cyberpunk universe: a Neon smartphone, the Neon pager and the floating buttons" width="520">
 
 ---
 

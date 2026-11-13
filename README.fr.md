@@ -61,11 +61,13 @@ Un appareil est un objet porté par un personnage, ou installé dans un lieu (un
 
 <img src="docs/devices.webp" alt="Les six modèles d'appareils : smartphone, mobile, bipeur, fixe, portable et terminal" width="900">
 
-- **Habillages :** chaque modèle a le sien, plus quelques variantes : téléphone vintage à cadran, console texte verte, militaire, poste du FBI.
+- **Univers** (réglage du monde) : Vintage, Moderne ou Cyberpunk fixe les appareils proposés, leurs habillages par défaut et quelques mots. 
 - **Fichiers** (portable, terminal) : glissez des pages de journal ou des images sur l'appareil. Les joueurs les lisent dans l'écran, sans accès à vos journaux Foundry. Chaque fichier peut être verrouillé ou masqué.
 - **États :** silencieux ou éteint, verrouillé, sans réseau (aussi sur les scènes marquées zone blanche), compromis (sur écoute, visible du MJ seul).
 - **Appareils partagés :** donnez un appareil de la barre Objets à plusieurs joueurs. Un terminal sans lieu devient une base de données qu'ils consultent de n'importe où.
 - **Donner à…** passe un appareil à un autre personnage avec son numéro, ses contacts et son historique.
+
+<img src="docs/cyberpunk-univers.webp" alt="Univers Cyberpunk : un smartphone Néon, le bip Néon et les boutons flottants" width="520">
 
 ---
 

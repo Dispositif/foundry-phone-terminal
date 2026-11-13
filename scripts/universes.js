@@ -12,6 +12,7 @@ import { MODULE_ID } from "./constants.js";
  *               "standard" = the model's own look. A model not listed keeps every look.
  * defaultModel: device created for a character when a player is called or texted.
  * numberPrefix: start of new numbers while the world setting keeps its default ("555-").
+ * mailPrefix:   laptops and terminals get an ID ("NX-4217") instead of a random email address.
  *
  * Vocabulary: the language files may override any key under "Universe.<key>.<same key>".
  */
@@ -46,11 +47,12 @@ export const UNIVERSES = {
       smartphone: ["neon", "glitch", "military"],
       computer: ["neon", "glitch", "console"],
       desktop: ["neon", "glitch", "console", "military"],
-      pager: ["standard"],
+      pager: ["neon", "standard"],
       landline: ["modern"]
     },
     defaultModel: "smartphone",
-    numberPrefix: "NC-"
+    numberPrefix: "NC-",
+    mailPrefix: "NX-"
   }
 };
 

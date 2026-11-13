@@ -77,7 +77,7 @@ export const THEMES = {
   console: { models: SCREENS },
   military: { models: SCREENS },
   // Cyberpunk / neon noir looks
-  neon: { models: ["smartphone", "computer", "desktop"] },
+  neon: { models: ["smartphone", "computer", "desktop", "pager"] },
   glitch: { models: ["smartphone", "computer", "desktop"] }
 };
 export const SKINS = [...Object.keys(MODELS), ...Object.keys(THEMES)];

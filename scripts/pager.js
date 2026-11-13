@@ -1,5 +1,5 @@
 import { ApplicationV2, MODES, MODULE_ID, SOCKET } from "./constants.js";
-import { getLog, getPhoneData, hasSignal, isUnread, markEntryRead, modeOf } from "./devices.js";
+import { getLog, getPhoneData, hasSignal, isUnread, markEntryRead, modeOf, skinOf } from "./devices.js";
 import { esc } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
@@ -114,6 +114,8 @@ export class PagerWindow extends ApplicationV2 {
     const list = phone ? pages(phone) : [];
     const off = !phone || modeOf(phone) === "off";
     el.querySelector(".spt-pager-led")?.classList.toggle("on", !off && list.some(isUnread));
+    // Neon look: black screen, cyan text (the green LCD otherwise).
+    el.classList.toggle("spt-pager-neon", !!phone && skinOf(phone) === "neon");
   }
 
   _onClose(options) {
