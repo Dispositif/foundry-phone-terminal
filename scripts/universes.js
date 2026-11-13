@@ -11,6 +11,7 @@ import { MODULE_ID } from "./constants.js";
  * themes:       looks offered per model; the first one is the default look.
  *               "standard" = the model's own look. A model not listed keeps every look.
  * defaultModel: device created for a character when a player is called or texted.
+ * numberPrefix: start of new numbers while the world setting keeps its default ("555-").
  *
  * Vocabulary: the language files may override any key under "Universe.<key>.<same key>".
  */
@@ -48,7 +49,8 @@ export const UNIVERSES = {
       pager: ["standard"],
       landline: ["modern"]
     },
-    defaultModel: "smartphone"
+    defaultModel: "smartphone",
+    numberPrefix: "NC-"
   }
 };
 

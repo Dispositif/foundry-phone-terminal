@@ -341,7 +341,7 @@
       "keybinding": "Téléphone : panneau MJ / Mon téléphone (joueur)",
       "numberPrefix": {
         "name": "Préfixe des numéros",
-        "hint": "Début des numéros donnés aux nouveaux appareils (555- par défaut) : 555-0123. Les numéros en 02xx (555-0200 à 555-0299) ne sont jamais attribués : gardez-les pour l'annuaire PNJ."
+        "hint": "Début des numéros donnés aux nouveaux appareils (555- par défaut, NC- en Cyberpunk) : 555-0123. Les numéros en 02xx (555-0200 à 555-0299) ne sont jamais attribués : gardez-les pour l'annuaire PNJ."
       },
       "universe": {
         "name": "Univers",

@@ -341,7 +341,7 @@
       "keybinding": "Phone: GM panel / My phone (player)",
       "numberPrefix": {
         "name": "Phone number prefix",
-        "hint": "Start of the numbers given to new devices (555- by default): 555-0123. Numbers ending in 02xx (555-0200 to 555-0299) are never given out: keep them for the NPC directory."
+        "hint": "Start of the numbers given to new devices (555- by default, NC- in Cyberpunk): 555-0123. Numbers ending in 02xx (555-0200 to 555-0299) are never given out: keep them for the NPC directory."
       },
       "universe": {
         "name": "Universe",

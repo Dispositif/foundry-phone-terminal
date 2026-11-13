@@ -4,6 +4,7 @@ import { t } from "./i18n.js";
 import { PhonePanel } from "./gm-panel.js";
 import { PlayerPhone } from "./player-phone.js";
 import { rerenderPagers } from "./pager.js";
+import { universe } from "./universes.js";
 /* -------------------------------------------- */
 /*  Utilities                                   */
 /* -------------------------------------------- */
@@ -55,6 +56,8 @@ export function randomNumber() {
   try {
     prefix = game.settings.get(MODULE_ID, "numberPrefix") ?? prefix;
   } catch {}
+  // Default prefix kept: the universe may have its own (NC- in Cyberpunk).
+  if (prefix === "555-") prefix = universe().numberPrefix ?? prefix;
   return `${prefix}0${String(n).padStart(3, "0")}`;
 }
 
