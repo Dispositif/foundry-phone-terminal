@@ -3,6 +3,8 @@
 ## Unreleased
 - **Universe** (world setting): the era or genre of the game sets the devices offered, their default looks and, later, some words. **Any era** (default) keeps everything as before; **Vintage (1980s-1990s)** (landline, pager, mobile, laptop and terminal as text consoles; no smartphone) and **Modern** (smartphone by default, pager too). A device whose look is not offered in the universe shows the universe's default look; its own look comes back with another universe.
 - Default device setting: new **Universe's choice** option (the default).
+- **Cyberpunk / neon noir** universe: smartphone, laptop, terminal, pager and modern landline. New looks for smartphone, laptop and terminal: **Neon** (magenta and cyan glow) and **Glitch** (interference, the screen jitters during calls).
+- Requires Foundry v14.
 
 ## 1.0.3
 - Minor UI fix on GM panel.

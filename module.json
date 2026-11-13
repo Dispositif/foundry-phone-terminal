@@ -14,7 +14,7 @@
   "license": "LICENSE",
   "readme": "https://github.com/Dispositif/foundry-phones-computers#readme",
   "compatibility": {
-    "minimum": "13",
+    "minimum": "14",
     "verified": "14"
   },
   "esmodules": [

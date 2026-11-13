@@ -364,15 +364,19 @@
     "UniverseName": {
       "all": "Toutes époques",
       "retro": "Vintage (années 80-90)",
-      "modern": "Moderne"
+      "modern": "Moderne",
+      "cyberpunk": "Cyberpunk / néon noir"
     },
     "Universe": {
       "retro": {},
-      "modern": {}
+      "modern": {},
+      "cyberpunk": {}
     },
     "Theme": {
       "default": "Celui du modèle",
       "standard": "Standard",
+      "neon": "Néon",
+      "glitch": "Glitch (parasité)",
       "console": "Console texte",
       "military": "Sécurisé (militaire)",
       "Classified": "Confidentiel défense",

@@ -1,8 +1,6 @@
 # Phones & Computers
 
-*Phones and computers as a storytelling tool. You are the network.*
-
-*For investigation games of any era: Call of Cthulhu, Delta Green, Vampire, Blade Runner, Alien.*
+*For modern or sci-fi settings: Delta Green, Cthulhu, Vampire, Blade Runner, Cyberpunk…*
 
 A Foundry VTT module that gives your characters phones, laptops and room terminals. Every call or message to an NPC lands with the GM, who answers, lets it ring, or decides the number doesn't exist. Built for investigation and narrative play, not as a smartphone simulator.
 
@@ -10,7 +8,7 @@ A Foundry VTT module that gives your characters phones, laptops and room termina
 - **No setup needed:** the GM can ring a player or text them right away; a phone is created for their character if needed.
 - **Agents talk to each other** directly, without the GM. Nothing ever goes to the chat.
 - **No clock:** no date or time is ever shown, so nothing contradicts your fiction.
-- Foundry VTT v13 and v14. Any game system. English and French.
+- Any game system. English and French.
 
 <img src="docs/call-screen-en.webp" alt="Call in progress: the agent's smartphone and the window for the rest of the table" width="760">
 

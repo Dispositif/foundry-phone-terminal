@@ -38,6 +38,17 @@ export const UNIVERSES = {
       landline: ["modern", "vintage"]
     },
     defaultModel: "smartphone"
+  },
+  cyberpunk: {
+    models: ["smartphone", "computer", "desktop", "pager", "landline"],
+    themes: {
+      smartphone: ["neon", "glitch", "military"],
+      computer: ["neon", "glitch", "console"],
+      desktop: ["neon", "glitch", "console", "military"],
+      pager: ["standard"],
+      landline: ["modern"]
+    },
+    defaultModel: "smartphone"
   }
 };
 

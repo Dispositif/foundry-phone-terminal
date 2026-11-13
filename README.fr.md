@@ -2,7 +2,7 @@
 
 *Le téléphone et l'ordinateur comme outils narratifs. Le réseau, c'est vous.*
 
-*Pour les jeux d'enquête de toutes les époques : L'Appel de Cthulhu, Delta Green, Vampire, Blade Runner, Alien.*
+*Pour les univers contemporains ou de science-fiction : Delta Green, Cthulhu, Vampire, Blade Runner, Cyberpunk…*
 
 Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateurs portables et des terminaux installés dans les lieux. Chaque appel ou message vers un PNJ arrive chez le MJ, qui répond, laisse sonner ou décide que le numéro n'existe pas. Pensé pour l'enquête et le jeu narratif, pas comme un simulateur de smartphone.
 
@@ -10,7 +10,7 @@ Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateur
 - **Rien à configurer :** le MJ peut tout de suite appeler un joueur ou lui écrire ; un téléphone est créé pour son personnage si besoin.
 - **Les agents communiquent entre eux** directement, sans le MJ. Rien ne passe jamais par le chat.
 - **Pas d'horloge :** aucune date ni heure n'est affichée, pour ne jamais contredire la fiction.
-- Foundry VTT v13 et v14. N'importe quel système de jeu. Français et anglais.
+- N'importe quel système de jeu. Français et anglais.
 
 <img src="docs/call-screen-en.webp" alt="Appel en cours : le smartphone de l'agent et la fenêtre du reste de la table" width="760">
 

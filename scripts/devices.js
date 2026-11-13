@@ -75,7 +75,10 @@ export const THEMES = {
   vintage: { models: ["landline"], skin: "landline" },
   federal: { models: ["computer", "desktop"] },
   console: { models: SCREENS },
-  military: { models: SCREENS }
+  military: { models: SCREENS },
+  // Cyberpunk / neon noir looks
+  neon: { models: ["smartphone", "computer", "desktop"] },
+  glitch: { models: ["smartphone", "computer", "desktop"] }
 };
 export const SKINS = [...Object.keys(MODELS), ...Object.keys(THEMES)];
 

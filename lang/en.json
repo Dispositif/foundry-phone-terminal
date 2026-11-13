@@ -364,15 +364,19 @@
     "UniverseName": {
       "all": "Any era",
       "retro": "Vintage (1980s-1990s)",
-      "modern": "Modern"
+      "modern": "Modern",
+      "cyberpunk": "Cyberpunk / neon noir"
     },
     "Universe": {
       "retro": {},
-      "modern": {}
+      "modern": {},
+      "cyberpunk": {}
     },
     "Theme": {
       "default": "Model default",
       "standard": "Standard",
+      "neon": "Neon",
+      "glitch": "Glitch (interference)",
       "console": "Text console",
       "military": "Secure (military)",
       "Classified": "Classified",

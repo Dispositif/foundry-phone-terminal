@@ -893,3 +893,77 @@ a.spt-link:hover { filter: brightness(1.15); }
 #spt-phone-panel.theme-light .spt-gm-status .spt-pill, body.theme-light #spt-phone-panel:not(.theme-dark) .spt-gm-status .spt-pill { color: #23602f; }
 #spt-phone-panel.theme-light .spt-gm-status.down .spt-pill, body.theme-light #spt-phone-panel:not(.theme-dark) .spt-gm-status.down .spt-pill { color: #a8281b; }
 #spt-phone-panel.theme-light .spt-fx-pill.warn, body.theme-light #spt-phone-panel:not(.theme-dark) .spt-fx-pill.warn { color: #a65a10; }
+
+/* ---------- Cyberpunk / neon noir looks ---------- */
+/* Neon: deep violet, magenta and cyan glow */
+.spt-player-phone.spt-skin-neon {
+  --skin-bg: #0d0818; --skin-fg: #ece8ff; --skin-font: "Trebuchet MS", "Segoe UI", Arial, sans-serif; --skin-line: rgba(255,43,214,0.5); --skin-line-soft: rgba(25,240,255,0.18);
+  --skin-hover: rgba(25,240,255,0.08); --skin-input-bg: #150d26; --skin-input-border: rgba(25,240,255,0.55);
+  --skin-btn-bg: rgba(25,240,255,0.06); --skin-btn-fg: #19f0ff; --skin-btn-border: #19f0ff; --skin-radius: 4px; --skin-link: #ff5ce1;
+}
+.spt-player-phone.spt-skin-neon .window-content {
+  background-image: radial-gradient(ellipse at 50% 115%, rgba(255,43,214,0.28), transparent 60%), linear-gradient(rgba(25,240,255,0.05) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 24px;
+}
+.spt-player-phone.spt-skin-neon .spt-phone-top { border-bottom: 1px solid #ff2bd6; box-shadow: 0 1px 8px rgba(255,43,214,0.45); }
+.spt-player-phone.spt-skin-neon .spt-phone-top strong { color: #fff; text-shadow: 0 0 6px #19f0ff, 0 0 12px rgba(25,240,255,0.6); letter-spacing: 0.04em; }
+.spt-player-phone.spt-skin-neon .spt-bubble { border-radius: 4px; }
+.spt-player-phone.spt-skin-neon .spt-bubble.in { background: rgba(25,240,255,0.08); color: #dffcff; border: 1px solid rgba(25,240,255,0.6); box-shadow: 0 0 6px rgba(25,240,255,0.3); }
+.spt-player-phone.spt-skin-neon .spt-bubble.out { background: linear-gradient(135deg, #ff2bd6, #7a2bff); color: #fff; box-shadow: 0 0 8px rgba(255,43,214,0.5); }
+.spt-player-phone.spt-skin-neon .spt-thread.mail .spt-bubble { background: #150d26; color: #ece8ff; border: 1px solid rgba(255,43,214,0.45); }
+.spt-player-phone.spt-skin-neon .spt-badge { background: #ff2bd6; box-shadow: 0 0 6px #ff2bd6; }
+.spt-player-phone.spt-skin-neon .window-content button:hover { background: rgba(25,240,255,0.15); box-shadow: 0 0 8px rgba(25,240,255,0.6); }
+.spt-player-phone.spt-skin-neon .spt-live-face { border-color: #ff2bd6; box-shadow: 0 0 14px rgba(255,43,214,0.7); }
+.spt-player-phone.spt-skin-neon .spt-caller { text-shadow: 0 0 8px #ff2bd6; }
+
+/* Glitch: black screen, split colours, scanlines; the screen jitters now and then (often during a call) */
+.spt-player-phone.spt-skin-glitch {
+  --skin-bg: #07090a; --skin-fg: #d6fff4; --skin-font: Consolas, "Lucida Console", "Courier New", monospace; --skin-line: rgba(0,255,170,0.35); --skin-line-soft: rgba(0,255,170,0.12);
+  --skin-hover: rgba(255,0,60,0.08); --skin-input-bg: #0c1012; --skin-input-border: rgba(0,255,170,0.45);
+  --skin-btn-bg: #0f1416; --skin-btn-fg: #d6fff4; --skin-btn-border: rgba(255,0,60,0.6); --skin-radius: 0; --skin-link: #00ffaa;
+}
+.spt-player-phone.spt-skin-glitch .window-content {
+  text-shadow: -1px 0 rgba(255,0,60,0.55), 1px 0 rgba(0,200,255,0.55);
+  background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 4px);
+}
+.spt-player-phone.spt-skin-glitch textarea, .spt-player-phone.spt-skin-glitch input { text-shadow: none; }
+.spt-player-phone.spt-skin-glitch .spt-bubble { border-radius: 0; }
+.spt-player-phone.spt-skin-glitch .spt-bubble.in { background: #10181a; color: #d6fff4; border-left: 2px solid #00ffaa; }
+.spt-player-phone.spt-skin-glitch .spt-bubble.out { background: #1a0d12; color: #ffe3ea; border-right: 2px solid #ff003c; }
+.spt-player-phone.spt-skin-glitch .spt-thread.mail .spt-bubble { background: #0c1012; color: #d6fff4; border: 1px solid rgba(0,255,170,0.3); }
+.spt-player-phone.spt-skin-glitch .spt-badge { background: #ff003c; border-radius: 0; text-shadow: none; }
+.spt-player-phone.spt-skin-glitch .window-content button:hover { background: rgba(255,0,60,0.15); }
+.spt-player-phone.spt-skin-glitch .spt-live-face { border-radius: 0; border-color: #00ffaa; }
+@media (prefers-reduced-motion: no-preference) {
+  .spt-player-phone.spt-skin-glitch .spt-phone-top strong { display: inline-block; animation: spt-glitch 7s steps(1) infinite; }
+  .spt-player-phone.spt-skin-glitch .spt-live-screen .spt-caller,
+  .spt-player-phone.spt-skin-glitch .spt-live-screen .spt-live-face,
+  .spt-player-phone.spt-skin-glitch .spt-incoming .spt-caller { animation: spt-glitch 2.6s steps(1) infinite; }
+}
+@keyframes spt-glitch {
+  0%, 88%, 100% { transform: none; clip-path: none; filter: none; }
+  89% { transform: translateX(-3px); clip-path: inset(12% 0 52% 0); }
+  91% { transform: translateX(3px); clip-path: inset(58% 0 8% 0); filter: hue-rotate(90deg); }
+  93% { transform: translateX(-1px); clip-path: none; }
+}
+
+/* Cyberpunk frames: dark cases with a glowing edge */
+.application.spt-player-phone.spt-frame-smartphone.spt-skin-neon:not(.minimized) {
+  box-shadow: 0 0 0 2px #ff2bd6, 0 0 0 4px #15171a, 0 0 22px rgba(255,43,214,0.55), 0 24px 50px rgba(0,0,0,0.55);
+}
+.spt-player-phone.spt-skin-neon .spt-frame-homebar { background: #19f0ff; box-shadow: 0 0 6px #19f0ff; }
+.application.spt-player-phone.spt-frame-smartphone.spt-skin-glitch:not(.minimized) {
+  box-shadow: 0 0 0 2px #2a2f33, 0 0 0 4px #0a0b0c, -2px 0 10px rgba(255,0,60,0.35), 2px 0 10px rgba(0,200,255,0.35), 0 24px 50px rgba(0,0,0,0.55);
+}
+.application.spt-player-phone.spt-frame-monitor.spt-skin-neon:not(.minimized),
+.application.spt-player-phone.spt-frame-monitor.spt-skin-glitch:not(.minimized) {
+  background: linear-gradient(#25212e, #141119);
+  box-shadow: 0 0 0 1px #3a3346, 0 30px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.application.spt-player-phone.spt-frame-monitor.spt-skin-neon:not(.minimized) { box-shadow: 0 0 0 1px #ff2bd6, 0 0 18px rgba(255,43,214,0.45), 0 30px 40px rgba(0,0,0,0.45); }
+.spt-player-phone.spt-frame-monitor.spt-skin-neon:not(.minimized) > .window-header,
+.spt-player-phone.spt-frame-monitor.spt-skin-glitch:not(.minimized) > .window-header { color: #c9c2d8; }
+.spt-frame-monitor.spt-skin-neon .spt-frame-led { background: #ff2bd6; box-shadow: 0 0 6px #ff2bd6; }
+.spt-frame-monitor.spt-skin-glitch .spt-frame-led { background: #ff003c; box-shadow: 0 0 6px #ff003c; }
+.spt-frame-monitor.spt-skin-neon .spt-frame-stand,
+.spt-frame-monitor.spt-skin-glitch .spt-frame-stand { filter: brightness(0.3); }
