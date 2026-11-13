@@ -388,6 +388,10 @@
       },
       "modern": {},
       "cyberpunk": {
+        "Lock": {
+          "Session": "Protected by ICE",
+          "User": "Handle"
+        },
         "Track": {
           "Via": {
             "gps": "Satellite",
