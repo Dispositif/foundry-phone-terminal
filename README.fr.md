@@ -10,7 +10,7 @@ Un module Foundry VTT qui donne aux personnages des téléphones, des ordinateur
 - **Rien à configurer :** le MJ peut tout de suite appeler un joueur ou lui écrire ; un téléphone est créé pour son personnage si besoin.
 - **Les agents communiquent entre eux** directement, sans le MJ. Rien ne passe jamais par le chat.
 - **Pas d'horloge :** aucune date ni heure n'est affichée, pour ne jamais contredire la fiction.
-- Foundry VTT v14. N'importe quel système de jeu. Français et anglais.
+- Foundry VTT v13 et v14. N'importe quel système de jeu. Français et anglais.
 
 <img src="docs/call-screen-en.webp" alt="Appel en cours : le smartphone de l'agent et la fenêtre du reste de la table" width="760">
 

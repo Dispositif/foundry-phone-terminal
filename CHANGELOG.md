@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2
+- Compatible with Foundry v13 again (tested in v13 and v14).
+- Fix: in the GM view of a device, "Add to history" did nothing.
+- Emails: Enter adds a line, Ctrl/Cmd+Enter sends (texts unchanged: Enter sends, Shift+Enter adds a line).
+
 ## 1.0.1
 - Requires Foundry v14.
 - README: a "For developers" section (data stored on each device, the GM as the network, the API).

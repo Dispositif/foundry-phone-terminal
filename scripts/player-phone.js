@@ -262,7 +262,6 @@ export class PlayerPhone extends ApplicationV2 {
   }
 
   async _send() {
-    if (this.gm) return;
     this._readForm();
     const p = this._current();
     if (!p) return;
@@ -839,12 +838,14 @@ export class PlayerPhone extends ApplicationV2 {
     for (const btn of el.querySelectorAll("[data-mode]")) {
       btn.addEventListener("click", () => p?.item.update({ [`flags.${MODULE_ID}.phone.mode`]: btn.dataset.mode }));
     }
-    // Enter = send, Shift+Enter = new line
+    // Texts: Enter sends, Shift+Enter adds a line. Emails are longer: Enter adds a line, Ctrl/Cmd+Enter sends.
+    const mail = p && isComputer(p.phone);
     el.querySelector("[name=draft]")?.addEventListener("keydown", (ev) => {
-      if (ev.key === "Enter" && !ev.shiftKey) {
-        ev.preventDefault();
-        this._send();
-      }
+      if (ev.key !== "Enter") return;
+      const send = mail ? ev.ctrlKey || ev.metaKey : !ev.shiftKey;
+      if (!send) return;
+      ev.preventDefault();
+      this._send();
     });
     const thread = el.querySelector(".spt-thread");
     if (thread) thread.scrollTop = thread.scrollHeight;
