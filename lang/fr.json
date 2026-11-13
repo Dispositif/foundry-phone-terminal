@@ -215,7 +215,8 @@
       "SceneName": "Nom de la scène",
       "DeviceName": "Nom de l'appareil",
       "DeviceNameHint": "perso, jetable, cabine, bureau…",
-      "Number": "Numéro / email",
+      "Number": "Numéro / email / IP / ID",
+      "NumberHint": "Tout identifiant convient (numéro, email, adresse IP, identifiant, indicatif…) : c'est ce qu'on compose ou écrit pour joindre l'appareil.",
       "HeldBy": "Porté par",
       "Nobody": "Personne (à préparer)",
       "HeldByHint": "Tapez quelques lettres pour trouver un agent ou un PNJ. Laissez vide pour préparer l'appareil sans porteur.",
@@ -344,12 +345,7 @@
       },
       "universe": {
         "name": "Univers",
-        "hint": "Époque ou genre de la partie : fixe les appareils proposés, leurs habillages par défaut et certains mots. Toutes époques : tout, comme avant."
-      },
-      "defaultDevice": {
-        "name": "Appareil par défaut",
-        "hint": "Un message ou un appel envoyé à un joueur (et non à un appareil) arrive sur le téléphone de son personnage. S'il n'en porte pas, un appareil de ce modèle est créé (selon l'univers : un mobile dans les années 80-90, sinon un smartphone).",
-        "auto": "Selon l'univers"
+        "hint": "Époque ou genre de la partie : fixe les appareils proposés, leurs habillages par défaut, le téléphone créé pour un personnage qui n'en a pas (un mobile en Vintage, un smartphone sinon) et certains mots. Tous univers : tout, comme avant."
       }
     },
     "Migrated": "{n} appareil(s) repris de l'ancienne version.",
@@ -362,15 +358,78 @@
       "Removed": "{n} appareil(s) de démo retiré(s)."
     },
     "UniverseName": {
-      "all": "Toutes époques",
+      "all": "Tous univers",
       "retro": "Vintage (années 80-90)",
       "modern": "Moderne",
       "cyberpunk": "Cyberpunk / néon noir"
     },
     "Universe": {
-      "retro": {},
+      "retro": {
+        "Outcome": {
+          "voicemail": "Répondeur"
+        },
+        "CallLog": {
+          "out": {
+            "voicemail": "Répondeur"
+          }
+        },
+        "CallerResult": {
+          "voicemail": "Vous êtes sur le répondeur de {name}."
+        },
+        "Read": {
+          "Seen": "Distribué"
+        },
+        "Track": {
+          "Via": {
+            "gps": "Triangulation",
+            "wifi": "Ligne télécom"
+          }
+        }
+      },
       "modern": {},
-      "cyberpunk": {}
+      "cyberpunk": {
+        "Track": {
+          "Via": {
+            "gps": "Satellite",
+            "gsm": "Réseau cellulaire",
+            "wifi": "Nœud du Net"
+          }
+        },
+        "Model": {
+          "computer": "Deck",
+          "smartphone": "Comm",
+          "pager": "Bip",
+          "landline": "Visiophone"
+        },
+        "NewDev": {
+          "landline": "Visiophone"
+        },
+        "Gm": {
+          "PanelTitle": "Le Net",
+          "CompromisedDevice": "Appareil piraté : {label}",
+          "Compromised": "Compromis (piraté, sur écoute…)"
+        },
+        "Live": {
+          "NetFail": "Signal brouillé",
+          "Tapped": "Appareil piraté"
+        },
+        "Calls": {
+          "neterror": "Signal brouillé"
+        },
+        "CallLog": {
+          "out": {
+            "neterror": "Signal brouillé"
+          }
+        },
+        "Net": {
+          "NoSignal": "Pas de liaison.",
+          "NoSignalShort": "Pas de liaison"
+        },
+        "CallerResult": {
+          "busy": "Net saturé. Réessayez plus tard."
+        },
+        "Masked": "ID intraçable"
+      }
     },
     "Theme": {
       "default": "Celui du modèle",
@@ -417,8 +476,8 @@
     "Close": "Fermer",
     "Track": {
       "Experimental": "Fonction expérimentale",
-      "Hint": "Précision avec laquelle le réseau peut localiser chaque agent.",
-      "None": "Aucun agent.",
+      "Hint": "Précision avec laquelle le réseau peut localiser chaque personnage.",
+      "None": "Aucun personnage.",
       "high": "Forte",
       "medium": "Moyenne",
       "low": "Faible",

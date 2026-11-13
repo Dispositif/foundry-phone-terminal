@@ -1,7 +1,7 @@
 import { LOG_MAX, MASKED, MODULE_ID, SHEET_ID } from "./constants.js";
 import { esc, maskedLabel, norm, randomEmail, randomNumber, isMasked } from "./util.js";
 import { t } from "./i18n.js";
-import { modelAllowed, universe } from "./universes.js";
+import { universe } from "./universes.js";
 /* -------------------------------------------- */
 /*  Model: phones, contacts, history            */
 /* -------------------------------------------- */
@@ -515,7 +515,7 @@ export async function unmarkPhone(item) {
 
 /**
  * GM: the device a message or call "to a player" lands on. The player's character carried phone
- * (smartphone first, then mobile); if it has none, one of the default model (world setting) is created.
+ * (smartphone first, then mobile); if it has none, one of the universe's default model is created.
  * null when the player has no assigned character to carry it.
  */
 export async function defaultDeviceFor(user) {
@@ -526,9 +526,7 @@ export async function defaultDeviceFor(user) {
     .filter((p) => p.actor === actor && order.includes(p.phone.model))
     .sort((a, b) => order.indexOf(a.phone.model) - order.indexOf(b.phone.model));
   if (carried.length) return carried[0];
-  // "auto": the universe's choice; a model the universe does not offer falls back to it too.
-  const chosen = game.settings.get(MODULE_ID, "defaultDevice");
-  const model = MODELS[chosen] && modelAllowed(chosen) ? chosen : universe().defaultModel;
+  const model = universe().defaultModel;
   const label = MODELS[model]?.label ?? MODELS.smartphone.label;
   const item = await createPhone(actor, { label, number: randomAddress(model), model, theme: DEFAULT_THEME });
   if (!item) return null;

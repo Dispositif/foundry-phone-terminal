@@ -33,7 +33,7 @@ export const SHEET_ID = `${MODULE_ID}.PhoneSheet`;
 
 /** Default NPC directory (New Orleans sample). Directory numbers use 555-02xx, never given to new devices. */
 export const DIRECTORY_SAMPLE = `# Tip: add the agents' own numbers as public, so they all know each other:
-# Agent Reyes | 555-0142 | public
+Agent Reyes | 555-0142 | public
 
 # Delta Green
 Marlin Hunt | 555-0242

@@ -215,7 +215,8 @@
       "SceneName": "Scene name",
       "DeviceName": "Device name",
       "DeviceNameHint": "personal, burner, booth, office…",
-      "Number": "Number / email",
+      "Number": "Number / email / IP / ID",
+      "NumberHint": "Any identifier works (number, email, IP address, user ID, call sign…): it is what others dial or write to reach the device.",
       "HeldBy": "Held by",
       "Nobody": "Nobody (to prepare)",
       "HeldByHint": "Type a few letters to find an agent or an NPC. Leave empty to prepare the device without a holder.",
@@ -344,12 +345,7 @@
       },
       "universe": {
         "name": "Universe",
-        "hint": "Era or genre of the game: sets the devices offered, their default looks and some words. Any era: everything, as before."
-      },
-      "defaultDevice": {
-        "name": "Default device",
-        "hint": "A message or call sent to a player (not to a device) lands on their character's phone. If the character carries none, one of this model is created (Universe's choice: a mobile in the 1980s-1990s, a smartphone otherwise).",
-        "auto": "Universe's choice"
+        "hint": "Era or genre of the game: sets the devices offered, their default looks, the phone created for a character who has none (a mobile in Vintage, a smartphone otherwise) and some words. Any setting: everything, as before."
       }
     },
     "Migrated": "{n} device(s) recovered from the previous version.",
@@ -362,15 +358,78 @@
       "Removed": "{n} demo device(s) removed."
     },
     "UniverseName": {
-      "all": "Any era",
+      "all": "Any setting",
       "retro": "Vintage (1980s-1990s)",
       "modern": "Modern",
       "cyberpunk": "Cyberpunk / neon noir"
     },
     "Universe": {
-      "retro": {},
+      "retro": {
+        "Outcome": {
+          "voicemail": "Answering machine"
+        },
+        "CallLog": {
+          "out": {
+            "voicemail": "Answering machine"
+          }
+        },
+        "CallerResult": {
+          "voicemail": "You've reached {name}'s answering machine."
+        },
+        "Read": {
+          "Seen": "Delivered"
+        },
+        "Track": {
+          "Via": {
+            "gps": "Triangulation",
+            "wifi": "Phone line"
+          }
+        }
+      },
       "modern": {},
-      "cyberpunk": {}
+      "cyberpunk": {
+        "Track": {
+          "Via": {
+            "gps": "Satellite",
+            "gsm": "Cell grid",
+            "wifi": "Net node"
+          }
+        },
+        "Model": {
+          "computer": "Deck",
+          "smartphone": "Comm",
+          "pager": "Beeper",
+          "landline": "Vidphone"
+        },
+        "NewDev": {
+          "landline": "Vidphone"
+        },
+        "Gm": {
+          "PanelTitle": "The Net",
+          "CompromisedDevice": "Hacked device: {label}",
+          "Compromised": "Compromised (hacked, tapped…)"
+        },
+        "Live": {
+          "NetFail": "Signal jammed",
+          "Tapped": "Hacked device"
+        },
+        "Calls": {
+          "neterror": "Signal jammed"
+        },
+        "CallLog": {
+          "out": {
+            "neterror": "Signal jammed"
+          }
+        },
+        "Net": {
+          "NoSignal": "No uplink.",
+          "NoSignalShort": "No uplink"
+        },
+        "CallerResult": {
+          "busy": "Net overloaded. Try again later."
+        },
+        "Masked": "Untraceable ID"
+      }
     },
     "Theme": {
       "default": "Model default",
@@ -417,8 +476,8 @@
     "Close": "Close",
     "Track": {
       "Experimental": "Experimental feature",
-      "Hint": "How precisely the network can locate each agent.",
-      "None": "No agents.",
+      "Hint": "How precisely the network can locate each character.",
+      "None": "No characters.",
       "high": "High",
       "medium": "Medium",
       "low": "Low",

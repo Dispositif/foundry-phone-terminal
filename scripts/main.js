@@ -108,18 +108,18 @@ Hooks.once("init", () => {
     range: { min: 0, max: 120, step: 5 },
     default: 60
   });
-  game.settings.register(MODULE_ID, "defaultDevice", {
-    name: "SPT.Settings.defaultDevice.name",
-    hint: "SPT.Settings.defaultDevice.hint",
-    scope: "world",
-    config: true,
-    type: String,
-    choices: { auto: "SPT.Settings.defaultDevice.auto", smartphone: "SPT.Model.smartphone", mobile: "SPT.Model.mobile" },
-    default: "auto"
-  });
   game.settings.register(MODULE_ID, "floatingButton", {
     name: "SPT.Settings.floatingButton.name",
     hint: "SPT.Settings.floatingButton.hint",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+    onChange: () => updateFab()
+  });
+  game.settings.register(MODULE_ID, "gmFloatingButton", {
+    name: "SPT.Settings.gmFloatingButton.name",
+    hint: "SPT.Settings.gmFloatingButton.hint",
     scope: "world",
     config: true,
     type: Boolean,
@@ -140,15 +140,6 @@ Hooks.once("init", () => {
     type: String,
     default: DIRECTORY_SAMPLE,
     onChange: () => rerenderAll()
-  });
-  game.settings.register(MODULE_ID, "gmFloatingButton", {
-    name: "SPT.Settings.gmFloatingButton.name",
-    hint: "SPT.Settings.gmFloatingButton.hint",
-    scope: "world",
-    config: true,
-    type: Boolean,
-    default: true,
-    onChange: () => updateFab()
   });
   // Calls in progress (GM writes): found again after a reload.
   game.settings.register(MODULE_ID, "liveCalls", { scope: "world", config: false, type: Object, default: {} });

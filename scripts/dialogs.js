@@ -40,7 +40,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
           <input type="text" name="scene" list="spt-scenes" value="${esc(sceneName)}" placeholder="${t("Form.NoPlace")}">
           <datalist id="spt-scenes">${scenes}</datalist></div>
         <div class="form-group"><label>${t("Form.DeviceName")}</label><input type="text" name="label" value="${esc(label)}" placeholder="${t("Form.DeviceNameHint")}"></div>
-        <div class="form-group"><label>${t("Form.Number")}</label><input type="text" name="number" value="${esc(number)}"></div>
+        <div class="form-group"><label>${t("Form.Number")}</label><input type="text" name="number" value="${esc(number)}"><p class="hint">${t("Form.NumberHint")}</p></div>
         <div class="form-group spt-if-themes"><label>${t("Form.Theme")}</label><select name="theme">${themeOpts}</select></div>
         <div class="form-group spt-if-computer"><label>${t("Form.Inbox")}</label><select name="inbox">${["on", "locked", "none"].map((k) => `<option value="${k}" ${k === inbox ? "selected" : ""}>${t(`Form.Inbox_${k}`)}</option>`).join("")}</select></div>
       </div>`,
@@ -242,7 +242,7 @@ function kindForm(kind) {
         <div class="form-group"><label>${t("Form.DeviceName")}</label><input type="text" name="label" value="${esc(fixed ? kindLabel(kind) : nameFor(first))}"></div>
         <div class="form-group"><label>${t("Form.Number")}</label><div class="form-fields">
           <input type="text" name="number" value="${esc(randomAddress(kind.model))}">
-          <button type="button" class="spt-dice" title="${t("NewDev.OtherNumber")}"><i class="fas fa-dice"></i></button></div></div>
+          <button type="button" class="spt-dice" title="${t("NewDev.OtherNumber")}"><i class="fas fa-dice"></i></button></div><p class="hint">${t("Form.NumberHint")}</p></div>
         ${lookRow}
       </div>`,
     render: (event, x) => {
