@@ -6,7 +6,7 @@
 - **Cyberpunk / neon noir** universe: smartphone, laptop, terminal, pager and modern landline. New looks for smartphone, laptop and terminal: **Neon** (magenta and cyan glow) and **Glitch** (interference, the screen jitters during calls).
 - Universe vocabulary: a few words change with the universe. **Vintage**: answering machine instead of voicemail, "Delivered" instead of "Seen", no GPS or Wi-Fi in tracking. **Cyberpunk**: the Net, deck, signal jammed, hacked device, untraceable ID… Translators: see `Universe.<key>` in the language files (same keys as the normal text, only the ones that change).
 - Cyberpunk: new numbers start with NC- (NC-0142) or ID (NX-4217)
-- Cyberpunk: add Neon look to pager.
+- Cyberpunk: add Neon look to pager, ringtone
 - Requires Foundry v14.
 
 ## 1.0.3

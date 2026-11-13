@@ -13,6 +13,7 @@ import { MODULE_ID } from "./constants.js";
  * defaultModel: device created for a character when a player is called or texted.
  * numberPrefix: start of new numbers while the world setting keeps its default ("555-").
  * mailPrefix:   laptops and terminals get an ID ("NX-4217") instead of a random email address.
+ * ring:         ringtone of every device that rings (file in sounds/), instead of the model's.
  *
  * Vocabulary: the language files may override any key under "Universe.<key>.<same key>".
  */
@@ -52,7 +53,8 @@ export const UNIVERSES = {
     },
     defaultModel: "smartphone",
     numberPrefix: "NC-",
-    mailPrefix: "NX-"
+    mailPrefix: "NX-",
+    ring: "ring-cyber.ogg"
   }
 };
 

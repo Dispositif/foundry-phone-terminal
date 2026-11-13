@@ -138,6 +138,7 @@ export function skinOf(phone) {
 
 /** Ringtone of a device: the modern landline has its own electronic ring, the rotary dial keeps the bell. */
 export function ringOf(phone) {
+  if (universe().ring) return universe().ring;
   return skinOf(phone) === "modern" ? "ring-landline.ogg" : modelOf(phone).ring;
 }
 
