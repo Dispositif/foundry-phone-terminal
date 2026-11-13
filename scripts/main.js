@@ -18,7 +18,7 @@ import { PhonePanel } from "./gm-panel.js";
 import { registerEnrichers, runJournalLink } from "./journal-links.js";
 import { flushAll, flushPending, sendSms } from "./messages.js";
 import { restoreLive } from "./live-call.js";
-import { UNIVERSES } from "./universes.js";
+import { UNIVERSES, universeKey } from "./universes.js";
 import { PlayerPhone } from "./player-phone.js";
 import { hangUp, ring } from "./ring.js";
 import { onSocket } from "./socket.js";
@@ -248,6 +248,8 @@ function renamedNotice(n, oldActive) {
 }
 
 Hooks.once("ready", async () => {
+  // Universe accent on the GM panel and floating buttons (CSS: body[data-spt-universe]).
+  document.body.dataset.sptUniverse = universeKey();
   game.socket.on(SOCKET, onSocket);
   await loadLanguages();
   document.body.addEventListener("click", (ev) => {

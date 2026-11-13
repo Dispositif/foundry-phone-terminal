@@ -967,3 +967,23 @@ a.spt-link:hover { filter: brightness(1.15); }
 .spt-frame-monitor.spt-skin-glitch .spt-frame-led { background: #ff003c; box-shadow: 0 0 6px #ff003c; }
 .spt-frame-monitor.spt-skin-neon .spt-frame-stand,
 .spt-frame-monitor.spt-skin-glitch .spt-frame-stand { filter: brightness(0.3); }
+
+/* ---------- Universe accent: GM panel and floating buttons ---------- */
+body[data-spt-universe="retro"] { --spt-uni: #9a6a3a; --spt-uni-glow: rgba(154,106,58,0.35); --spt-uni-fab-bg: #2a211a; --spt-uni-fab-fg: #ecdcc0; }
+body[data-spt-universe="cyberpunk"] { --spt-uni: #19d3e6; --spt-uni-glow: rgba(25,211,230,0.45); --spt-uni-fab-bg: #0a1517; --spt-uni-fab-fg: #c8f8ff; }
+/* GM panel: a thin coloured edge and a line under the title bar */
+body[data-spt-universe="retro"] #spt-phone-panel:not(.minimized),
+body[data-spt-universe="cyberpunk"] #spt-phone-panel:not(.minimized) { box-shadow: 0 0 0 1px var(--spt-uni), 0 0 12px var(--spt-uni-glow), 0 0 20px rgba(0,0,0,0.6); }
+body[data-spt-universe="retro"] #spt-phone-panel > .window-header,
+body[data-spt-universe="cyberpunk"] #spt-phone-panel > .window-header { border-bottom: 2px solid var(--spt-uni); }
+body[data-spt-universe="retro"] #spt-phone-panel.minimized > .window-header,
+body[data-spt-universe="cyberpunk"] #spt-phone-panel.minimized > .window-header { border-bottom: none; }
+/* Floating buttons (players and GM): tinted, coloured edge; call states keep their own colours */
+body[data-spt-universe="retro"] #spt-phone-fab .spt-fab:not(.online):not(.calling):not(.ringing),
+body[data-spt-universe="cyberpunk"] #spt-phone-fab .spt-fab:not(.online):not(.calling):not(.ringing) {
+  background: var(--spt-uni-fab-bg); color: var(--spt-uni-fab-fg); border: 1px solid var(--spt-uni);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.55), 0 0 8px var(--spt-uni-glow);
+}
+body[data-spt-universe="retro"] #spt-phone-fab .spt-fab:not(.online):not(.calling):not(.ringing):hover,
+body[data-spt-universe="cyberpunk"] #spt-phone-fab .spt-fab:not(.online):not(.calling):not(.ringing):hover { filter: brightness(1.35); }
+body[data-spt-universe="retro"] #spt-phone-fab .spt-fab { border-radius: 10px; }
