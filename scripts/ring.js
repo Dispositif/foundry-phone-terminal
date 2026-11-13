@@ -91,11 +91,11 @@ export async function ring(target, { caller = MASKED, origin = null, callId = fo
     return;
   }
   pendingCalls.set(callId, call);
-  // GM calling as an NPC: the call window, ringing (NPC and the agent called, hang-up button).
-  if (!origin) {
-    const [userId, itemUuid] = call.open.entries().next().value;
-    openGmRing(callId, npcSide(call.from, "", maskedLabel(caller)), agentSide(fromUuidSync(itemUuid), userId));
-  }
+  // GM: the call window while it rings. As an NPC: the NPC and the agent called (hang-up button).
+  // Between agents: who calls whom ("network unavailable" button).
+  const [userId, itemUuid] = call.open.entries().next().value;
+  const from = origin ? agentSide(fromUuidSync(origin.itemUuid), origin.userId) : npcSide(call.from, "", maskedLabel(caller));
+  openGmRing(callId, from, agentSide(fromUuidSync(itemUuid), userId));
   rerenderAll();
   return callId;
 }
@@ -118,6 +118,14 @@ export function hangUp(callId, { notifyOrigin = true } = {}) {
   if (call.origin && notifyOrigin) finishOrigin(call.origin, "noanswer");
   if (!call.origin) ui.notifications.info(`📱 ${t("Info.CallInterrupted")}`);
   rerenderAll();
+}
+
+/** GM, between agents while it rings: the network fails. The caller gets a network error, the callee a missed call. */
+export function failCall(callId) {
+  const origin = pendingCalls.get(callId)?.origin;
+  if (!origin) return;
+  hangUp(callId, { notifyOrigin: false });
+  finishOrigin(origin, "neterror");
 }
 
 export function hangUpAll() {

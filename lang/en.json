@@ -206,7 +206,8 @@
       "unassigned": "The number you have dialed is not in service.",
       "unreachable": "The person you are calling cannot be reached at the moment.",
       "noanswer": "{name} does not answer.",
-      "busy": "Network busy. Try again later."
+      "busy": "Network busy. Try again later.",
+      "neterror": "Network error. The call could not be completed."
     },
     "Form": {
       "Model": "Model",
@@ -305,7 +306,8 @@
         "unreachable": "Unreachable",
         "cancelled": "Call cancelled",
         "noanswer": "No answer",
-        "busy": "Network busy"
+        "busy": "Network busy",
+        "neterror": "Network error"
       },
       "in": {
         "answer": "Incoming call",
@@ -448,7 +450,9 @@
       "Cut": "Line cut",
       "CutLine": "Cut the line",
       "CutHint": "Cuts the call for both ends: network failure, dead zone, an enemy who controls the network…",
-      "Tapped": "Compromised device"
+      "Tapped": "Compromised device",
+      "NetFail": "Network unavailable",
+      "NetFailHint": "Cuts the call before anyone answers: the caller gets a network error (dead zone, outage, an enemy who controls the network…)."
     },
     "Calls": {
       "Tab": "Calls",
@@ -463,6 +467,7 @@
       "unassigned": "Not assigned",
       "cancelled": "Cancelled",
       "busy": "Network busy",
+      "neterror": "Network unavailable",
       "LastHour": "Last hour of play",
       "Today": "Last 24 hours",
       "Before": "Before"

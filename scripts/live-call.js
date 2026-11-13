@@ -3,7 +3,7 @@ import { getPhoneData, isFixed, patchLog } from "./devices.js";
 import { esc, isActiveGM, isMasked, playLocal, rerenderAll } from "./util.js";
 import { t } from "./i18n.js";
 import { PlayerPhone } from "./player-phone.js";
-import { hangUp } from "./ring.js";
+import { failCall, hangUp } from "./ring.js";
 import { outgoing } from "./player-calls.js";
 /* -------------------------------------------- */
 /*  Live call: once answered, the whole table   */
@@ -151,7 +151,7 @@ export function openRinging({ callId, exclude = [], name, img }) {
 
 const UNKNOWN = { pc: false, seen: "", number: "", userIds: [] };
 
-/** GM calling as an NPC: the call window while it rings, with a hang-up button. */
+/** GM: the call window while it rings (calling as an NPC: hang-up button; between agents: "network unavailable"). */
 export function openGmRing(callId, a, b) {
   liveCalls.set(callId, { callId, a, b, dialing: true, ringing: true });
   openWindow(callId);
@@ -324,6 +324,7 @@ class LiveCallWindow extends ApplicationV2 {
         else hangUpLive(this.callId);
       },
       cut: function () { hangUpLive(this.callId, "cut"); },
+      netFail: function () { failCall(this.callId); },
       dismiss: function () { this.close(); }
     }
   };
@@ -342,8 +343,13 @@ class LiveCallWindow extends ApplicationV2 {
     // The agents on the line hang up; the GM hangs up for the NPC and can cut the line.
     // The rest of the table only watches: the window's cross is enough to close it.
     if (data.dialing) {
-      // While it rings: who calls and whose phone rings (unknown until known). The GM can hang up.
-      const hang = game.user.isGM ? `<div class="spt-live-buttons"><button type="button" class="spt-live-hangup" data-action="hangup"><i class="fas fa-phone-slash"></i> ${t("Call.HangUp")}</button></div>` : "";
+      // While it rings: who calls and whose phone rings (unknown until known).
+      // The GM hangs up for the NPC; between agents, the network can fail (the caller gets a network error).
+      const between = data.a?.pc && data.b?.pc;
+      const gmButton = between
+        ? `<button type="button" class="spt-live-netfail" data-action="netFail" title="${t("Live.NetFailHint")}"><i class="fas fa-skull"></i> ${t("Live.NetFail")}</button>`
+        : `<button type="button" class="spt-live-hangup" data-action="hangup"><i class="fas fa-phone-slash"></i> ${t("Call.HangUp")}</button>`;
+      const hang = game.user.isGM ? `<div class="spt-live-buttons">${gmButton}</div>` : "";
       return `<div class="spt-live-body dialing">
         <div class="spt-live-icon"><i class="fas fa-phone-volume"></i></div>
         <div class="spt-live-status">${statusHtml(data)}</div>

@@ -206,7 +206,8 @@
       "unassigned": "Le numéro que vous avez demandé n'est pas attribué.",
       "unreachable": "Votre correspondant n'est pas joignable pour le moment.",
       "noanswer": "{name} ne répond pas.",
-      "busy": "Réseau encombré. Réessayez plus tard."
+      "busy": "Réseau encombré. Réessayez plus tard.",
+      "neterror": "Erreur réseau. L'appel n'a pas pu aboutir."
     },
     "Form": {
       "Model": "Modèle",
@@ -305,7 +306,8 @@
         "unreachable": "Injoignable",
         "cancelled": "Appel annulé",
         "noanswer": "Sans réponse",
-        "busy": "Réseau encombré"
+        "busy": "Réseau encombré",
+        "neterror": "Erreur réseau"
       },
       "in": {
         "answer": "Appel reçu",
@@ -448,7 +450,9 @@
       "Cut": "Communication coupée",
       "CutLine": "Couper la communication",
       "CutHint": "Coupe l'appel des deux côtés : panne de réseau, zone morte, ennemi qui contrôle le réseau…",
-      "Tapped": "Appareil compromis"
+      "Tapped": "Appareil compromis",
+      "NetFail": "Réseau indisponible",
+      "NetFailHint": "Coupe l'appel avant que quiconque décroche : l'appelant reçoit une erreur réseau (zone morte, panne, ennemi qui contrôle le réseau…)."
     },
     "Calls": {
       "Tab": "Appels",
@@ -463,6 +467,7 @@
       "unassigned": "Non attribué",
       "cancelled": "Annulé",
       "busy": "Réseau encombré",
+      "neterror": "Réseau indisponible",
       "LastHour": "Dernière heure de jeu",
       "Today": "Dernières 24 heures",
       "Before": "Avant"

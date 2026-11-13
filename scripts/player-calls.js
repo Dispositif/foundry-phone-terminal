@@ -196,7 +196,8 @@ export const CALLER_RESULTS = {
   unassigned: () => t("CallerResult.unassigned"),
   unreachable: () => t("CallerResult.unreachable"),
   noanswer: (name) => t("CallerResult.noanswer", { name }),
-  busy: () => t("CallerResult.busy")
+  busy: () => t("CallerResult.busy"),
+  neterror: () => t("CallerResult.neterror")
 };
 
 export function onCallResult({ callId, result, name }) {
@@ -210,7 +211,7 @@ export function onCallResult({ callId, result, name }) {
   // Answered: the device shows the call, no notice. Otherwise, a notice on the device.
   if (result === "answer") return playLocal(PICKUP_SRC);
   const msg = (CALLER_RESULTS[result] ?? CALLER_RESULTS.noanswer)(name);
-  deviceNotice(msg, { warn: true, icon: result === "busy" ? "fa-signal spt-busy" : null });
+  deviceNotice(msg, { warn: true, icon: ["busy", "neterror"].includes(result) ? "fa-signal spt-busy" : null });
 }
 
 
