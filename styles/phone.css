@@ -987,3 +987,18 @@ body[data-spt-universe="cyberpunk"] #spt-phone-fab .spt-fab:not(.online):not(.ca
 body[data-spt-universe="retro"] #spt-phone-fab .spt-fab:not(.online):not(.calling):not(.ringing):hover,
 body[data-spt-universe="cyberpunk"] #spt-phone-fab .spt-fab:not(.online):not(.calling):not(.ringing):hover { filter: brightness(1.35); }
 body[data-spt-universe="retro"] #spt-phone-fab .spt-fab { border-radius: 10px; }
+
+/* Mobile (monochrome LCD): call buttons in the screen's two tones instead of green and red */
+.spt-player-phone.spt-skin-mobile .window-content .spt-incoming-keys button { border-radius: 6px; font-size: 1.2rem; box-shadow: none; }
+.spt-player-phone.spt-skin-mobile .window-content .spt-incoming-keys .spt-answer { background: #1e2a17; color: #b7c79c; border: 2px solid #1e2a17; }
+.spt-player-phone.spt-skin-mobile .window-content .spt-incoming-keys .spt-decline,
+.spt-player-phone.spt-skin-mobile .window-content .spt-incoming-keys .spt-dismiss { background: transparent; color: #1e2a17; border: 2px solid #1e2a17; }
+.spt-player-phone.spt-skin-mobile .window-content .spt-incoming-keys button:hover { filter: none; background: rgba(30,42,23,0.15); }
+.spt-player-phone.spt-skin-mobile .window-content .spt-incoming-keys .spt-answer:hover { background: #2e3d24; }
+.spt-phone-ring-dialog.spt-skin-mobile .form-footer button[data-action="answer"] { background: #1e2a17; border-color: #1e2a17; color: #b7c79c; }
+.spt-phone-ring-dialog.spt-skin-mobile .form-footer button[data-action="decline"],
+.spt-phone-ring-dialog.spt-skin-mobile .form-footer button[data-action="hangup"] { background: transparent; border-color: #1e2a17; color: #1e2a17; }
+.spt-player-phone.spt-skin-mobile .spt-live-screen .spt-live-state,
+.spt-player-phone.spt-skin-mobile .spt-live-screen .spt-live-state.dialing,
+.spt-player-phone.spt-skin-mobile .spt-live-screen .spt-live-state.ended,
+.spt-player-phone.spt-skin-mobile .spt-live-screen .spt-live-state.ended.cut { color: #1e2a17; }
