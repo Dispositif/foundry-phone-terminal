@@ -2,7 +2,7 @@
   "id": "soren-phones-computers",
   "title": "Phones & Computers",
   "description": "Phones and computers for your characters: calls, text messages, emails and documents. The GM is the network.",
-  "version": "1.1.0",
+  "version": "1.0.3",
   "authors": [
     {
       "name": "Soren"
@@ -10,7 +10,7 @@
   ],
   "url": "https://github.com/Dispositif/foundry-phones-computers",
   "manifest": "https://github.com/Dispositif/foundry-phones-computers/releases/latest/download/module.json",
-  "download": "https://github.com/Dispositif/foundry-phones-computers/releases/download/v1.1.0/soren-phones-computers.zip",
+  "download": "https://github.com/Dispositif/foundry-phones-computers/releases/download/v1.0.3/soren-phones-computers.zip",
   "license": "LICENSE",
   "readme": "https://github.com/Dispositif/foundry-phones-computers#readme",
   "compatibility": {

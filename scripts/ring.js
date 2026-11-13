@@ -1,5 +1,5 @@
 import { MASKED, MODULE_ID, RESULT_LABELS, SOCKET } from "./constants.js";
-import { addLog, defaultDeviceFor, displayName, findContact, getPhoneData, hasSignal, holders, isFixed, isLandline, keyFor, modelOf, npcNumber, phoneLabel, phonesByNumber, skinOf, modeOf } from "./devices.js";
+import { addLog, defaultDeviceFor, displayName, findContact, getPhoneData, hasSignal, holders, isFixed, isLandline, keyFor, modelOf, npcNumber, phoneLabel, phonesByNumber, ringOf, skinOf, modeOf } from "./devices.js";
 import { maskedLabel, rerenderAll } from "./util.js";
 import { t } from "./i18n.js";
 import { agentSide, closeDial, lineBusy, npcSide, openGmRing, startLive } from "./live-call.js";
@@ -67,7 +67,6 @@ export async function ring(target, { caller = MASKED, origin = null, callId = fo
         continue;
       }
       for (const u of users) {
-        const model = modelOf(p.phone);
         emitRing(u.id, {
           caller: modelOf(p.phone).callerId ? displayName(p.phone, call.from) : null,
           callerNumber: landlineNumber(p, call.from),
@@ -75,13 +74,13 @@ export async function ring(target, { caller = MASKED, origin = null, callId = fo
           itemUuid: p.item.uuid,
           phoneLabel: isLandline(p.phone) && game.scenes.get(p.phone.sceneId) ? `${p.phone.label} (${game.scenes.get(p.phone.sceneId).name})` : p.phone.label,
           silent: mode === "silent",
-          ringSrc: model.ring
+          ringSrc: ringOf(p.phone)
         });
       }
       // Narration: every other player hears a carried phone ring (ring mode only), softer.
       if (mode === "on" && !isFixed(p.phone) && p.actor) {
         call.nearby = true;
-        game.socket.emit(SOCKET, { type: "ringNearby", callId, exclude: users.map((u) => u.id), name: p.actor.name, img: p.actor.img, ringSrc: modelOf(p.phone).ring, timeout });
+        game.socket.emit(SOCKET, { type: "ringNearby", callId, exclude: users.map((u) => u.id), name: p.actor.name, img: p.actor.img, ringSrc: ringOf(p.phone), timeout });
       }
     }
   }

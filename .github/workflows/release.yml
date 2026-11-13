@@ -27,7 +27,7 @@ jobs:
              '.version=$v | .manifest=$m | .download=$d' module.json > module.tmp && mv module.tmp module.json
 
       - name: Build zip
-        run: zip -r soren-phones-computers.zip module.json README.md README.fr.md CHANGELOG.md LICENSE scripts styles lang sounds templates icons
+        run: zip -r soren-phones-computers.zip module.json README.md README.fr.md CHANGELOG.md LICENSE CREDITS.md scripts styles lang sounds templates icons
 
       - name: Upload assets
         env:

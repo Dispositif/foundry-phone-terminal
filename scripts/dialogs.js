@@ -138,7 +138,7 @@ const NEW_KINDS = [
   { key: "pager", model: "pager", carried: true },
   { key: "computer", model: "computer", carried: true },
   { key: "landline", model: "landline", theme: "modern" },
-  { key: "rotary", model: "landline", theme: "vintage" },
+  { key: "rotary", model: "landline", theme: "vintage", icon: "rotary" },
   { key: "desktop", model: "desktop" }
 ];
 const kindLabel = (k) => (k.key === "landline" || k.key === "rotary" ? t(`NewDev.${k.key}`) : MODELS[k.model].label);
@@ -146,7 +146,7 @@ const kindLabel = (k) => (k.key === "landline" || k.key === "rotary" ? t(`NewDev
 /** Step 1: resolves with the chosen kind, or null. */
 async function pickKind() {
   const tile = (k) => `<button type="button" class="spt-kind" data-kind="${k.key}">
-      <img src="modules/${MODULE_ID}/icons/${k.model}.svg" alt="" ${k.key === "rotary" ? 'class="spt-sepia"' : ""}>
+      <img src="modules/${MODULE_ID}/icons/${k.icon ?? k.model}.svg" alt="">
       <b>${esc(kindLabel(k))}</b><small>${t(`NewDev.Caps.${k.key}`)}</small></button>`;
   let picked = null;
   // DialogV2.wait wires the render callback (a plain constructor ignores it); a tile click closes it.
@@ -227,7 +227,7 @@ function kindForm(kind) {
     classes: ["spt-new-device"],
     position: { width: 500 },
     content: `<div class="spt-phone-form">
-        <div class="spt-chosen"><img src="modules/${MODULE_ID}/icons/${kind.model}.svg" alt="" ${kind.key === "rotary" ? 'class="spt-sepia"' : ""}>
+        <div class="spt-chosen"><img src="modules/${MODULE_ID}/icons/${kind.icon ?? kind.model}.svg" alt="">
           <div><b>${esc(kindLabel(kind))}</b><small>${t(`NewDev.Caps.${kind.key}`)}</small></div></div>
         ${holderRow}
         <div class="form-group"><label>${t("Form.DeviceName")}</label><input type="text" name="label" value="${esc(fixed ? kindLabel(kind) : nameFor(first))}"></div>

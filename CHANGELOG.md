@@ -1,8 +1,8 @@
 # Changelog
 
-## 1.1.0
-- The GM's **Cut the line** button is red.
-- **Call between two agents, while it rings:** the GM gets the call window too, with both portraits, who calls whom, and a red **Network unavailable** button. It stops the call: the caller gets "Network error. The call could not be completed.", the agent called sees a missed call.
+## 1.0.3
+- Minor UI fix on GM panel.
+- New icons and sounds (.ogg) from human authors. See CREDITS.md.
 
 ## 1.0.2
 - Compatible with Foundry v13 again (tested in v13 and v14).

@@ -123,3 +123,7 @@ Chaque appareil est un objet Foundry ordinaire qui porte un seul flag, `flags["s
 **Le navigateur du MJ est le réseau.** Les joueurs n'écrivent jamais directement dans les appareils : chaque message, appel ou accusé de lecture passe par le socket du module vers le MJ actif, qui vérifie et écrit. Le contenu d'un journal affiché sur un appareil est rendu par le MJ et envoyé en HTML : les joueurs n'ont besoin d'aucun droit sur le journal.
 
 **API** (`game.modules.get("soren-phones-computers").api`) : `openPanel({ tab })`, `openPhone(itemUuid)`, `ring(target, { caller })`, `sendSms(target, text, { sender, att })`, `hangUp(callId)`, `allPhones()`, `createPhone(actor, { label, number, model, sceneId })`, `markPhone(item, { label, number, model })`, `transferPhone(item, actor)`, `demo()`, `removeDemo()`. Une cible s'écrit `"phone:555-0142"` ou `"user:<userId>"`.
+
+---
+
+Icônes et sons : auteurs et licences dans [CREDITS.md](CREDITS.md).

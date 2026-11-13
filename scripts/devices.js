@@ -16,12 +16,12 @@ export function getPhoneData(item) {
 
 /** Device models and what they can do. */
 export const MODELS = {
-  landline: { get label() { return t("Model.landline"); }, icon: "fa-phone", fixed: true, sms: false, callerId: false, attachments: false, ring: "ring-bell.wav" },
-  mobile: { get label() { return t("Model.mobile"); }, icon: "fa-mobile-retro", sms: true, callerId: true, attachments: false, ring: "ring-mobile.wav" },
-  pager: { get label() { return t("Model.pager"); }, icon: "fa-pager", sms: true, pager: true, noCalls: true, callerId: true, attachments: false, notif: "pager.wav" },
-  smartphone: { get label() { return t("Model.smartphone"); }, icon: "fa-mobile-screen", sms: true, callerId: true, attachments: true, ring: "ring.wav" },
-  computer: { get label() { return t("Model.computer"); }, icon: "fa-laptop", sms: true, mail: true, noCalls: true, callerId: true, attachments: true, notif: "mail.wav" },
-  desktop: { get label() { return t("Model.desktop"); }, icon: "fa-desktop", fixed: true, sms: true, mail: true, noCalls: true, callerId: true, attachments: true, notif: "mail.wav" }
+  landline: { get label() { return t("Model.landline"); }, icon: "fa-phone", fixed: true, sms: false, callerId: false, attachments: false, ring: "ring-bell.ogg" },
+  mobile: { get label() { return t("Model.mobile"); }, icon: "fa-mobile-retro", sms: true, callerId: true, attachments: false, ring: "ring-mobile.ogg", notif: "sms-mobile.ogg" },
+  pager: { get label() { return t("Model.pager"); }, icon: "fa-pager", sms: true, pager: true, noCalls: true, callerId: true, attachments: false, notif: "pager.ogg" },
+  smartphone: { get label() { return t("Model.smartphone"); }, icon: "fa-mobile-screen", sms: true, callerId: true, attachments: true, ring: "ring.ogg" },
+  computer: { get label() { return t("Model.computer"); }, icon: "fa-laptop", sms: true, mail: true, noCalls: true, callerId: true, attachments: true, notif: "mail.ogg" },
+  desktop: { get label() { return t("Model.desktop"); }, icon: "fa-desktop", fixed: true, sms: true, mail: true, noCalls: true, callerId: true, attachments: true, notif: "mail.ogg" }
 };
 
 /** Can this device send messages (texts or emails)? */
@@ -95,6 +95,11 @@ export function skinOf(phone) {
   const model = MODELS[phone?.model] ? phone.model : "smartphone";
   // "default" keeps the model's look (rotary dial for a landline), so existing devices do not change.
   return themeFits(phone?.theme, model) ? THEMES[phone.theme].skin ?? phone.theme : model;
+}
+
+/** Ringtone of a device: the modern landline has its own electronic ring, the rotary dial keeps the bell. */
+export function ringOf(phone) {
+  return skinOf(phone) === "modern" ? "ring-landline.ogg" : modelOf(phone).ring;
 }
 
 export function modelOf(phone) {

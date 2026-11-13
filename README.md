@@ -123,3 +123,7 @@ Each device is an ordinary Foundry item carrying one flag, `flags["soren-phones-
 **The GM's browser is the network.** Players never write to devices directly: every message, call and read receipt goes through the module socket to the active GM, who checks and writes. Journal content shown on a device is rendered by the GM and sent as HTML, so players need no journal permission.
 
 **API** (`game.modules.get("soren-phones-computers").api`): `openPanel({ tab })`, `openPhone(itemUuid)`, `ring(target, { caller })`, `sendSms(target, text, { sender, att })`, `hangUp(callId)`, `allPhones()`, `createPhone(actor, { label, number, model, sceneId })`, `markPhone(item, { label, number, model })`, `transferPhone(item, actor)`, `demo()`, `removeDemo()`. A target is `"phone:555-0142"` or `"user:<userId>"`.
+
+---
+
+Icons and sounds: authors and licenses in [CREDITS.md](CREDITS.md).
