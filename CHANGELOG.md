@@ -1,7 +1,9 @@
 # Changelog
 
-## Unreleased
-- **Secure devices**: calls and messages between two secure devices are encrypted.
+## 1.2.0
+- **Secure communications** (in-game): secure devices and encrypted lines for calls and messages, shown by a shield icon.
+- GM can call, send or answer NPCs on a secure line.
+- New journal links: `@Mail`, `@SecureSMS`, `@SecureMail`, `@SecureCall`.
 
 ## 1.1.0
 - **Universe** (world setting): default looks and some vocabulary. **Any setting** (default), **Vintage (1980s-1990s)**, **Modern**.
