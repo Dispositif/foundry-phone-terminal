@@ -7,6 +7,7 @@ import { onResponse } from "./ring.js";
 import { closeDial, endLive, openDial, openLive, openRinging } from "./live-call.js";
 import { receiveShow } from "./share.js";
 import { onDocRequest, onFileContent, onFileRequest } from "./files.js";
+import { onJammerRequest } from "./jammer.js";
 import { isActiveGM, playLocal } from "./util.js";
 /* -------------------------------------------- */
 /*  Socket                                      */
@@ -82,6 +83,9 @@ export function onSocket(data) {
       break;
     case "fileContent":
       if (forMe) onFileContent(data);
+      break;
+    case "jammer":
+      if (isActiveGM()) onJammerRequest(data);
       break;
     case "playerHangup":
       if (isActiveGM()) onPlayerHangup(data);

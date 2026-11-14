@@ -1,7 +1,7 @@
 import { attChipHtml, attFromDrop, pickImage } from "./attachments.js";
 import { ApplicationV2, DialogV2, HandlebarsApplicationMixin, MASKED, MODES, MODULE_ID } from "./constants.js";
 import { filesOverview, previewEntry, previewFile, setFileStates } from "./files.js";
-import { allPhones, phonesByNumber, holders, sharedUsers, displayName, getLog, getPhoneData, hasSignal, holderName, inDeadZone, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc, isComputer } from "./devices.js";
+import { allJammers, isJammer, jammedScenes, allPhones, phonesByNumber, holders, sharedUsers, displayName, getLog, getPhoneData, hasSignal, holderName, inDeadZone, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc, isComputer } from "./devices.js";
 import { contactsDialog, directoryDialog, editPhoneDialog, giveDialog, newPhoneDialog } from "./dialogs.js";
 import { copyJournalLink } from "./journal-links.js";
 import { openPhone } from "./main.js";
@@ -440,7 +440,9 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       if (shared.length) return { key: "shared", order: 2, name: t("Gm.Shared"), img: null, icon: "fa-users" };
       return { key: "none", order: 3, name: t("Gm.Nobody"), img: null, icon: "fa-ghost" };
     };
-    for (const p of phones) {
+    // Jammers are listed with their carrier, never as recipients.
+    const jammers = allJammers().sort((a, b) => phoneLabel(a).localeCompare(phoneLabel(b)));
+    for (const p of [...phones, ...jammers]) {
       const g = groupOf(p);
       if (!groups.has(g.key)) groups.set(g.key, { ...g, devices: [] });
       const model = modelOf(p.phone);
@@ -461,7 +463,10 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
         noSignal: !fixed && !!p.phone.noSignal,
         cloned: countByNumber.get(norm(p.phone.number)) > 1,
         unread,
-        unreadTitle: unread ? tn("Gm.UnreadByPlayer", unread) : ""
+        unreadTitle: unread ? tn("Gm.UnreadByPlayer", unread) : "",
+        jammer: isJammer(p.phone),
+        jamOn: isJammer(p.phone) && !!p.phone.jamming && !p.phone.jamFailed,
+        jamFailed: isJammer(p.phone) && !!p.phone.jamming && !!p.phone.jamFailed
       });
     }
     const sortedGroups = [...groups.values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
@@ -479,6 +484,10 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       mode: this._state.mode,
       messaging,
       down: game.settings.get(MODULE_ID, "networkDown"),
+      // Scenes cut by a jammer: one chip each, a click opens the jammer.
+      jams: [...jammedScenes()].flatMap(([sceneId, list]) =>
+        list.map((p) => ({ uuid: p.item.uuid, label: t("Jammer.Chip", { scene: game.scenes.get(sceneId)?.name ?? "?", who: p.actor?.name ?? p.phone.label }) }))
+      ),
       pending: phones.reduce((n, p) => n + getLog(p.phone, { includePending: true }).filter((e) => e.pending).length, 0),
       ringing: [...pendingCalls.values()].map((c) => c.label).join(", "),
       targetDevices,

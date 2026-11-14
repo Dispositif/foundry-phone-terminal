@@ -26,7 +26,8 @@
       "pager": "Pager",
       "smartphone": "Smartphone",
       "computer": "Laptop",
-      "desktop": "Terminal"
+      "desktop": "Terminal",
+      "jammer": "Jammer"
     },
     "NoPlace": "No location (network access)",
     "NoHolder": "No holder",
@@ -513,7 +514,8 @@
         "computer": "Emails, documents",
         "landline": "Calls",
         "rotary": "Calls",
-        "desktop": "Emails, documents"
+        "desktop": "Emails, documents",
+        "jammer": "Cuts the network"
       },
       "NameFor": "{name}'s {model}",
       "Npc": "NPC…",
@@ -598,6 +600,29 @@
       "MailFrom": "from {name}",
       "MailTo": "to {name}",
       "FollowsMailbox": "Email attachment: follows the mailbox ({state})"
+    },
+    "Jammer": {
+      "OnTitle": "Jammer switched on",
+      "OnBody": "{who} switched on a jammer: no mobile network or Wi-Fi in {scene}.",
+      "OnHint": "Landlines and terminals still work. If the story needs the network, make the jammer fail: its light keeps blinking.",
+      "Keep": "Let it jam",
+      "Fail": "Make it fail",
+      "Repair": "Make it work",
+      "Off": "{who} switched the jammer off: network back in {scene}.",
+      "OffMoved": "{who} left {scene}: the jammer switched off, network back.",
+      "TurnOn": "Switch on",
+      "TurnOff": "Switch off",
+      "Dial": "Frequency",
+      "StatusOff": "Off",
+      "StatusOn": "Jamming {scene}",
+      "StatusFailed": "On, but failing: network up",
+      "StateOn": "jamming",
+      "StateFailed": "failing",
+      "Chip": "{scene} jammed ({who})",
+      "Open": "Open the jammer",
+      "FabHint": "jamming (click to open)",
+      "GmFab": "Jammed: {scenes}",
+      "NewHint": "No number. Switched on, it cuts the mobile network and Wi-Fi in its carrier's scene, until switched off or the carrier changes scene."
     }
   }
 }

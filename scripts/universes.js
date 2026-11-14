@@ -20,7 +20,7 @@ import { MODULE_ID } from "./constants.js";
 export const UNIVERSES = {
   all: { models: null, themes: {}, defaultModel: "smartphone" },
   retro: {
-    models: ["landline", "pager", "mobile", "computer", "desktop"],
+    models: ["landline", "pager", "mobile", "computer", "desktop", "jammer"],
     themes: {
       landline: ["modern", "vintage"],
       mobile: ["standard"],
@@ -31,7 +31,7 @@ export const UNIVERSES = {
     defaultModel: "mobile"
   },
   modern: {
-    models: ["smartphone", "mobile", "pager", "computer", "desktop", "landline"],
+    models: ["smartphone", "mobile", "pager", "computer", "desktop", "landline", "jammer"],
     themes: {
       smartphone: ["standard", "military"],
       mobile: ["standard"],
@@ -43,7 +43,7 @@ export const UNIVERSES = {
     defaultModel: "smartphone"
   },
   cyberpunk: {
-    models: ["smartphone", "computer", "desktop", "pager", "landline"],
+    models: ["smartphone", "computer", "desktop", "pager", "landline", "jammer"],
     themes: {
       smartphone: ["neon", "glitch", "military"],
       computer: ["neon", "glitch", "console"],

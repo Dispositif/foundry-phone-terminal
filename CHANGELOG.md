@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- New device: **Jammer**. Switched on, it cuts the mobile network and Wi-Fi in its carrier's scene; the GM can make it fail. Switches off when the carrier changes scene.
+
 ## 1.1.0
 - **Universe** (world setting): default looks and some vocabulary. **Any setting** (default), **Vintage (1980s-1990s)**, **Modern**.
 - The **Default device** setting is gone.
