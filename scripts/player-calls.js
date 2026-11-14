@@ -18,7 +18,7 @@ export class RingDialog extends DialogV2 {
   }
 }
 
-export async function receiveRing({ callId, caller, callerNumber, callerImg, timeout, phoneLabel: label, silent, ringSrc, itemUuid }) {
+export async function receiveRing({ callId, caller, callerNumber, callerImg, timeout, phoneLabel: label, silent, ringSrc, itemUuid, secure = false }) {
   if (activeCall) endCall("decline"); // already on a call: drop the old call
   calledOn(callId); // called: no spectator window for this call
 
@@ -31,20 +31,21 @@ export async function receiveRing({ callId, caller, callerNumber, callerImg, tim
   const onScreen = ["smartphone", "mobile"].includes(ringing?.model) || (ringing?.model === "landline" && skinOf(ringing) === "modern");
   if (!game.user.isGM && onScreen) {
     // Smartphone, mobile and modern landline show the call on the device itself: open it (or bring it forward).
-    call.screen = { caller: caller ? maskedLabel(caller) : callerNumber || null, known: !!caller, silent, img: callerImg ?? null };
+    call.screen = { caller: caller ? maskedLabel(caller) : callerNumber || null, known: !!caller, silent, img: callerImg ?? null, secure };
     const app = PlayerPhone.instance ?? new PlayerPhone();
     app._state.phoneUuid = itemUuid;
     app._skipRead = true;
     app.render({ force: true }).then(() => app.bringToFront?.());
   } else {
+    const sec = secure ? `<p class="spt-ring-secure"><i class="fas fa-shield-halved"></i> ${t("Secure.Line")}</p>` : "";
     const which = label ? `<p class="spt-which"><i class="fas ${icon}"></i> ${esc(label)}${silent ? ` (${t("Mode.silent").toLowerCase()})` : ""}</p>` : "";
     const dialog = new RingDialog({
       window: { title: t("Call.Incoming"), icon: `fas ${icon}` },
       classes: ["spt-phone-ring-dialog", "spt-player-phone", `spt-skin-${ringing ? skinOf(ringing) : "smartphone"}`],
       position: { width: 320 },
       content: caller
-        ? `<div class="spt-phone-ring ${silent ? "silent" : ""}">${which}<i class="fas fa-phone-volume"></i><p class="spt-caller">${esc(maskedLabel(caller))}</p><p>${t("Call.IsCalling")}</p></div>`
-        : `<div class="spt-phone-ring ${silent ? "silent" : ""}">${which}<i class="fas fa-phone-volume"></i><p class="spt-caller">${callerNumber ? esc(callerNumber) : t("Call.Ringing")}</p></div>`,
+        ? `<div class="spt-phone-ring ${silent ? "silent" : ""}">${which}<i class="fas fa-phone-volume"></i><p class="spt-caller">${esc(maskedLabel(caller))}</p><p>${t("Call.IsCalling")}</p>${sec}</div>`
+        : `<div class="spt-phone-ring ${silent ? "silent" : ""}">${which}<i class="fas fa-phone-volume"></i><p class="spt-caller">${callerNumber ? esc(callerNumber) : t("Call.Ringing")}</p>${sec}</div>`,
       buttons: [
         { action: "answer", label: t("Call.Answer"), icon: "fas fa-phone", default: true, callback: () => "answer" },
         { action: "decline", label: t("Call.Decline"), icon: "fas fa-phone-slash", callback: () => "decline" }

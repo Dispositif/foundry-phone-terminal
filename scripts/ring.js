@@ -1,5 +1,5 @@
 import { MASKED, MODULE_ID, RESULT_LABELS, SOCKET } from "./constants.js";
-import { addLog, secureWith, setSecureWith, defaultDeviceFor, displayName, findContact, getPhoneData, hasSignal, holders, isFixed, isLandline, keyFor, modelOf, npcNumber, phoneLabel, phonesByNumber, ringOf, skinOf, modeOf } from "./devices.js";
+import { addLog, isSecure, secureWith, setSecureWith, defaultDeviceFor, displayName, findContact, getPhoneData, hasSignal, holders, isFixed, isLandline, keyFor, modelOf, npcNumber, phoneLabel, phonesByNumber, ringOf, skinOf, modeOf } from "./devices.js";
 import { maskedLabel, rerenderAll } from "./util.js";
 import { t } from "./i18n.js";
 import { agentSide, closeDial, lineBusy, npcSide, openGmRing, startLive } from "./live-call.js";
@@ -83,7 +83,9 @@ export async function ring(target, { caller = MASKED, origin = null, callId = fo
           itemUuid: p.item.uuid,
           phoneLabel: isLandline(p.phone) && game.scenes.get(p.phone.sceneId) ? `${p.phone.label} (${game.scenes.get(p.phone.sceneId).name})` : p.phone.label,
           silent: mode === "silent",
-          ringSrc: ringOf(p.phone)
+          ringSrc: ringOf(p.phone),
+          // Secure line, known while it rings: both ends secure (the calling agent's device, or the GM's choice for the NPC).
+          secure: isSecure(p.phone) && (origin ? isSecure(getPhoneData(fromUuidSync(origin.itemUuid))) : call.secure)
         });
       }
       // Narration: every other player hears a carried phone ring (ring mode only), softer.

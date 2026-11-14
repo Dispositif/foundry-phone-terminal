@@ -1028,3 +1028,4 @@ body[data-spt-universe="retro"] #spt-phone-fab .spt-fab { border-radius: 10px; }
 .spt-phone-form .spt-secure-row > label { flex: 1 1 auto; white-space: nowrap; }
 .spt-phone-form .spt-secure-row > .form-fields { flex: 0 0 auto; }
 .spt-gm-send .spt-secure-btn { background: #24524d; border-color: #3f9f95; }
+.spt-ring-secure { color: #4fb3a9; font-size: 0.85em; }
