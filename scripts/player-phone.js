@@ -1,7 +1,7 @@
 import { attChipHtml, attHtml, openAttachment, pickImage } from "./attachments.js";
 import { openSystemSheet } from "./item-sheet.js";
 import { ApplicationV2, MODES, MODULE_ID, SOCKET } from "./constants.js";
-import { SKINS, addLog, allPhones, conversations, displayName, findContact, getLog, getPhoneData, hasSignal, isComputer, isFixed, isLandline, isPager, keyFor, markRead, modelOf, msgOn, mutateLog, phoneLabel, sameConv, isUnread, skinOf, unreadCount, modeOf, npcDirectory, inboxOf, filesOf, playerUnread } from "./devices.js";
+import { SKINS, addLog, allPhones, conversations, displayName, findContact, getLog, getPhoneData, hasSignal, isComputer, isSecure, isFixed, isLandline, isPager, keyFor, markRead, modelOf, msgOn, mutateLog, phoneLabel, sameConv, isUnread, skinOf, unreadCount, modeOf, npcDirectory, inboxOf, filesOf, playerUnread } from "./devices.js";
 import { addFile, findFile, loadEntryDoc, loadFile, patchFile, removeFile, renameFile } from "./files.js";
 import { addContactDialog, contactsDialog } from "./dialogs.js";
 import { loadLastDevice, myPhones, saveLastDevice } from "./fab.js";
@@ -607,7 +607,9 @@ export class PlayerPhone extends ApplicationV2 {
     const gmTools = this.gm
       ? `${contactsBtn}<a data-action="gmItemSheet" title="${t("Sheet.ItemSheet")}" aria-label="${t("Sheet.ItemSheet")}"><i class="fas fa-file-lines"></i></a>`
       : contactsBtn;
-    return `<header class="spt-phone-top">${phoneSel}${signal}${gmTools}<div class="spt-modes">${modeBtns}</div></header>`;
+    // Secure device: a shield next to the signal.
+    const secure = isSecure(p.phone) ? `<i class="fas fa-shield-halved spt-secure-badge" title="${t("Secure.Device")}"></i>` : "";
+    return `<header class="spt-phone-top">${phoneSel}${secure}${signal}${gmTools}<div class="spt-modes">${modeBtns}</div></header>`;
   }
 
   _renderList(p, mine) {
@@ -645,7 +647,8 @@ export class PlayerPhone extends ApplicationV2 {
       return `<span class="spt-share"><a data-action="showEntry" data-id="${id}" title="${t("Share.ShowScreen")}"><i class="fas fa-eye"></i></a><a data-action="fwdEntry" data-id="${id}" title="${t("Fwd.Forward")}"><i class="fas fa-share"></i></a></span>`;
     };
     // Encrypted message (secure line): a small shield.
-    const secureTag = (e) => (e.secure ? `<span class="spt-secure-tag" title="${t("Secure.Message")}"><i class="fas fa-shield-halved"></i></span>` : "");
+    // An <i>, not a <span>: bubble spans are full-width blocks that would cover the share icons.
+    const secureTag = (e) => (e.secure ? `<i class="fas fa-shield-halved spt-secure-tag" title="${t("Secure.Message")}"></i>` : "");
     const fwdTag = (e) => (e.fwd ? `<span class="spt-fwd"><i class="fas fa-share"></i> ${t("Fwd.Forwarded")}</span>` : "");
     // Federal look: each email becomes a case file, with a stable reference and a stamp on received ones.
     const federal = skinOf(p.phone) === "federal";

@@ -138,7 +138,8 @@
       "BetweenAgents": "Entre PJ (lecture seule)",
       "InboxNpc": "PNJ",
       "InboxAgents": "Entre PJ",
-      "DropJournal": "Glissez une page de journal ou une image sur le message : l'agent la lira sur son appareil."
+      "DropJournal": "Glissez une page de journal ou une image sur le message : l'agent la lira sur son appareil.",
+      "LeakedForward": "{who} a transféré un message chiffré en clair à {to}."
     },
     "Document": "Document",
     "RemoveAttachment": "Retirer la pièce jointe",
@@ -386,6 +387,9 @@
             "gps": "Triangulation",
             "wifi": "Ligne télécom"
           }
+        },
+        "Secure": {
+          "Line": "Ligne protégée"
         }
       },
       "modern": {},
@@ -434,7 +438,10 @@
         "CallerResult": {
           "busy": "Net saturé. Réessayez plus tard."
         },
-        "Masked": "ID intraçable"
+        "Masked": "ID intraçable",
+        "Secure": {
+          "Line": "Canal chiffré"
+        }
       }
     },
     "Theme": {
@@ -610,7 +617,9 @@
       "On": "Ligne sécurisée avec ce PNJ (cliquer pour la couper)",
       "Off": "Ligne en clair avec ce PNJ (cliquer pour la sécuriser)",
       "Send": "Envoi sécurisé",
-      "Ring": "Appel sécurisé"
+      "Ring": "Appel sécurisé",
+      "Answer": "Répondre sécurisé",
+      "CopyLink": "Copier le lien de journal sécurisé"
     }
   }
 }

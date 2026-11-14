@@ -123,8 +123,9 @@ export function gmInbox() {
 
 /** Device selector: model icon on the left, updated on change. */
 export function deviceSelect(mine, p, labelFn) {
+  // A single device: its name only (the screen already shows what kind of device it is).
   if (mine.length <= 1) {
-    return `<div class="spt-icon-select"><i class="fas ${modelOf(p.phone).icon}"></i> <strong>${esc(labelFn(p))}</strong></div>`;
+    return `<div class="spt-icon-select"><strong>${esc(labelFn(p))}</strong></div>`;
   }
   const opts = mine
     .map((q) => `<option value="${q.item.uuid}" data-icon="${modelOf(q.phone).icon}" ${q.item.uuid === p.item.uuid ? "selected" : ""}>${esc(labelFn(q))}</option>`)
@@ -293,6 +294,10 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       copyLink: function () {
         this._readForm();
         copyJournalLink(this._state);
+      },
+      copySecureLink: function () {
+        this._readForm();
+        copyJournalLink(this._state, { secure: true });
       },
       attach: async function () {
         const src = await pickImage();

@@ -99,7 +99,8 @@ export function networkUp(phone) {
   return false;
 }
 
-export function playerSendSms(item, to, text, { att = null, fwd = false } = {}) {
+/** fwdSecure: forwarding an encrypted message (the GM is told if it leaves in clear). */
+export function playerSendSms(item, to, text, { att = null, fwd = false, fwdSecure = false } = {}) {
   if (!msgOn(getPhoneData(item))) return false;
   text = text?.trim() ?? "";
   to = to?.trim();
@@ -108,7 +109,7 @@ export function playerSendSms(item, to, text, { att = null, fwd = false } = {}) 
   if (getPhoneData(item)?.locked) return deviceNotice(t("Warn.Locked"), { warn: true }), false;
   if (modeOf(getPhoneData(item)) === "off") return deviceNotice(t("Warn.PhoneOff"), { warn: true }), false;
   if (!networkUp(getPhoneData(item))) return false;
-  game.socket.emit(SOCKET, { type: "playerSms", fromItemUuid: item.uuid, to, text, att, fwd, userId: game.user.id });
+  game.socket.emit(SOCKET, { type: "playerSms", fromItemUuid: item.uuid, to, text, att, fwd, fwdSecure, userId: game.user.id });
   return true;
 }
 

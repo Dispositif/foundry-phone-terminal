@@ -1020,10 +1020,7 @@ body[data-spt-universe="retro"] #spt-phone-fab .spt-fab { border-radius: 10px; }
 .spt-gm .spt-secure-toggle { color: inherit; opacity: 0.45; }
 .spt-gm .spt-secure-toggle.on { opacity: 1; }
 .spt-bb-secure { float: right; margin-left: 4px; font-size: 0.8em; }
-.spt-secure-tag { display: inline-block; margin-right: 4px; font-size: 0.75em; opacity: 0.75; }
-.spt-secure-box { display: flex; align-items: center; gap: 6px; margin: 6px 0; cursor: pointer; }
-.spt-secure-box .fa-shield-halved { color: #3f9f95; }
-.spt-phone-ring .spt-secure-box { justify-content: center; margin-top: 10px; }
+.spt-bubble .spt-secure-tag { margin-right: 4px; font-size: 0.75em; opacity: 0.75; }
 /* Edit device: "Secure (encrypted)" on one line, the box at the end, the hint below. */
 .spt-phone-form .spt-secure-row { margin: 6px 0; }
 .spt-phone-form .spt-secure-check { display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; }
@@ -1031,3 +1028,6 @@ body[data-spt-universe="retro"] #spt-phone-fab .spt-fab { border-radius: 10px; }
 .spt-phone-form .spt-secure-row .hint { margin: 2px 0 0 28px; }
 .spt-gm-send .spt-secure-btn { background: #24524d; border-color: #3f9f95; }
 .spt-ring-secure { color: #4fb3a9; font-size: 0.85em; }
+.spt-phone-top .spt-secure-badge { color: #4fb3a9; font-size: 0.85em; }
+.spt-phone-ring-dialog button[data-action="answerSecure"] { background: #2f6b3a; border-color: #4caf50; color: #fff; }
+.spt-gm-send .spt-secure-link .fa-shield-halved { font-size: 0.7em; margin-left: 2px; color: #4fb3a9; }

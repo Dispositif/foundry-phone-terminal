@@ -94,7 +94,7 @@ The **Network** panel (Ctrl+Shift+P, or the telecom button):
 
 **NPC directory:** list your NPCs once, one per line (`Marlin Hunt | 555-0242`). You see who the agents call, and `public` numbers (pizzeria, taxi, hospital) work as yellow pages for the players.
 
-**Journal links:** `@SMS[recipient|sender]{text}` and `@Call[recipient|sender]` become buttons in your scenario notes. The panel's link button writes them for you. Players see only the text.
+**Journal links:** `@SMS[recipient|sender]{text}` and `@Call[recipient|sender]` (also `@Mail`, `@SecureSMS`, `@SecureMail`, `@SecureCall`) become buttons in your scenario notes. The panel's link button writes them for you. Players see only the text.
 
 ---
 

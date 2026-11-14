@@ -1,11 +1,13 @@
 import { MASKED } from "./constants.js";
-import { allPhones, phonesByNumber } from "./devices.js";
+import { allPhones, isComputer, phonesByNumber } from "./devices.js";
 import { sendSms } from "./messages.js";
 import { ring } from "./ring.js";
 import { esc, isMasked, maskedLabel, norm } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
-/*  @SMS / @Call links in journals              */
+/*  @SMS / @Mail / @Call links in journals      */
+/*  (@SMS and @Mail are the same message;       */
+/*  @Secure...: on a secure line)               */
 /* -------------------------------------------- */
 
 /** Plain text from the HTML captured in a journal. */
@@ -40,8 +42,8 @@ export function parseAtt(str) {
   return null;
 }
 
-/** Builds the link from the GM panel state and copies it. */
-export async function copyJournalLink({ target, sender, text, att }) {
+/** Builds the link from the GM panel state and copies it (secure: @SecureSMS / @SecureCall). */
+export async function copyJournalLink({ target, sender, text, att }, { secure = false } = {}) {
   const [kind, value] = String(target ?? "").split(/:(.*)/s);
   let to = value;
   if (kind === "user") {
@@ -54,9 +56,12 @@ export async function copyJournalLink({ target, sender, text, att }) {
   const attStr = att ? (att.type === "image" ? `img:${att.src}` : `doc:${att.uuid}`) : "";
   const body = clean(text);
   const isSms = !!(body || attStr);
+  // A message to a laptop or terminal reads as an email in the journal.
+  const msgKind = kind === "phone" && phonesByNumber(value).some((p) => isComputer(p.phone)) ? "Mail" : "SMS";
   const args = [clean(to), from, isSms ? attStr : ""];
   while (args.length > 1 && !args[args.length - 1]) args.pop();
-  const link = isSms ? `@SMS[${args.join("|")}]{${body}}` : `@Call[${args.join("|")}]`;
+  const prefix = secure ? "Secure" : "";
+  const link = isSms ? `@${prefix}${msgKind}[${args.join("|")}]{${body}}` : `@${prefix}Call[${args.join("|")}]`;
   try {
     if (game.clipboard?.copyPlainText) await game.clipboard.copyPlainText(link);
     else await navigator.clipboard.writeText(link);
@@ -68,9 +73,12 @@ export async function copyJournalLink({ target, sender, text, att }) {
 
 export function registerEnrichers() {
   CONFIG.TextEditor.enrichers.push({
-    pattern: /@(SMS|Call)\[([^\]]*)\](?:\{([^}]*)\})?/g,
+    pattern: /@(Secure)?(SMS|Mail|Call)\[([^\]]*)\](?:\{([^}]*)\})?/g,
     enricher: async (match) => {
-      const [, kind, rawArgs, rawText] = match;
+      const [, secure, written, rawArgs, rawText] = match;
+      // @Mail is an @SMS written for a computer: same message, an envelope icon.
+      const kind = written === "Call" ? "Call" : "SMS";
+      const msgIcon = written === "Mail" ? "fa-envelope" : "fa-comment-sms";
       const [to = "", from = "", attStr = ""] = plainText(rawArgs).split("|").map((x) => x.trim());
       const text = plainText(rawText);
       if (!game.user.isGM) {
@@ -81,23 +89,26 @@ export function registerEnrichers() {
       }
       const a = document.createElement("a");
       a.classList.add("spt-link", kind === "SMS" ? "sms" : "call");
-      Object.assign(a.dataset, { kind, to, from, text, att: attStr });
+      Object.assign(a.dataset, { kind, to, from, text, att: attStr, secure: secure ? "1" : "" });
       a.title = t("Link.ClickToSend");
       const who = esc(maskedLabel(from || MASKED));
-      a.innerHTML =
-        kind === "SMS"
-          ? `<i class="fas fa-comment-sms"></i> ${who} → ${esc(to)}${attStr ? ' <i class="fas fa-paperclip"></i>' : ""} : « ${esc(text)} »`
-          : `<i class="fas fa-phone-volume"></i> ${t("Link.Calls", { who, to: esc(to) })}`;
+      const shield = secure ? `<i class="fas fa-shield-halved" title="${t("Secure.Line")}"></i> ` : "";
+      a.innerHTML = shield +
+        (kind === "SMS"
+          ? `<i class="fas ${msgIcon}"></i> ${who} → ${esc(to)}${attStr ? ' <i class="fas fa-paperclip"></i>' : ""} : « ${esc(text)} »`
+          : `<i class="fas fa-phone-volume"></i> ${t("Link.Calls", { who, to: esc(to) })}`);
       return a;
     }
   });
 }
 
-export async function runJournalLink({ kind, to, from, text, att }) {
+/** secure: "1" for @SecureSMS / @SecureCall (a secure line); @SMS / @Call are always in clear. */
+export async function runJournalLink({ kind, to, from, text, att, secure }) {
   const target = resolveTarget(to);
   if (!target) return ui.notifications.warn(`📱 ${t("Warn.RecipientNotFound", { to })}`);
   const sender = from || MASKED;
-  if (kind === "SMS") return sendSms(target, text, { sender, att: parseAtt(att) });
-  return ring(target, { caller: sender });
+  const opts = { secure: !!secure };
+  if (kind === "SMS") return sendSms(target, text, { sender, att: parseAtt(att), ...opts });
+  return ring(target, { caller: sender, ...opts });
 }
 

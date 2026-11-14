@@ -96,7 +96,7 @@ Le panneau **Réseau** (Ctrl+Shift+P, ou le bouton télécom) :
 
 **Annuaire PNJ :** listez vos PNJ une fois, un par ligne (`Marlin Hunt | 555-0242`). Vous voyez qui les agents appellent, et les numéros `public` (pizzeria, taxi, hôpital) servent de pages jaunes aux joueurs.
 
-**Liens dans les journaux :** `@SMS[destinataire|expéditeur]{texte}` et `@Call[destinataire|expéditeur]` deviennent des boutons dans vos notes de scénario. Le bouton lien du panneau les écrit pour vous. Les joueurs ne voient que le texte.
+**Liens dans les journaux :** `@SMS[destinataire|expéditeur]{texte}` et `@Call[destinataire|expéditeur]` (aussi `@Mail`, `@SecureSMS`, `@SecureMail`, `@SecureCall`) deviennent des boutons dans vos notes de scénario. Le bouton lien du panneau les écrit pour vous. Les joueurs ne voient que le texte.
 
 ---
 

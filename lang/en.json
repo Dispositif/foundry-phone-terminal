@@ -138,7 +138,8 @@
       "BetweenAgents": "Between PCs (read only)",
       "InboxNpc": "NPCs",
       "InboxAgents": "Between PCs",
-      "DropJournal": "Drop a journal page or an image on the message: the agent reads it on their device."
+      "DropJournal": "Drop a journal page or an image on the message: the agent reads it on their device.",
+      "LeakedForward": "{who} forwarded an encrypted message in clear to {to}."
     },
     "Document": "Document",
     "RemoveAttachment": "Remove attachment",
@@ -386,6 +387,9 @@
             "gps": "Triangulation",
             "wifi": "Phone line"
           }
+        },
+        "Secure": {
+          "Line": "Secure voice"
         }
       },
       "modern": {},
@@ -434,7 +438,10 @@
         "CallerResult": {
           "busy": "Net overloaded. Try again later."
         },
-        "Masked": "Untraceable ID"
+        "Masked": "Untraceable ID",
+        "Secure": {
+          "Line": "Encrypted channel"
+        }
       }
     },
     "Theme": {
@@ -610,7 +617,9 @@
       "On": "Secure line with this NPC (click to turn off)",
       "Off": "Line in clear with this NPC (click to make it secure)",
       "Send": "Secure send",
-      "Ring": "Secure ring"
+      "Ring": "Secure ring",
+      "Answer": "Answer secure",
+      "CopyLink": "Copy the secure journal link"
     }
   }
 }

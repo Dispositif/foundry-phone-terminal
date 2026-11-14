@@ -56,12 +56,14 @@
       <div class="spt-phone-row">
         <button type="button" class="spt-icon-btn" data-action="attach" title="{{spt "AttachImage"}}" aria-label="{{spt "AttachImage"}}"><i class="fas fa-paperclip"></i></button>
         <button type="button" class="spt-icon-btn" data-action="copyLink" title="{{spt "Gm.CopyLink"}}" aria-label="{{spt "Gm.CopyLink"}}"><i class="fas fa-link"></i></button>
+        {{#if canSecure}}<button type="button" class="spt-icon-btn spt-secure-link" data-action="copySecureLink" title="{{spt "Secure.CopyLink"}}" aria-label="{{spt "Secure.CopyLink"}}"><i class="fas fa-link"></i><i class="fas fa-shield-halved"></i></button>{{/if}}
         <button type="button" class="spt-primary" data-action="sms"><i class="fas fa-paper-plane"></i> {{spt "Send"}}</button>
         {{#if canSecure}}<button type="button" class="spt-primary spt-secure-btn" data-action="smsSecure" title="{{spt "Secure.BoxHint"}}"><i class="fas fa-shield-halved"></i> {{spt "Secure.Send"}}</button>{{/if}}
       </div>
       {{else}}
       <div class="spt-phone-row">
         <button type="button" class="spt-icon-btn" data-action="copyLink" title="{{spt "Gm.CopyLink"}}" aria-label="{{spt "Gm.CopyLink"}}"><i class="fas fa-link"></i></button>
+        {{#if canSecure}}<button type="button" class="spt-icon-btn spt-secure-link" data-action="copySecureLink" title="{{spt "Secure.CopyLink"}}" aria-label="{{spt "Secure.CopyLink"}}"><i class="fas fa-link"></i><i class="fas fa-shield-halved"></i></button>{{/if}}
         <button type="button" class="spt-primary" data-action="ring"><i class="fas fa-phone-volume"></i> {{spt "Gm.Ring"}}</button>
         {{#if canSecure}}<button type="button" class="spt-primary spt-secure-btn" data-action="ringSecure" title="{{spt "Secure.BoxHint"}}"><i class="fas fa-shield-halved"></i> {{spt "Secure.Ring"}}</button>{{/if}}
       </div>

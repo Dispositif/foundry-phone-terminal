@@ -120,6 +120,6 @@ export async function forwardEntry(p, e) {
     rejectClose: false
   });
   if (!to) return;
-  if (playerSendSms(p.item, to, e.text ?? "", { att, fwd: true })) deviceNotice(t("Fwd.Done", { to }));
+  if (playerSendSms(p.item, to, e.text ?? "", { att, fwd: true, fwdSecure: !!e.secure })) deviceNotice(t("Fwd.Done", { to }));
 }
 
