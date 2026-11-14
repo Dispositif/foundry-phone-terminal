@@ -59,6 +59,16 @@ function callRows(phones) {
   });
 }
 
+/** Between agents: the other end(s) of a thread, each with their device icon. */
+function otherAgents(th) {
+  const others = phonesByNumber(keyFor(th.phone, th.key)).filter((p) => p.item !== th.item);
+  if (!others.length) return [{ name: gmName(th.phone, th.key), icon: null }];
+  const seen = new Set();
+  return others
+    .map((p) => ({ name: holderName(p.item, p.phone), icon: modelOf(p.phone).icon, modelLabel: modelOf(p.phone).label }))
+    .filter((o) => !seen.has(o.name) && seen.add(o.name));
+}
+
 /** Calls by real time of play: the last hour, the last 24 hours, before (empty groups left out). */
 function callGroups(rows) {
   const hour = Date.now() - 3600 * 1000;
@@ -418,8 +428,12 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
         uuid: th.item.uuid,
         key: th.key,
         who: holderName(th.item, th.phone),
-        // Between agents: the other agent's name; to an NPC: the directory name.
-        to: th.agents ? [...new Set(phonesByNumber(keyFor(th.phone, th.key)).filter((p) => p.item !== th.item).map((p) => holderName(p.item, p.phone)))].join(", ") || gmName(th.phone, th.key) : gmName(th.phone, th.key),
+        // The agent's device icon: the GM sees at a glance a text (phone) or an email (computer).
+        icon: modelOf(th.phone).icon,
+        modelLabel: modelOf(th.phone).label,
+        // Between agents: the other agent's name (with their device icon); to an NPC: the directory name.
+        others: th.agents ? otherAgents(th) : [],
+        to: th.agents ? "" : gmName(th.phone, th.key),
         agents: th.agents,
         unknown: !th.agents && isUnknownNumber(th.phone, th.key),
         compromised: !!th.phone.compromised,
