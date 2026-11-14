@@ -40,10 +40,6 @@
         <datalist id="spt-senders">{{#each senderOptions}}<option value="{{value}}" label="{{label}}"></option>{{/each}}</datalist>
       </div>
 
-      {{#if canSecure}}
-      <label class="spt-secure-box" title="{{spt "Secure.BoxHint"}}"><input type="checkbox" name="secure" {{#if secure}}checked{{/if}}> <i class="fas fa-shield-halved"></i> {{spt "Secure.Line"}}</label>
-      {{/if}}
-
       {{#if messaging}}
       <div class="spt-segmented" role="radiogroup">
         <a class="{{#if (eq mode "message")}}active{{/if}}" data-action="mode" data-mode="message" role="radio"><i class="fas fa-comment-sms"></i> {{spt "Gm.ModeMessage"}}</a>
@@ -61,11 +57,13 @@
         <button type="button" class="spt-icon-btn" data-action="attach" title="{{spt "AttachImage"}}" aria-label="{{spt "AttachImage"}}"><i class="fas fa-paperclip"></i></button>
         <button type="button" class="spt-icon-btn" data-action="copyLink" title="{{spt "Gm.CopyLink"}}" aria-label="{{spt "Gm.CopyLink"}}"><i class="fas fa-link"></i></button>
         <button type="button" class="spt-primary" data-action="sms"><i class="fas fa-paper-plane"></i> {{spt "Send"}}</button>
+        {{#if canSecure}}<button type="button" class="spt-primary spt-secure-btn" data-action="smsSecure" title="{{spt "Secure.BoxHint"}}"><i class="fas fa-shield-halved"></i> {{spt "Secure.Send"}}</button>{{/if}}
       </div>
       {{else}}
       <div class="spt-phone-row">
         <button type="button" class="spt-icon-btn" data-action="copyLink" title="{{spt "Gm.CopyLink"}}" aria-label="{{spt "Gm.CopyLink"}}"><i class="fas fa-link"></i></button>
         <button type="button" class="spt-primary" data-action="ring"><i class="fas fa-phone-volume"></i> {{spt "Gm.Ring"}}</button>
+        {{#if canSecure}}<button type="button" class="spt-primary spt-secure-btn" data-action="ringSecure" title="{{spt "Secure.BoxHint"}}"><i class="fas fa-shield-halved"></i> {{spt "Secure.Ring"}}</button>{{/if}}
       </div>
       {{/if}}
     </section>

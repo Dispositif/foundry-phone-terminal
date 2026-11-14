@@ -606,9 +606,11 @@
       "LineHint": "Encrypted call: both devices are secure.",
       "Message": "Encrypted message",
       "Device": "Secure device (encrypted)",
-      "BoxHint": "The NPC talks on a secure line. Encrypted only if the agent's device is secure. Remembered for this NPC.",
+      "BoxHint": "The NPC talks on a secure line. Remembered for this NPC on this device.",
       "On": "Secure line with this NPC (click to turn off)",
-      "Off": "Line in clear with this NPC (click to make it secure)"
+      "Off": "Line in clear with this NPC (click to make it secure)",
+      "Send": "Secure send",
+      "Ring": "Secure ring"
     }
   }
 }

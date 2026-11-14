@@ -228,6 +228,8 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       switchTab: function (event, target) { this._focusSend = true; this._setState({ tab: target.dataset.tab }); },
       mode: function (event, target) { this._focusSend = true; this._setState({ mode: target.dataset.mode }); },
       ring: function () { this._doRing(); },
+      ringSecure: function () { this._doRing(true); },
+      smsSecure: function () { this._doSms(true); },
       hangup: function () { hangUpAll(); },
       sms: function () { this._doSms(); },
       newPhone: async function () {
@@ -339,7 +341,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static recentSenders = [];
 
-  _state = { target: null, sender: "", text: "", att: null, tab: "send", mode: "message", drafts: {}, secure: false, inboxView: "npc", filesView: "device", filesFilter: "all", filesQuery: "" };
+  _state = { target: null, sender: "", text: "", att: null, tab: "send", mode: "message", drafts: {}, inboxView: "npc", filesView: "device", filesFilter: "all", filesQuery: "" };
 
   /** Changes the state (tab, mode, recipient…) while keeping the current input. */
   _setState(patch) {
@@ -360,8 +362,6 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     this._state.sender = el.querySelector("[name=sender]")?.value ?? this._state.sender;
     this._state.text = el.querySelector("[name=text]")?.value ?? this._state.text;
     this._state.filesQuery = el.querySelector("[name=filesQuery]")?.value ?? this._state.filesQuery;
-    const box = el.querySelector(".spt-gm-send [name=secure]");
-    if (box) this._state.secure = box.checked;
     for (const input of el.querySelectorAll("[data-draft]")) this._state.drafts[input.dataset.draft] = input.value;
   }
 
@@ -496,7 +496,6 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
       mode: this._state.mode,
       messaging,
       canSecure,
-      secure: this._state.secure,
       down: game.settings.get(MODULE_ID, "networkDown"),
       pending: phones.reduce((n, p) => n + getLog(p.phone, { includePending: true }).filter((e) => e.pending).length, 0),
       ringing: [...pendingCalls.values()].map((c) => c.label).join(", "),
@@ -567,11 +566,12 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     await sendSms(`phone:${phone.number}`, text, { sender: displayName(phone, key) });
   }
 
-  _doRing() {
+  /** secure: the "secure" button (secure recipient only); the plain button is a line in clear. */
+  _doRing(secure = false) {
     this._readForm();
     if (!this._state.target) return ui.notifications.warn(t("Warn.NoRecipient"));
     this._rememberSender();
-    ring(this._state.target, { caller: this._normSender(), secure: this._secureChoice() });
+    ring(this._state.target, { caller: this._normSender(), secure: this._secureChoice(secure) });
   }
 
   /** Files tab: every computer file, by device or by source journal. */
@@ -618,9 +618,9 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     return [...opts.values()];
   }
 
-  /** Send tab: the "Secure line" box when it is shown; otherwise the device's memory for that NPC decides. */
-  _secureChoice() {
-    return this.element?.querySelector(".spt-gm-send [name=secure]") ? !!this._state.secure : undefined;
+  /** Send tab, secure recipient: which button was used. Otherwise the device's memory for that NPC decides. */
+  _secureChoice(secure) {
+    return this.element?.querySelector(".spt-gm-send .spt-secure-btn") ? secure : undefined;
   }
 
   /** Remembers the last senders used (this session only). */
@@ -639,11 +639,11 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     return npc?.number || s;
   }
 
-  async _doSms() {
+  async _doSms(secure = false) {
     this._readForm();
     if (!this._state.target) return ui.notifications.warn(t("Warn.NoRecipient"));
     this._rememberSender();
-    await sendSms(this._state.target, this._state.text, { sender: this._normSender(), att: this._state.att, secure: this._secureChoice() });
+    await sendSms(this._state.target, this._state.text, { sender: this._normSender(), att: this._state.att, secure: this._secureChoice(secure) });
     this._state.text = "";
     this._state.att = null;
     this._skipRead = true;
