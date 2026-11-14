@@ -43,7 +43,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
         <div class="form-group"><label>${t("Form.Number")}</label><input type="text" name="number" value="${esc(number)}"><p class="hint">${t("Form.NumberHint")}</p></div>
         <div class="form-group spt-if-themes"><label>${t("Form.Theme")}</label><select name="theme">${themeOpts}</select></div>
         <div class="form-group spt-if-computer"><label>${t("Form.Inbox")}</label><select name="inbox">${["on", "locked", "none"].map((k) => `<option value="${k}" ${k === inbox ? "selected" : ""}>${t(`Form.Inbox_${k}`)}</option>`).join("")}</select></div>
-        <div class="form-group"><label><i class="fas fa-shield-halved"></i> ${t("Form.Secure")}</label><div class="form-fields"><input type="checkbox" name="secure" ${secure ? "checked" : ""}></div><p class="hint">${t("Form.SecureHint")}</p></div>
+        <div class="form-group spt-secure-row"><label><i class="fas fa-shield-halved"></i> ${t("Form.Secure")}</label><div class="form-fields"><input type="checkbox" name="secure" ${secure ? "checked" : ""}></div><p class="hint">${t("Form.SecureHint")}</p></div>
       </div>`,
     render: (event, x) => {
       // v13+: (event, dialog); an HTML element is accepted too.

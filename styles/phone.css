@@ -1024,3 +1024,6 @@ body[data-spt-universe="retro"] #spt-phone-fab .spt-fab { border-radius: 10px; }
 .spt-secure-box { display: flex; align-items: center; gap: 6px; margin: 6px 0; cursor: pointer; }
 .spt-secure-box .fa-shield-halved { color: #3f9f95; }
 .spt-phone-ring .spt-secure-box { justify-content: center; margin-top: 10px; }
+/* Edit device: "Secure (encrypted)" on one line, the box at the end, the hint below. */
+.spt-phone-form .spt-secure-row > label { flex: 1 1 auto; white-space: nowrap; }
+.spt-phone-form .spt-secure-row > .form-fields { flex: 0 0 auto; }
