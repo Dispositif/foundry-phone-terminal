@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.3.0
+- New device: **Jammer**. Switched on, it cuts the mobile network and Wi-Fi in its carrier's scene; the GM can make it fail. Switches off when the carrier changes scene.
+
 ## 1.2.0
 - **Secure communications** (in-game): secure devices and encrypted lines for calls and messages, shown by a shield icon.
 - GM can call, send or answer NPCs on a secure line.

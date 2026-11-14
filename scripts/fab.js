@@ -1,10 +1,11 @@
 import { MODULE_ID } from "./constants.js";
 import { t, tn } from "./i18n.js";
-import { allPhones, getLog, getPhoneData, holders, isFixed, isPager, landlineUsers, modeOf, modelOf, playerUnread } from "./devices.js";
+import { allPhones, getLog, getPhoneData, holders, isFixed, isJammer, isPager, jammedScenes, landlineUsers, modeOf, modelOf, playerUnread } from "./devices.js";
 import { gmIncoming } from "./gm-actions.js";
 import { elapsed, liveCalls, liveOn } from "./live-call.js";
 import { openPanel, openPhone } from "./main.js";
 import { activeCall } from "./player-calls.js";
+import { myActiveJammers } from "./jammer.js";
 /* -------------------------------------------- */
 /*  Floating button (players, and GM network)   */
 /* -------------------------------------------- */
@@ -65,7 +66,9 @@ export function updateFab() {
   // Room buttons: installed devices in the room where the agent is, and shared ones with no place
   // (reached over the network from anywhere, e.g. a case file database). Not a room device used from afar.
   const rooms = mine.filter((p) => isFixed(p.phone) && (!game.scenes.get(p.phone.sceneId) || landlineUsers(p.phone).some((u) => u.id === game.user.id)));
-  const wanted = !game.user.isGM && game.settings.get(MODULE_ID, "floatingButton") && personal.length + rooms.length > 0;
+  // A jammer switched on gets its own red button (click = its window, to switch it off).
+  const jammers = myActiveJammers();
+  const wanted = !game.user.isGM && game.settings.get(MODULE_ID, "floatingButton") && personal.length + rooms.length + jammers.length > 0;
   if (!wanted) return fab?.remove();
   if (!fab) fab = createFab();
   const ringingUuid = activeCall?.itemUuid ?? null;
@@ -95,7 +98,24 @@ export function updateFab() {
   main.title = n ? tn("Unread", n) : t("MyPhone");
 
   roomButtons(fab, rooms, { unread: (p) => playerUnread(p.phone), ringing: ringsHere, live: onLine });
+  jammerButtons(fab, jammers);
   orient(fab);
+}
+
+/** Pulsing red button per jammer switched on. */
+function jammerButtons(fab, jammers) {
+  const keep = new Set(jammers.map((p) => p.item.uuid));
+  for (const b of fab.querySelectorAll(".spt-fab-jammer")) if (!keep.has(b.dataset.uuid)) b.remove();
+  for (const p of jammers) {
+    let b = [...fab.querySelectorAll(".spt-fab-jammer")].find((x) => x.dataset.uuid === p.item.uuid);
+    if (!b) {
+      b = fabButton("spt-fab-jammer");
+      b.dataset.uuid = p.item.uuid;
+      b.querySelector("i").className = `fas ${modelOf(p.phone).icon}`;
+      fab.appendChild(b);
+    }
+    b.title = `${p.phone.label} — ${t("Jammer.FabHint")}`;
+  }
 }
 
 /** Green button and running timer while on the line. */
@@ -183,7 +203,11 @@ function updateGmFab() {
   // An agent is calling you: orange, and a click brings the call window back.
   const calling = gmIncoming.size > 0;
   main.classList.toggle("calling", calling);
+  // A jammer is cutting the network somewhere: red ring.
+  const jams = [...jammedScenes().keys()].map((id) => game.scenes.get(id)?.name ?? "?");
+  main.classList.toggle("jamming", jams.length > 0);
   main.title = calling ? t("Gm.AgentCalling") : n ? tn("Unread", n) : t("Gm.PanelTitle");
+  if (jams.length) main.title += `\n${t("Jammer.GmFab", { scenes: jams.join(", ") })}`;
   // Devices installed on the scene the GM is viewing: one click opens their GM view.
   const sceneId = canvas?.scene?.id ?? game.user.viewedScene;
   const rooms = sceneId ? allPhones().filter((p) => isFixed(p.phone) && p.phone.sceneId === sceneId) : [];
@@ -240,7 +264,8 @@ export function createFab() {
         uuid = mainDevice(personal)?.item.uuid;
       }
       if (uuid) {
-        if (!game.user.isGM && !isPager(getPhoneData(fromUuidSync(uuid)))) saveLastDevice(uuid);
+        const ph = getPhoneData(fromUuidSync(uuid));
+        if (!game.user.isGM && !isPager(ph) && !isJammer(ph)) saveLastDevice(uuid);
         openPhone(uuid);
       }
     }

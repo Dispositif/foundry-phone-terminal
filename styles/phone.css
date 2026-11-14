@@ -981,13 +981,13 @@ body[data-spt-universe="cyberpunk"] #spt-phone-panel > .window-header { border-b
 body[data-spt-universe="retro"] #spt-phone-panel.minimized > .window-header,
 body[data-spt-universe="cyberpunk"] #spt-phone-panel.minimized > .window-header { border-bottom: none; }
 /* Floating buttons (players and GM): tinted, coloured edge; call states keep their own colours */
-body[data-spt-universe="retro"] #spt-phone-fab .spt-fab:not(.online):not(.calling):not(.ringing),
-body[data-spt-universe="cyberpunk"] #spt-phone-fab .spt-fab:not(.online):not(.calling):not(.ringing) {
+body[data-spt-universe="retro"] #spt-phone-fab .spt-fab:not(.online):not(.calling):not(.ringing):not(.jamming):not(.spt-fab-jammer),
+body[data-spt-universe="cyberpunk"] #spt-phone-fab .spt-fab:not(.online):not(.calling):not(.ringing):not(.jamming):not(.spt-fab-jammer) {
   background: var(--spt-uni-fab-bg); color: var(--spt-uni-fab-fg); border: 1px solid var(--spt-uni);
   box-shadow: 0 2px 8px rgba(0,0,0,0.55), 0 0 8px var(--spt-uni-glow);
 }
-body[data-spt-universe="retro"] #spt-phone-fab .spt-fab:not(.online):not(.calling):not(.ringing):hover,
-body[data-spt-universe="cyberpunk"] #spt-phone-fab .spt-fab:not(.online):not(.calling):not(.ringing):hover { filter: brightness(1.35); }
+body[data-spt-universe="retro"] #spt-phone-fab .spt-fab:not(.online):not(.calling):not(.ringing):not(.jamming):not(.spt-fab-jammer):hover,
+body[data-spt-universe="cyberpunk"] #spt-phone-fab .spt-fab:not(.online):not(.calling):not(.ringing):not(.jamming):not(.spt-fab-jammer):hover { filter: brightness(1.35); }
 body[data-spt-universe="retro"] #spt-phone-fab .spt-fab { border-radius: 10px; }
 
 /* Mobile (monochrome LCD): call buttons in the screen's two tones instead of green and red */
@@ -1033,3 +1033,68 @@ body[data-spt-universe="retro"] #spt-phone-fab .spt-fab { border-radius: 10px; }
 .spt-phone-top .spt-secure-badge { color: var(--spt-secure); font-size: 0.85em; }
 .spt-phone-ring-dialog button[data-action="answerSecure"] { background: #2f6b3a; border-color: #4caf50; color: #fff; }
 .spt-gm-send .spt-secure-link .fa-shield-halved { font-size: 0.7em; margin-left: 2px; color: var(--spt-secure); }
+/* ---------- Jammer: screenless box, red light, switch, fake dial ---------- */
+.application.spt-jammer-window.spt-framed:not(.minimized) {
+  padding: 30px 16px 16px; border-radius: 16px 16px 20px 20px;
+  background: linear-gradient(160deg, #3b3e3a, #1f211e 55%, #121311);
+  box-shadow: 0 0 0 1px #000, 0 22px 40px rgba(0,0,0,0.6), inset 0 2px 2px rgba(255,255,255,0.1);
+}
+.spt-jammer-window.spt-framed:not(.minimized) > .window-header { height: 26px; padding: 0 12px; }
+.spt-jammer-window.spt-framed:not(.minimized) > .window-header .header-control { width: 15px; height: 15px; font-size: 9px; }
+.spt-jammer-window:not(.minimized) > .window-content { padding: 0; background: transparent; overflow: visible; }
+.spt-jammer-antennas { left: 20px; top: -30px; display: flex; align-items: flex-end; gap: 20px; }
+.spt-jammer-antennas i { display: block; width: 7px; border-radius: 4px 4px 0 0; background: linear-gradient(90deg, #4a4c48, #151614); }
+.spt-jammer-antennas i:nth-child(1) { height: 26px; }
+.spt-jammer-antennas i:nth-child(2) { height: 36px; }
+.spt-jammer-antennas i:nth-child(3) { height: 22px; }
+.spt-jammer { display: flex; flex-direction: column; gap: 12px; color: #a3a8a0; }
+.spt-jammer-grille { height: 44px; border-radius: 6px; background: repeating-linear-gradient(90deg, #0b0c0b 0 4px, #2a2c29 4px 8px); box-shadow: inset 0 1px 3px #000; }
+.spt-jammer-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.spt-jammer-led { flex: 0 0 auto; width: 12px; height: 12px; border-radius: 50%; background: #3d0f0c; box-shadow: inset 0 1px 2px #000; }
+.spt-jammer-led.on { background: #ff3b30; box-shadow: 0 0 10px #ff3b30; animation: spt-pager-blink 1s steps(2, start) infinite; }
+.spt-jammer-sw { display: flex; flex-direction: column; align-items: center; gap: 3px; font: bold 8px/1 sans-serif; letter-spacing: 0.08em; color: #7d827a; }
+.spt-jammer .spt-jammer-switch {
+  position: relative; flex: 0 0 auto; width: 44px; height: 22px; min-height: 0; margin: 0; padding: 0;
+  border: 1px solid #000; border-radius: 11px; background: #111210; box-shadow: inset 0 2px 4px #000; cursor: pointer;
+}
+.spt-jammer .spt-jammer-switch > span {
+  position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;
+  background: linear-gradient(#9a9e97, #5d615a); box-shadow: 0 1px 2px #000; transition: left 0.12s;
+}
+.spt-jammer .spt-jammer-switch.on > span { left: 24px; background: linear-gradient(#ff6a5f, #b3241b); }
+.spt-jammer .spt-jammer-dial {
+  flex: 0 0 auto; width: 34px; height: 34px; min-height: 0; margin: 0; padding: 0; border: 1px solid #000; border-radius: 50%;
+  background: repeating-conic-gradient(#30332f 0 10deg, #1a1c19 10deg 20deg); box-shadow: 0 2px 3px #000, inset 0 0 0 5px #262825;
+  position: relative; transform: rotate(var(--spt-dial, 0deg)); transition: transform 0.2s; cursor: pointer;
+}
+.spt-jammer .spt-jammer-dial::after { content: ""; position: absolute; left: 50%; top: 3px; width: 2px; height: 9px; margin-left: -1px; background: #d8dbd4; border-radius: 1px; }
+.spt-jammer-gm { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.15); font-size: 11px; color: #e6b450; }
+.spt-jammer-gm button { flex: 0 0 auto; width: auto; min-height: 0; padding: 1px 6px; font-size: 10px; line-height: 16px; }
+/* Floating button: carrier's jammer switched on; GM button while a scene is jammed */
+#spt-phone-fab .spt-fab-jammer { width: 34px; height: 34px; font-size: 15px; background: #8e1b14; color: #fff; border-color: #ff5a4f; animation: spt-fab-jam 1.4s ease-out infinite; }
+#spt-phone-fab .spt-fab.jamming { border-color: #ff5a4f; animation: spt-fab-jam 1.4s ease-out infinite; }
+#spt-phone-fab .spt-fab.jamming.calling { animation: spt-fab-ring 0.5s infinite; }
+@keyframes spt-fab-jam { 0% { box-shadow: 0 0 0 0 rgba(255,59,48,0.75); } 100% { box-shadow: 0 0 0 12px rgba(255,59,48,0); } }
+/* GM panel */
+.spt-gm-status .spt-pill.spt-jam-pill { background: rgba(192,57,43,0.25); color: #ff8a7a; cursor: pointer; }
+.spt-gm .spt-jamming { color: var(--spt-danger); }
+.spt-gm .spt-jam-state { font-size: 0.8em; padding: 0 6px; border-radius: 1em; background: rgba(255,255,255,0.08); opacity: 0.8; }
+.spt-gm .spt-jam-state.on { background: rgba(192,57,43,0.25); color: #ff8a7a; opacity: 1; }
+.spt-jammer-alert-body { display: flex; gap: 12px; align-items: flex-start; }
+.spt-jammer-alert-body > i { font-size: 1.8em; color: #d2402f; margin-top: 4px; }
+/* Jammer, Neon look (Cyberpunk) */
+.application.spt-jammer-window.spt-jammer-neon.spt-framed:not(.minimized) {
+  background: linear-gradient(160deg, #1d1a24, #0b0a10 60%, #050407);
+  box-shadow: 0 0 0 1px #ff2fb4, 0 0 14px rgba(255,47,180,0.4), 0 22px 40px rgba(0,0,0,0.6);
+}
+.spt-jammer-neon .spt-jammer-antennas i { background: linear-gradient(90deg, #2a2433, #0b0a10); box-shadow: 0 0 4px rgba(255,47,180,0.5); }
+.spt-jammer-neon .spt-jammer { color: #19f0ff; }
+.spt-jammer-neon .spt-jammer-grille { background: repeating-linear-gradient(90deg, #050407 0 4px, rgba(25,240,255,0.28) 4px 6px, #050407 6px 8px); box-shadow: inset 0 0 8px rgba(25,240,255,0.25); }
+.spt-jammer-neon .spt-jammer-sw { color: #19f0ff; text-shadow: 0 0 4px rgba(25,240,255,0.7); }
+.spt-jammer-neon .spt-jammer-led { background: #2a0820; }
+.spt-jammer-neon .spt-jammer-led.on { background: #ff2fb4; box-shadow: 0 0 10px #ff2fb4; }
+.spt-jammer-neon .spt-jammer .spt-jammer-switch { background: #07060a; border-color: #19f0ff; box-shadow: 0 0 6px rgba(25,240,255,0.4), inset 0 2px 4px #000; }
+.spt-jammer-neon .spt-jammer .spt-jammer-switch > span { background: linear-gradient(#bffcff, #19a9b8); }
+.spt-jammer-neon .spt-jammer .spt-jammer-switch.on > span { background: linear-gradient(#ff8ad8, #d0158f); box-shadow: 0 0 8px #ff2fb4; }
+.spt-jammer-neon .spt-jammer .spt-jammer-dial { background: repeating-conic-gradient(#1a1622 0 10deg, #0b0a10 10deg 20deg); box-shadow: 0 0 6px rgba(255,47,180,0.45), inset 0 0 0 5px #141019; }
+.spt-jammer-neon .spt-jammer .spt-jammer-dial::after { background: #19f0ff; box-shadow: 0 0 4px #19f0ff; }

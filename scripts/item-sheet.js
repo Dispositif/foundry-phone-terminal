@@ -33,7 +33,7 @@ export function openSystemSheet(item) {
 
 /** Existing devices: the GM sets the "device" sheet, model icon and description where nothing was chosen. */
 export async function ensureDeviceItems() {
-  for (const { item, phone } of allPhones()) {
+  for (const { item, phone } of allPhones({ jammers: true })) {
     const patch = deviceItemPatch(item, phone);
     if (Object.keys(patch).length) await item.update(patch);
   }

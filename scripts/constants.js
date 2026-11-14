@@ -12,6 +12,7 @@ export const RINGBACK_SRC = `modules/${MODULE_ID}/sounds/ringback.ogg`;
 export const SECURE_ICON = "fa-shield-halved";
 // Data exchange heard when a secure line is set up.
 export const SECURE_SRC = `modules/${MODULE_ID}/sounds/secure.ogg`;
+export const JAM_SRC = `modules/${MODULE_ID}/sounds/jammer.ogg`;
 export const VIBRATE_SRC = `modules/${MODULE_ID}/sounds/vibrate.ogg`;
 /** Stored value for a hidden number (internal data, shown translated). */
 export const MASKED = "Numéro masqué"; // kept in French: stored in existing data

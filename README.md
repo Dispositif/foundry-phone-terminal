@@ -56,6 +56,7 @@ A device is an item carried by a character, or installed in a place (a scene) an
 | **Laptop** | carried | no | emails and files |
 | **Terminal** | installed | no | emails and files |
 | **Landline** | installed | yes | no |
+| **Jammer** | carried | no | no: switched on, it cuts the mobile network and Wi-Fi in its carrier's scene |
 
 <img src="docs/devices.webp" alt="The six device models: smartphone, mobile phone, pager, landline, laptop and terminal" width="900">
 
@@ -114,7 +115,7 @@ Each device is an ordinary Foundry item carrying one flag, `flags["soren-phones-
 }
 ```
 
-- `model`: smartphone, mobile, pager, computer (laptop), desktop (terminal), landline. Laptops and terminals add `files` and `inbox`.
+- `model`: smartphone, mobile, pager, computer (laptop), desktop (terminal), landline, jammer. Laptops and terminals add `files` and `inbox`.
 - `log` is newest first, 200 entries max (GM-prepared ones, `prep: true`, are always kept). `t` only orders entries; it is never shown.
 - `with` is the other end's number: names come from contacts or the NPC directory when displayed.
 - Attachments and files hold a reference (`uuid` for a journal page, `src` for an image), not the content.

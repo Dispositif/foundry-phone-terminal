@@ -5,13 +5,14 @@
  * - The GM calls / texts a device; players reply, write and call.
  * - Conversations per correspondent; the address book builds up in play (+ contacts given by the GM).
  * - Messages to another PC: delivered directly (copy to GM). To an NPC: land with the GM.
- * Target: Foundry VTT v13-v14 (ApplicationV2 / DialogV2 only).
+ * Target: Foundry VTT v14 (ApplicationV2 / DialogV2 only).
  */
 
 import { DIRECTORY_SAMPLE, LEGACY_IDS, MODULE_ID, SHEET_ID, SOCKET } from "./constants.js";
 import { ensureDeviceItems, registerPhoneSheet } from "./item-sheet.js";
-import { allPhones, createPhone, getPhoneData, isFixed, isPager, markPhone, randomAddress } from "./devices.js";
+import { allPhones, createPhone, getPhoneData, isFixed, isJammer, isPager, markPhone, randomAddress } from "./devices.js";
 import { openPager } from "./pager.js";
+import { myJammers, openJammer, registerJammerHooks } from "./jammer.js";
 import { transferPhone } from "./dialogs.js";
 import { myPhones, updateFab } from "./fab.js";
 import { PhonePanel } from "./gm-panel.js";
@@ -43,11 +44,14 @@ export function openPanel({ tab = null } = {}) {
 }
 
 export function openPhone(phoneUuid = null) {
+  // A jammer has no screen: its own small window, for the GM too.
+  if (phoneUuid && isJammer(getPhoneData(fromUuidSync(phoneUuid)))) return openJammer(phoneUuid);
   if (!game.user.isGM) {
     // A pager has its own window, next to the phone.
     if (phoneUuid && isPager(getPhoneData(fromUuidSync(phoneUuid)))) return openPager(phoneUuid, { latest: true });
     const mine = myPhones();
     if (!phoneUuid && mine.length && mine.every((p) => isPager(p.phone))) return mine.map((p) => openPager(p.item.uuid));
+    if (!phoneUuid && !mine.length && myJammers().length) return myJammers().map((p) => openJammer(p.item.uuid));
   }
   const app = PlayerPhone.instance ?? new PlayerPhone();
   if (phoneUuid) {
@@ -65,6 +69,7 @@ export function openPhone(phoneUuid = null) {
 
 Hooks.once("init", () => {
   registerEnrichers();
+  registerJammerHooks();
   registerPhoneSheet();
   // Templates: {{spt "Key" var=value}} and {{sptn "Key" n}} use the module's texts (module language).
   Handlebars.registerHelper("spt", (key, options) => t(key, options?.hash ?? {}));
@@ -312,7 +317,7 @@ Hooks.on("createItem", async (item, options) => {
   if (options?.spt || !isActiveGM()) return;
   const phone = getPhoneData(item);
   if (!phone || isFixed(phone)) return;
-  const twins = allPhones().filter((p) => p.item !== item && !isFixed(p.phone) && norm(p.phone.number) === norm(phone.number));
+  const twins = allPhones({ jammers: true }).filter((p) => p.item !== item && !isFixed(p.phone) && norm(p.phone.number) === norm(phone.number));
   if (!twins.length) return;
   if (twins.some((p) => p.item.parent === item.parent)) {
     await item.update({ [`flags.${MODULE_ID}.phone`]: { ...phone, number: randomAddress(phone.model), log: [], contacts: [] } });

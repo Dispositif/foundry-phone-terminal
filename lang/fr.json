@@ -26,7 +26,8 @@
       "pager": "Bipeur",
       "smartphone": "Smartphone",
       "computer": "Ordinateur",
-      "desktop": "Terminal"
+      "desktop": "Terminal",
+      "jammer": "Brouilleur"
     },
     "NoPlace": "Sans lieu (accès réseau)",
     "NoHolder": "Sans possesseur",
@@ -522,7 +523,8 @@
         "computer": "Mails, documents",
         "landline": "Appels",
         "rotary": "Appels",
-        "desktop": "Mails, documents"
+        "desktop": "Mails, documents",
+        "jammer": "Coupe le réseau"
       },
       "NameFor": "{model} de {name}",
       "Npc": "PNJ…",
@@ -620,6 +622,29 @@
       "Ring": "Appel sécurisé",
       "Answer": "Répondre sécurisé",
       "CopyLink": "Copier le lien de journal sécurisé"
+    },
+    "Jammer": {
+      "OnTitle": "Brouilleur allumé",
+      "OnBody": "{who} a allumé un brouilleur : plus de réseau mobile ni de Wi-Fi dans {scene}.",
+      "OnHint": "Les fixes et les terminaux fonctionnent toujours. Si l'histoire a besoin du réseau, faites échouer le brouilleur : son voyant continue de clignoter.",
+      "Keep": "Laisser brouiller",
+      "Fail": "Le faire échouer",
+      "Repair": "Le faire fonctionner",
+      "Off": "{who} a éteint le brouilleur : réseau rétabli dans {scene}.",
+      "OffMoved": "{who} a quitté {scene} : brouilleur éteint, réseau rétabli.",
+      "TurnOn": "Allumer",
+      "TurnOff": "Éteindre",
+      "Dial": "Fréquence",
+      "StatusOff": "Éteint",
+      "StatusOn": "Brouille {scene}",
+      "StatusFailed": "Allumé, mais en échec : réseau actif",
+      "StateOn": "brouille",
+      "StateFailed": "en échec",
+      "Chip": "{scene} brouillée ({who})",
+      "Open": "Ouvrir le brouilleur",
+      "FabHint": "brouillage en cours (clic pour ouvrir)",
+      "GmFab": "Brouillé : {scenes}",
+      "NewHint": "Sans numéro. Allumé, il coupe le réseau mobile et le Wi-Fi dans la scène de son porteur, jusqu'à ce qu'on l'éteigne ou que le porteur change de scène."
     }
   }
 }

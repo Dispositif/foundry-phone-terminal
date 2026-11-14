@@ -22,8 +22,36 @@ export const MODELS = {
   pager: { get label() { return t("Model.pager"); }, icon: "fa-pager", sms: true, pager: true, noCalls: true, callerId: true, attachments: false, notif: "pager.ogg" },
   smartphone: { get label() { return t("Model.smartphone"); }, icon: "fa-mobile-screen", sms: true, callerId: true, attachments: true, ring: "ring.ogg" },
   computer: { get label() { return t("Model.computer"); }, icon: "fa-laptop", sms: true, mail: true, noCalls: true, callerId: true, attachments: true, notif: "mail.ogg" },
-  desktop: { get label() { return t("Model.desktop"); }, icon: "fa-desktop", fixed: true, sms: true, mail: true, noCalls: true, callerId: true, attachments: true, notif: "mail.ogg" }
+  desktop: { get label() { return t("Model.desktop"); }, icon: "fa-desktop", fixed: true, sms: true, mail: true, noCalls: true, callerId: true, attachments: true, notif: "mail.ogg" },
+  // No screen, no number: an on/off switch that cuts the network on the carrier's scene.
+  jammer: { get label() { return t("Model.jammer"); }, icon: "fa-tower-broadcast", jammer: true, sms: false, noCalls: true, callerId: false, attachments: false }
 };
+
+/** Jammer: not a phone, never listed as a recipient or in the directory. */
+export function isJammer(phone) {
+  return !!modelOf(phone).jammer;
+}
+
+/** Is this jammer actually cutting the network (switched on, and not made to fail by the GM)? */
+export function isJamming(phone) {
+  return isJammer(phone) && !!phone.jamming && !phone.jamFailed && !!phone.jamScene;
+}
+
+/* Scenes cut by a jammer, cached until a device item changes. */
+let jamCache = null;
+for (const hook of ["createItem", "updateItem", "deleteItem", "deleteActor"]) Hooks.on(hook, () => (jamCache = null));
+
+/** Scene id -> jammers cutting it ({ item, phone, actor }). */
+export function jammedScenes() {
+  if (jamCache) return jamCache;
+  jamCache = new Map();
+  for (const p of allJammers()) {
+    if (!isJamming(p.phone)) continue;
+    if (!jamCache.has(p.phone.jamScene)) jamCache.set(p.phone.jamScene, []);
+    jamCache.get(p.phone.jamScene).push(p);
+  }
+  return jamCache;
+}
 
 /** Can this device send messages (texts or emails)? */
 export function msgOn(phone) {
@@ -100,7 +128,7 @@ export const THEMES = {
   console: { models: SCREENS },
   military: { models: SCREENS },
   // Cyberpunk / neon noir looks
-  neon: { models: ["smartphone", "computer", "desktop", "pager"] },
+  neon: { models: ["smartphone", "computer", "desktop", "pager", "jammer"] },
   glitch: { models: ["smartphone", "computer", "desktop"] }
 };
 export const SKINS = [...Object.keys(MODELS), ...Object.keys(THEMES)];
@@ -220,7 +248,11 @@ export function landlineUsers(phone) {
  */
 export function inDeadZone(actor) {
   if (!actor) return false;
-  return phoneUsers(actor).some((u) => !!game.scenes.get(u.viewedScene)?.getFlag(MODULE_ID, "deadZone"));
+  // A jammer switched on in the scene counts as a dead zone too (flag kept up to date by the GM: players may not see the jammer).
+  return phoneUsers(actor).some((u) => {
+    const scene = game.scenes.get(u.viewedScene);
+    return !!scene?.getFlag(MODULE_ID, "deadZone") || !!scene?.getFlag(MODULE_ID, "jammed");
+  });
 }
 
 /** Does the device have signal? (network cut, no signal for this device, or its holder in a dead zone) */
@@ -232,16 +264,23 @@ export function hasSignal(phone) {
   return !(holder instanceof Actor && inDeadZone(holder));
 }
 
-/** All devices: items carried by actors + world items (held by nobody). */
-export function allPhones() {
+/**
+ * All devices: items carried by actors + world items (held by nobody).
+ * Jammers are left out unless asked for: they are not phones (no number, no messages).
+ */
+export function allPhones({ jammers = false } = {}) {
   const out = [];
   const push = (item) => {
     const phone = getPhoneData(item);
-    if (phone) out.push({ item, phone, actor: item.parent instanceof Actor ? item.parent : null });
+    if (phone && (jammers || !isJammer(phone))) out.push({ item, phone, actor: item.parent instanceof Actor ? item.parent : null });
   };
   for (const actor of game.actors) for (const item of actor.items) push(item);
   for (const item of game.items) push(item);
   return out;
+}
+
+export function allJammers() {
+  return allPhones({ jammers: true }).filter((p) => isJammer(p.phone));
 }
 
 export function phonesByNumber(number) {
@@ -454,6 +493,7 @@ function descriptionPath(item) {
 
 /** Short device description: "Smartphone · 555-0142". */
 export function deviceDescription(phone) {
+  if (isJammer(phone)) return `<p>${esc(modelOf(phone).label)}</p>`;
   return `<p>${esc(modelOf(phone).label)} · ${esc(phone.number ?? "")}</p>`;
 }
 
@@ -482,6 +522,8 @@ export function deviceItemPatch(item, phone) {
 /** Random number for the model: an email address for a laptop or a terminal. */
 /** Random number or email for a new device, never one already used by a device or the directory. */
 export function randomAddress(model) {
+  // A jammer has no number: a hidden id keeps it unique (an item dragged to another character moves).
+  if (MODELS[model]?.jammer) return `jam-${foundry.utils.randomID(8)}`;
   let address;
   for (let i = 0; i < 30; i++) {
     address = MODELS[model]?.mail ? randomEmail() : randomNumber();

@@ -40,7 +40,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
           <input type="text" name="scene" list="spt-scenes" value="${esc(sceneName)}" placeholder="${t("Form.NoPlace")}">
           <datalist id="spt-scenes">${scenes}</datalist></div>
         <div class="form-group"><label>${t("Form.DeviceName")}</label><input type="text" name="label" value="${esc(label)}" placeholder="${t("Form.DeviceNameHint")}"></div>
-        <div class="form-group"><label>${t("Form.Number")}</label><input type="text" name="number" value="${esc(number)}"><p class="hint">${t("Form.NumberHint")}</p></div>
+        <div class="form-group spt-if-number"><label>${t("Form.Number")}</label><input type="text" name="number" value="${esc(number)}"><p class="hint">${t("Form.NumberHint")}</p></div>
         <div class="form-group spt-if-themes"><label>${t("Form.Theme")}</label><select name="theme">${themeOpts}</select></div>
         <div class="form-group spt-if-computer"><label>${t("Form.Inbox")}</label><select name="inbox">${["on", "locked", "none"].map((k) => `<option value="${k}" ${k === inbox ? "selected" : ""}>${t(`Form.Inbox_${k}`)}</option>`).join("")}</select></div>
         ${secureRow(secure)}
@@ -68,6 +68,9 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
         root.querySelector(".spt-if-landline")?.classList.toggle("hidden", !landline);
         root.querySelector(".spt-if-mobile")?.classList.toggle("hidden", landline);
         root.querySelector(".spt-if-computer")?.classList.toggle("hidden", !MODELS[select?.value ?? model]?.mail);
+        // A jammer has no number.
+        root.querySelector(".spt-if-number")?.classList.toggle("hidden", !!MODELS[select?.value ?? model]?.jammer);
+        root.querySelector(".spt-secure-row")?.classList.toggle("hidden", !!MODELS[select?.value ?? model]?.jammer);
         // Looks: only those that fit the chosen model.
         const m = select?.value ?? model;
         const themeSel = root.querySelector("[name=theme]");
@@ -92,11 +95,14 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
           const f = button.form.elements;
           const model = f.model?.value;
           const sceneName = f.scene?.value?.trim();
+          // Becoming a jammer, or no longer one: the hidden id and a real number do not mix.
+          let number = f.number.value.trim();
+          if (!!MODELS[model]?.jammer !== number.startsWith("jam-")) number = "";
           const scene = sceneName ? game.scenes.find((sc) => norm(sc.name) === norm(sceneName)) : null;
           return {
             target: f.target?.value,
             label: f.label.value.trim() || (MODELS[model]?.label ?? MODELS.smartphone.label),
-            number: f.number.value.trim() || randomAddress(model),
+            number: number || randomAddress(model),
             model,
             sceneName,
             theme: f.theme?.value ?? DEFAULT_THEME,
@@ -151,6 +157,7 @@ const NEW_KINDS = [
   { key: "mobile", model: "mobile", carried: true },
   { key: "pager", model: "pager", carried: true },
   { key: "computer", model: "computer", carried: true },
+  { key: "jammer", model: "jammer", carried: true },
   { key: "landline", model: "landline", theme: "modern" },
   { key: "rotary", model: "landline", theme: "vintage", icon: "rotary" },
   { key: "desktop", model: "desktop" }
@@ -231,7 +238,7 @@ function kindForm(kind) {
       actor,
       npcName: f.npc?.value ?? "",
       label: f.label.value.trim() || nameFor(actor || null),
-      number: f.number.value.trim() || randomAddress(kind.model),
+      number: model.jammer ? randomAddress(kind.model) : f.number.value.trim() || randomAddress(kind.model),
       model: kind.model,
       theme: kind.theme ?? f.theme?.value ?? DEFAULT_THEME,
       sceneId: fixed ? f.scene?.value || null : undefined,
@@ -248,11 +255,12 @@ function kindForm(kind) {
           <div><b>${esc(kindLabel(kind))}</b><small>${t(`NewDev.Caps.${kind.key}`)}</small></div></div>
         ${holderRow}
         <div class="form-group"><label>${t("Form.DeviceName")}</label><input type="text" name="label" value="${esc(fixed ? kindLabel(kind) : nameFor(first))}"></div>
-        <div class="form-group"><label>${t("Form.Number")}</label><div class="form-fields">
+        <div class="form-group ${model.jammer ? "hidden" : ""}"><label>${t("Form.Number")}</label><div class="form-fields">
           <input type="text" name="number" value="${esc(randomAddress(kind.model))}">
           <button type="button" class="spt-dice" title="${t("NewDev.OtherNumber")}"><i class="fas fa-dice"></i></button></div><p class="hint">${t("Form.NumberHint")}</p></div>
+        ${model.jammer ? `<p class="hint">${t("Jammer.NewHint")}</p>` : ""}
         ${lookRow}
-        ${secureRow(false)}
+        ${model.jammer ? "" : secureRow(false)}
       </div>`,
     render: (event, x) => {
       const root = x?.element ?? x;
@@ -301,7 +309,7 @@ export async function newPhoneDialog() {
       return { item, open: res.open };
     }
     const item = await createPhone(res.actor, res);
-    ui.notifications.info(`📱 ${t("Info.Created", { label: res.label, number: res.number })}`);
+    ui.notifications.info(`📱 ${t("Info.Created", { label: res.label, number: MODELS[res.model]?.jammer ? "—" : res.number })}`);
     return { item, open: res.open };
   }
 }
@@ -311,6 +319,9 @@ export async function transferPhone(item, actor) {
   if ((item.parent ?? null) === (actor ?? null)) return item;
   const data = item.toObject();
   delete data._id;
+  // A jammer changes hands switched off.
+  const ph = data.flags?.[MODULE_ID]?.phone;
+  if (ph?.jamming) ph.jamming = false;
   const created = await Item.create(data, actor ? { parent: actor, spt: true } : { spt: true });
   await item.delete();
   return created;
@@ -319,7 +330,7 @@ export async function transferPhone(item, actor) {
 export async function giveDialog(item) {
   const phone = getPhoneData(item);
   const res = await DialogV2.wait({
-    window: { title: t("Give.Title", { label: phone.label, number: phone.number }), icon: "fas fa-hand-holding" },
+    window: { title: t("Give.Title", { label: phone.label, number: MODELS[phone.model]?.jammer ? "—" : phone.number }), icon: "fas fa-hand-holding" },
     position: { width: 380 },
     content: `<div class="spt-phone-form">${holderField()}
       <p class="hint">${t("Give.Hint")}</p></div>`,

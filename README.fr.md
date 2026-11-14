@@ -58,6 +58,7 @@ Un appareil est un objet porté par un personnage, ou installé dans un lieu (un
 | **Ordinateur portable** | porté | non | mails et fichiers |
 | **Terminal** | installé | non | mails et fichiers |
 | **Téléphone fixe** | installé | oui | non |
+| **Brouilleur** | porté | non | non : allumé, il coupe le réseau mobile et le Wi-Fi dans la scène de son porteur |
 
 <img src="docs/devices.webp" alt="Les six modèles d'appareils : smartphone, mobile, bipeur, fixe, portable et terminal" width="900">
 
@@ -116,7 +117,7 @@ Chaque appareil est un objet Foundry ordinaire qui porte un seul flag, `flags["s
 }
 ```
 
-- `model` : smartphone, mobile, pager, computer (portable), desktop (terminal), landline. Portables et terminaux ajoutent `files` et `inbox`.
+- `model` : smartphone, mobile, pager, computer (portable), desktop (terminal), landline, jammer (brouilleur). Portables et terminaux ajoutent `files` et `inbox`.
 - `log` va du plus récent au plus ancien, 200 entrées au plus (celles préparées par le MJ, `prep: true`, sont toujours gardées). `t` sert seulement à l'ordre, il n'est jamais affiché.
 - `with` est le numéro du correspondant : le nom vient des contacts ou de l'annuaire PNJ à l'affichage.
 - Pièces jointes et fichiers gardent une référence (`uuid` d'une page de journal, `src` d'une image), pas le contenu.

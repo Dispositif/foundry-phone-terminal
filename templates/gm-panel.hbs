@@ -2,6 +2,7 @@
   {{!-- Status bar: network, pending messages, ongoing call --}}
   <header class="spt-gm-status {{#if down}}down{{/if}}" aria-label="{{spt "Gm.Status"}}">
     <span class="spt-pill"><i class="fas {{#if down}}fa-ban{{else}}fa-tower-cell{{/if}}"></i> {{#if down}}{{spt "Net.DownAll"}}{{else}}{{spt "Net.Ok"}}{{/if}}</span>
+    {{#each jams}}<a class="spt-pill spt-jam-pill" data-action="openPhone" data-uuid="{{uuid}}" title="{{spt "Jammer.Open"}}"><i class="fas fa-tower-broadcast"></i> {{label}}</a>{{/each}}
     {{#if pending}}<span class="spt-gm-pending">{{spt "Net.Pending" n=pending}}</span>{{/if}}
     <button type="button" class="spt-gm-net" data-action="toggleNetwork">{{#if down}}{{spt "Net.Restore"}}{{else}}{{spt "Net.Cut"}}{{/if}}</button>
   </header>
@@ -114,6 +115,14 @@
         <ul class="spt-dev-list">
           {{#each devices}}
           <li class="spt-dev">
+            {{#if jammer}}
+            <a class="spt-dev-main" data-action="openPhone" data-uuid="{{uuid}}" title="{{spt "Jammer.Open"}}">
+              <i class="fas {{icon}} {{#if jamOn}}spt-jamming{{/if}}" title="{{modelLabel}}"></i>
+              <span class="spt-dev-label">{{label}}</span>
+              {{#if jamOn}}<span class="spt-jam-state on">{{spt "Jammer.StateOn"}}</span>{{/if}}
+              {{#if jamFailed}}<span class="spt-jam-state">{{spt "Jammer.StateFailed"}}</span>{{/if}}
+            </a>
+            {{else}}
             <a class="spt-dev-main" data-action="selectPhone" data-number="{{number}}" title="{{spt "Gm.PickRecipient"}}">
               <i class="fas {{icon}}" title="{{modelLabel}}"></i>
               <span class="spt-dev-label">{{label}} <small>{{number}}</small></span>
@@ -125,12 +134,15 @@
               {{#if cloned}}<i class="fas fa-clone spt-warn" title="{{spt "Gm.ClonedHint"}}"></i>{{/if}}
               {{#if unread}}<span class="spt-row-unread" title="{{unreadTitle}}"><i class="fas fa-envelope"></i> {{unread}}</span>{{/if}}
             </a>
+            {{/if}}
             <span class="spt-dev-actions" aria-label="{{spt "Gm.Actions"}}">
               <a data-action="openPhone" data-uuid="{{uuid}}" title="{{spt "Gm.OpenPrepare"}}" aria-label="{{spt "Gm.OpenPrepare"}}"><i class="fas fa-pen-to-square"></i></a>
+              {{#unless jammer}}
               <a data-action="toggleLock" data-uuid="{{uuid}}" class="{{#if locked}}spt-locked{{/if}}" title="{{#if locked}}{{spt "Gm.Locked"}}{{else}}{{spt "Gm.Unlocked"}}{{/if}}" aria-label="{{#if locked}}{{spt "Gm.Locked"}}{{else}}{{spt "Gm.Unlocked"}}{{/if}}"><i class="fas {{#if locked}}fa-lock{{else}}fa-lock-open{{/if}}"></i></a>
               <a data-action="toggleCompromised" data-uuid="{{uuid}}" class="{{#if compromised}}spt-compromised{{/if}}" title="{{#if compromised}}{{spt "Gm.Compromised"}}{{else}}{{spt "Gm.NotCompromised"}}{{/if}}" aria-label="{{#if compromised}}{{spt "Gm.Compromised"}}{{else}}{{spt "Gm.NotCompromised"}}{{/if}}"><i class="fas fa-triangle-exclamation"></i></a>
               {{#unless fixed}}<a data-action="toggleSignal" data-uuid="{{uuid}}" class="{{#if noSignal}}spt-nosignal{{/if}}" title="{{#if noSignal}}{{spt "Gm.NoSignal"}}{{else}}{{spt "Gm.SignalOk"}}{{/if}}" aria-label="{{#if noSignal}}{{spt "Gm.NoSignal"}}{{else}}{{spt "Gm.SignalOk"}}{{/if}}"><i class="fas fa-signal"></i></a>{{/unless}}
               <a data-action="contacts" data-uuid="{{uuid}}" title="{{spt "Contacts.Title"}}" aria-label="{{spt "Contacts.Title"}}"><i class="fas fa-address-book"></i></a>
+              {{/unless}}
               {{#unless fixed}}<a data-action="give" data-uuid="{{uuid}}" title="{{spt "Gm.GiveTo"}}" aria-label="{{spt "Gm.GiveTo"}}"><i class="fas fa-hand-holding"></i></a>{{/unless}}
               <a data-action="editPhone" data-uuid="{{uuid}}" title="{{spt "Gm.Edit"}}" aria-label="{{spt "Gm.Edit"}}"><i class="fas fa-gear"></i></a>
               <a data-action="unmarkPhone" data-uuid="{{uuid}}" title="{{spt "Gm.Remove"}}" aria-label="{{spt "Gm.Remove"}}"><i class="fas fa-trash"></i></a>
