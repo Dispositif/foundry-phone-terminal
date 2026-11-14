@@ -643,6 +643,8 @@ export class PlayerPhone extends ApplicationV2 {
       const id = esc(e.id ?? String(e.t));
       return `<span class="spt-share"><a data-action="showEntry" data-id="${id}" title="${t("Share.ShowScreen")}"><i class="fas fa-eye"></i></a><a data-action="fwdEntry" data-id="${id}" title="${t("Fwd.Forward")}"><i class="fas fa-share"></i></a></span>`;
     };
+    // Encrypted message (secure line): a small shield.
+    const secureTag = (e) => (e.secure ? `<span class="spt-secure-tag" title="${t("Secure.Message")}"><i class="fas fa-shield-halved"></i></span>` : "");
     const fwdTag = (e) => (e.fwd ? `<span class="spt-fwd"><i class="fas fa-share"></i> ${t("Fwd.Forwarded")}</span>` : "");
     // Federal look: each email becomes a case file, with a stable reference and a stamp on received ones.
     const federal = skinOf(p.phone) === "federal";
@@ -650,7 +652,7 @@ export class PlayerPhone extends ApplicationV2 {
     const bubbles = entries
       .map((e) =>
         e.kind === "sms"
-          ? `<div class="spt-bubble ${e.dir}">${fileTag(e)}${del(e)}${share(e)}${fwdTag(e)}${this._attHtml(e)}${e.text ? `<div>${nl2br(e.text)}</div>` : ""}${this.gm && e.dir === "in" && !e.prep ? `<span class="spt-read ${e.read === false ? "unread" : ""}">${e.pending ? t("Read.Pending") : e.read === false ? t("Read.Unread") : t("Read.Seen")}</span>` : ""}</div>`
+          ? `<div class="spt-bubble ${e.dir}">${fileTag(e)}${del(e)}${share(e)}${fwdTag(e)}${secureTag(e)}${this._attHtml(e)}${e.text ? `<div>${nl2br(e.text)}</div>` : ""}${this.gm && e.dir === "in" && !e.prep ? `<span class="spt-read ${e.read === false ? "unread" : ""}">${e.pending ? t("Read.Pending") : e.read === false ? t("Read.Unread") : t("Read.Seen")}</span>` : ""}</div>`
           : `<div class="spt-call-line"><i class="fas ${e.result === "answer" ? "fa-phone" : "fa-phone-slash"}"></i> ${callLabel(e)} ${del(e)}</div>`
       )
       .join("");

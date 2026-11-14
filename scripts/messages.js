@@ -1,6 +1,6 @@
 import { attChatHtml } from "./attachments.js";
 import { MASKED, MODULE_ID, PAGER_MAX, SOCKET } from "./constants.js";
-import { addLog, allPhones, defaultDeviceFor, getLog, getPhoneData, hasSignal, holders, keyFor, modelOf, msgOn, npcNumber, phoneLabel, phonesByNumber, withItemLock, modeOf } from "./devices.js";
+import { addLog, isSecure, secureWith, setSecureWith, allPhones, defaultDeviceFor, getLog, getPhoneData, hasSignal, holders, keyFor, modelOf, msgOn, npcNumber, phoneLabel, phonesByNumber, withItemLock, modeOf } from "./devices.js";
 import { esc, maskedLabel, nl2br } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
@@ -14,7 +14,8 @@ export function smsHtml(sender, text, phoneName, att = null, mail = false, icon 
 }
 
 /** Delivers a message to a PC's device: history, whispered chat, beep. */
-export async function deliverToPhone(p, senderKeyOrName, text, att = null, { fwd = false } = {}) {
+/** secure: sent on a secure line (only kept if this device is secure too). */
+export async function deliverToPhone(p, senderKeyOrName, text, att = null, { fwd = false, secure = false } = {}) {
   const model = modelOf(p.phone);
   if (!msgOn(p.phone)) {
     if (game.user.isGM) ui.notifications.warn(`📱 ${phoneLabel(p)} : ${t("Warn.NoSms")}`);
@@ -33,7 +34,7 @@ export async function deliverToPhone(p, senderKeyOrName, text, att = null, { fwd
     if (line.length > PAGER_MAX && game.user.isGM) ui.notifications.warn(`📟 ${phoneLabel(p)} : ${t("Warn.PagerCut", { n: PAGER_MAX })}`);
   }
   const key = keyFor(p.phone, senderKeyOrName);
-  const extra = { ...(att ? { att } : {}), ...(fwd ? { fwd: true } : {}) };
+  const extra = { ...(att ? { att } : {}), ...(fwd ? { fwd: true } : {}), ...(secure && isSecure(p.phone) ? { secure: true } : {}) };
   const switchedOff = modeOf(p.phone) === "off";
   if (!hasSignal(p.phone) || switchedOff) {
     // Pending: delivered (chat copy, beep) when signal returns or the device is switched on.
@@ -83,7 +84,11 @@ export async function flushAll() {
 }
 
 /** Message sent by the GM. target = "phone:<number>" or "user:<id>" */
-export async function sendSms(target, text, { sender = MASKED, att = null } = {}) {
+/**
+ * secure: the GM writes as an NPC on a secure line ("Secure line" box), remembered on the device for that NPC.
+ * Left undefined (journal links), the device's memory for that NPC decides.
+ */
+export async function sendSms(target, text, { sender = MASKED, att = null, secure } = {}) {
   if (!game.user.isGM) return ui.notifications.warn(t("Warn.GmOnlySms"));
   text = text?.trim() ?? "";
   if (!text && !att) return ui.notifications.warn(t("Warn.Empty"));
@@ -95,7 +100,7 @@ export async function sendSms(target, text, { sender = MASKED, att = null } = {}
     // The player's character phone (created with the default model if needed): the message lands there.
     const p = await defaultDeviceFor(user);
     if (p) {
-      await deliverToPhone(p, npcNumber(sender), text, att);
+      await deliverToPhone(p, npcNumber(sender), text, att, { secure: await npcSecure(p, sender, secure) });
       return ui.notifications.info(`📱 ${t("Info.SentTo", { name: `${user.name} (${p.phone.label})` })}`);
     }
     // No assigned character to carry a phone: nothing is sent.
@@ -105,9 +110,17 @@ export async function sendSms(target, text, { sender = MASKED, att = null } = {}
   const phones = phonesByNumber(value);
   if (!phones.length) return ui.notifications.warn(t("Warn.NoDevice", { value }));
   for (const p of phones) {
-    const ok = await deliverToPhone(p, npcNumber(sender), text, att);
+    const ok = await deliverToPhone(p, npcNumber(sender), text, att, { secure: await npcSecure(p, sender, secure) });
     if (ok === false) ui.notifications.warn(`📱 ${phoneLabel(p)} : ${t("Warn.NobodyHolds")}`);
   }
   ui.notifications.info(`📱 ${t("Info.SentTo", { name: value })}`);
 }
 
+
+/** GM writing as an NPC: secure line or not (the box, else what the device remembers for that NPC). */
+async function npcSecure(p, sender, secure) {
+  const key = keyFor(p.phone, npcNumber(sender));
+  if (secure === undefined) return secureWith(p.phone, key);
+  await setSecureWith(p.item, key, secure);
+  return !!secure;
+}

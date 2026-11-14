@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+- **Secure devices** (Edit device): calls and messages are encrypted when both ends are secure. A shield shows on the call, the messages and the GM panel.
+- GM: a **Secure line** box when calling, texting or answering as an NPC, remembered per NPC (shield toggle in the Messages tab).
+- Long tone when a secure call is answered (temporary sound).
+
 ## 1.1.0
 - **Universe** (world setting): default looks and some vocabulary. **Any setting** (default), **Vintage (1980s-1990s)**, **Modern**.
 - The **Default device** setting is gone.

@@ -51,7 +51,7 @@ export function onSocket(data) {
       }
       break;
     case "liveStart":
-      openLive(data);
+      openLive(data, { answered: true });
       break;
     case "liveEnd":
       endLive(data.callId, data.reason);

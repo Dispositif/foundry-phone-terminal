@@ -1,7 +1,7 @@
 import { attChipHtml, attFromDrop, pickImage } from "./attachments.js";
 import { ApplicationV2, DialogV2, HandlebarsApplicationMixin, MASKED, MODES, MODULE_ID } from "./constants.js";
 import { filesOverview, previewEntry, previewFile, setFileStates } from "./files.js";
-import { allPhones, phonesByNumber, holders, sharedUsers, displayName, getLog, getPhoneData, hasSignal, holderName, inDeadZone, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc, isComputer } from "./devices.js";
+import { allPhones, phonesByNumber, holders, sharedUsers, displayName, getLog, getPhoneData, hasSignal, holderName, inDeadZone, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc, isComputer, isSecure, secureWith, setSecureWith } from "./devices.js";
 import { contactsDialog, directoryDialog, editPhoneDialog, giveDialog, newPhoneDialog } from "./dialogs.js";
 import { copyJournalLink } from "./journal-links.js";
 import { openPhone } from "./main.js";
@@ -261,6 +261,13 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
         this._setState({ target: `phone:${target.dataset.number}`, tab: "send" });
       },
       sendReply: function (event, target) { this._sendReply(target.closest("[data-thread]")); },
+      toggleSecureWith: async function (event, target) {
+        // Secure line with this NPC, for this secure device: the GM's replies and calls, and the agent's messages.
+        const th = target.closest("[data-thread]");
+        const item = await fromUuid(th.dataset.uuid);
+        const phone = getPhoneData(item);
+        await setSecureWith(item, th.dataset.key, !secureWith(phone, th.dataset.key));
+      },
       callBack: async function (event, target) {
         const th = target.closest("[data-thread]");
         const item = await fromUuid(th.dataset.uuid);
@@ -332,7 +339,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static recentSenders = [];
 
-  _state = { target: null, sender: "", text: "", att: null, tab: "send", mode: "message", drafts: {}, inboxView: "npc", filesView: "device", filesFilter: "all", filesQuery: "" };
+  _state = { target: null, sender: "", text: "", att: null, tab: "send", mode: "message", drafts: {}, secure: false, inboxView: "npc", filesView: "device", filesFilter: "all", filesQuery: "" };
 
   /** Changes the state (tab, mode, recipient…) while keeping the current input. */
   _setState(patch) {
@@ -353,6 +360,8 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     this._state.sender = el.querySelector("[name=sender]")?.value ?? this._state.sender;
     this._state.text = el.querySelector("[name=text]")?.value ?? this._state.text;
     this._state.filesQuery = el.querySelector("[name=filesQuery]")?.value ?? this._state.filesQuery;
+    const box = el.querySelector(".spt-gm-send [name=secure]");
+    if (box) this._state.secure = box.checked;
     for (const input of el.querySelectorAll("[data-draft]")) this._state.drafts[input.dataset.draft] = input.value;
   }
 
@@ -413,12 +422,16 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
         agents: th.agents,
         unknown: !th.agents && isUnknownNumber(th.phone, th.key),
         compromised: !!th.phone.compromised,
+        // Secure device: the shield switches the secure line with this NPC (between agents: shown only).
+        canSecure: !th.agents && isSecure(th.phone),
+        secure: th.agents ? !!conv.at(-1)?.secure : secureWith(th.phone, th.key),
         unread: th.unread,
         canCall: !th.agents && !modelOf(th.phone).noCalls,
         draft: this._state.drafts[th.id] ?? "",
         bubbles: conv.slice(-INBOX_BUBBLES).map((e) => ({
           dir: e.dir,
           fwd: !!e.fwd,
+          secure: !!e.secure,
           pending: !!e.pending,
           att: bubbleAtt(e.att),
           text: e.text ? nl2br(e.text) : ""
@@ -458,6 +471,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
         fixed,
         locked: !!p.phone.locked,
         compromised: !!p.phone.compromised,
+        secure: isSecure(p.phone),
         noSignal: !fixed && !!p.phone.noSignal,
         cloned: countByNumber.get(norm(p.phone.number)) > 1,
         unread,
@@ -474,10 +488,15 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!canMessage && canCall) this._state.mode = "call";
     if (!canCall && canMessage) this._state.mode = "message";
     const messaging = canMessage && canCall;
+    // "Secure line" box: only for a secure recipient (a player: their character's carried phone).
+    const tpUser = kind === "user" ? phones.filter((p) => p.actor && p.actor === game.users.get(id)?.character && ["smartphone", "mobile"].includes(p.phone.model)) : [];
+    const canSecure = [...tp, ...tpUser].some((p) => isSecure(p.phone));
     return {
       tab: this._state.tab,
       mode: this._state.mode,
       messaging,
+      canSecure,
+      secure: this._state.secure,
       down: game.settings.get(MODULE_ID, "networkDown"),
       pending: phones.reduce((n, p) => n + getLog(p.phone, { includePending: true }).filter((e) => e.pending).length, 0),
       ringing: [...pendingCalls.values()].map((c) => c.label).join(", "),
@@ -552,7 +571,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     this._readForm();
     if (!this._state.target) return ui.notifications.warn(t("Warn.NoRecipient"));
     this._rememberSender();
-    ring(this._state.target, { caller: this._normSender() });
+    ring(this._state.target, { caller: this._normSender(), secure: this._secureChoice() });
   }
 
   /** Files tab: every computer file, by device or by source journal. */
@@ -599,6 +618,11 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     return [...opts.values()];
   }
 
+  /** Send tab: the "Secure line" box when it is shown; otherwise the device's memory for that NPC decides. */
+  _secureChoice() {
+    return this.element?.querySelector(".spt-gm-send [name=secure]") ? !!this._state.secure : undefined;
+  }
+
   /** Remembers the last senders used (this session only). */
   _rememberSender() {
     const s = this._state.sender.trim();
@@ -619,7 +643,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     this._readForm();
     if (!this._state.target) return ui.notifications.warn(t("Warn.NoRecipient"));
     this._rememberSender();
-    await sendSms(this._state.target, this._state.text, { sender: this._normSender(), att: this._state.att });
+    await sendSms(this._state.target, this._state.text, { sender: this._normSender(), att: this._state.att, secure: this._secureChoice() });
     this._state.text = "";
     this._state.att = null;
     this._skipRead = true;

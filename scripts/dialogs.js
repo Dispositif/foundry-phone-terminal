@@ -7,7 +7,7 @@ import { t } from "./i18n.js";
 /*  Dialogs (GM, and contacts for the player)    */
 /* -------------------------------------------- */
 
-export async function phoneFormDialog({ title, selectHtml = "", label = null, number = null, model = "smartphone", sceneId = null, theme = null, inbox = "on", withModel = true }) {
+export async function phoneFormDialog({ title, selectHtml = "", label = null, number = null, model = "smartphone", sceneId = null, theme = null, inbox = "on", secure = false, withModel = true }) {
   // Default name = model label, as long as the GM has not changed it.
   const autoLabel = label === null;
   label ??= MODELS[model]?.label ?? MODELS.smartphone.label;
@@ -43,6 +43,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
         <div class="form-group"><label>${t("Form.Number")}</label><input type="text" name="number" value="${esc(number)}"><p class="hint">${t("Form.NumberHint")}</p></div>
         <div class="form-group spt-if-themes"><label>${t("Form.Theme")}</label><select name="theme">${themeOpts}</select></div>
         <div class="form-group spt-if-computer"><label>${t("Form.Inbox")}</label><select name="inbox">${["on", "locked", "none"].map((k) => `<option value="${k}" ${k === inbox ? "selected" : ""}>${t(`Form.Inbox_${k}`)}</option>`).join("")}</select></div>
+        <div class="form-group"><label><i class="fas fa-shield-halved"></i> ${t("Form.Secure")}</label><div class="form-fields"><input type="checkbox" name="secure" ${secure ? "checked" : ""}></div><p class="hint">${t("Form.SecureHint")}</p></div>
       </div>`,
     render: (event, x) => {
       // v13+: (event, dialog); an HTML element is accepted too.
@@ -100,6 +101,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
             sceneName,
             theme: f.theme?.value ?? DEFAULT_THEME,
             inbox: MODELS[model ?? "smartphone"]?.mail ? f.inbox?.value ?? "on" : undefined,
+            secure: f.secure ? f.secure.checked : undefined,
             sceneId: MODELS[model]?.fixed ? scene?.id ?? null : undefined
           };
         }
@@ -336,7 +338,8 @@ export async function editPhoneDialog(item) {
     model: phone.model ?? "smartphone",
     sceneId: phone.sceneId,
     theme: phone.theme ?? null,
-    inbox: phone.inbox ?? "on"
+    inbox: phone.inbox ?? "on",
+    secure: !!phone.secure
   });
   if (!res) return;
   // An empty place is allowed (network access only); a name that matches no scene is not.

@@ -40,6 +40,10 @@
         <datalist id="spt-senders">{{#each senderOptions}}<option value="{{value}}" label="{{label}}"></option>{{/each}}</datalist>
       </div>
 
+      {{#if canSecure}}
+      <label class="spt-secure-box" title="{{spt "Secure.BoxHint"}}"><input type="checkbox" name="secure" {{#if secure}}checked{{/if}}> <i class="fas fa-shield-halved"></i> {{spt "Secure.Line"}}</label>
+      {{/if}}
+
       {{#if messaging}}
       <div class="spt-segmented" role="radiogroup">
         <a class="{{#if (eq mode "message")}}active{{/if}}" data-action="mode" data-mode="message" role="radio"><i class="fas fa-comment-sms"></i> {{spt "Gm.ModeMessage"}}</a>
@@ -77,10 +81,10 @@
       <div class="spt-gthreads">
         {{#each inbox}}
         <div class="spt-gthread {{#if unread}}unread{{/if}} {{#if agents}}agents{{/if}}" data-thread="{{id}}" data-uuid="{{uuid}}" data-key="{{key}}">
-          <div class="spt-gthread-head">{{#if agents}}<i class="fas fa-user-group spt-dim" title="{{spt "Gm.BetweenAgents"}}"></i> {{/if}}<strong>{{who}}</strong>{{#if compromised}} <i class="fas fa-triangle-exclamation spt-compromised" title="{{spt "Gm.Compromised"}}"></i>{{/if}} <i class="fas fa-arrow-right" aria-hidden="true"></i> {{to}}{{#if unknown}} <small class="spt-dim">({{spt "Directory.Unknown"}})</small>{{/if}}{{#if unread}} <span class="spt-badge">{{unread}}</span>{{/if}}</div>
+          <div class="spt-gthread-head">{{#if agents}}<i class="fas fa-user-group spt-dim" title="{{spt "Gm.BetweenAgents"}}"></i> {{/if}}<strong>{{who}}</strong>{{#if compromised}} <i class="fas fa-triangle-exclamation spt-compromised" title="{{spt "Gm.Compromised"}}"></i>{{/if}} <i class="fas fa-arrow-right" aria-hidden="true"></i> {{to}}{{#if canSecure}} <a data-action="toggleSecureWith" class="spt-secure-toggle {{#if secure}}on{{/if}}" title="{{#if secure}}{{spt "Secure.On"}}{{else}}{{spt "Secure.Off"}}{{/if}}"><i class="fas fa-shield-halved"></i></a>{{else if secure}} <i class="fas fa-shield-halved spt-secure" title="{{spt "Secure.Line"}}"></i>{{/if}}{{#if unknown}} <small class="spt-dim">({{spt "Directory.Unknown"}})</small>{{/if}}{{#if unread}} <span class="spt-badge">{{unread}}</span>{{/if}}</div>
           {{#if more}}<div class="spt-gthread-more">…</div>{{/if}}
           {{#each bubbles}}
-          <div class="spt-bb {{dir}} {{#if pending}}pending{{/if}}">{{#if fwd}}<span class="spt-bb-fwd"><i class="fas fa-share"></i> {{spt "Fwd.Forwarded"}}</span>{{/if}}{{{att}}}{{#if text}}<div>{{{text}}}</div>{{/if}}</div>
+          <div class="spt-bb {{dir}} {{#if pending}}pending{{/if}}">{{#if secure}}<i class="fas fa-shield-halved spt-secure spt-bb-secure" title="{{spt "Secure.Message"}}"></i>{{/if}}{{#if fwd}}<span class="spt-bb-fwd"><i class="fas fa-share"></i> {{spt "Fwd.Forwarded"}}</span>{{/if}}{{{att}}}{{#if text}}<div>{{{text}}}</div>{{/if}}</div>
           {{/each}}
           {{#unless agents}}
           <div class="spt-gthread-reply">
@@ -115,6 +119,7 @@
               <span class="spt-dev-label">{{label}} <small>{{number}}</small></span>
               {{#if modeIcon}}<i class="fas {{modeIcon}} spt-dim" title="{{modeLabel}}"></i>{{/if}}
               {{#if locked}}<i class="fas fa-lock spt-warn spt-dev-state" title="{{spt "Gm.Locked"}}"></i>{{/if}}
+              {{#if secure}}<i class="fas fa-shield-halved spt-secure spt-dev-state" title="{{spt "Secure.Device"}}"></i>{{/if}}
               {{#if compromised}}<i class="fas fa-triangle-exclamation spt-compromised spt-dev-state" title="{{spt "Gm.Compromised"}}"></i>{{/if}}
               {{#if noSignal}}<i class="fas fa-signal spt-nosignal spt-dev-state" title="{{spt "Gm.NoSignal"}}"></i>{{/if}}
               {{#if cloned}}<i class="fas fa-clone spt-warn" title="{{spt "Gm.ClonedHint"}}"></i>{{/if}}
