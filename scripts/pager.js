@@ -84,6 +84,7 @@ export class PagerWindow extends ApplicationV2 {
         <div class="spt-pager-status">
           <a data-action="mode" title="${MODES[mode].label}"><i class="fas ${MODES[mode].icon}"></i></a>
           ${net}
+          ${!off && e?.secure ? `<i class="fas fa-shield-halved" title="${t("Secure.Message")}"></i>` : ""}
           <span>${!off && unread ? `<i class="fas fa-envelope"></i>` : ""}</span>
           <span class="spt-pager-pos">${!off && list.length ? `${this.idx + 1}/${list.length}` : ""}</span>
         </div>

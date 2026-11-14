@@ -1,5 +1,5 @@
 import { MASKED, MODULE_ID, RESULT_LABELS, SOCKET } from "./constants.js";
-import { addLog, defaultDeviceFor, displayName, findContact, getPhoneData, hasSignal, holders, isFixed, isLandline, keyFor, modelOf, npcNumber, phoneLabel, phonesByNumber, ringOf, skinOf, modeOf } from "./devices.js";
+import { addLog, secureWith, setSecureWith, defaultDeviceFor, displayName, findContact, getPhoneData, hasSignal, holders, isFixed, isLandline, keyFor, modelOf, npcNumber, phoneLabel, phonesByNumber, ringOf, skinOf, modeOf } from "./devices.js";
 import { maskedLabel, rerenderAll } from "./util.js";
 import { t } from "./i18n.js";
 import { agentSide, closeDial, lineBusy, npcSide, openGmRing, startLive } from "./live-call.js";
@@ -20,14 +20,18 @@ export function networkBusy() {
   return pendingCalls.size > 0 || gmIncoming.size > 0 || lineBusy();
 }
 
-export async function ring(target, { caller = MASKED, origin = null, callId = foundry.utils.randomID() } = {}) {
+/**
+ * secure: the GM calls as an NPC on a secure line ("Secure line" box), remembered on the device for that NPC.
+ * Left undefined (journal links, call back), the device's memory for that NPC decides.
+ */
+export async function ring(target, { caller = MASKED, origin = null, callId = foundry.utils.randomID(), secure } = {}) {
   if (!game.user.isGM) return ui.notifications.warn(t("Warn.GmOnlyCall"));
   // GM calling while another call rings or is in progress: the network is busy.
   if (!origin && networkBusy()) return ui.notifications.warn(t("Warn.NetworkBusy"));
   const [kind, value] = String(target).split(/:(.*)/s);
   const timeout = game.settings.get(MODULE_ID, "ringTimeout");
   // A directory name rings as its number, so the agent's own contact name shows on their device.
-  const call = { caller, from: npcNumber(caller), label: value, open: new Map(), origin, lastResult: "nobody" };
+  const call = { caller, from: npcNumber(caller), label: value, open: new Map(), origin, lastResult: "nobody", secure: false };
 
   const emitRing = (userId, extra) => {
     call.open.set(userId, extra.itemUuid ?? null);
@@ -39,7 +43,7 @@ export async function ring(target, { caller = MASKED, origin = null, callId = fo
     if (!user) return ui.notifications.warn(t("Warn.PlayerNotFound"));
     // The player's character phone (created with the default model if needed) rings like any device.
     const p = await defaultDeviceFor(user);
-    if (p) return ring(`phone:${p.phone.number}`, { caller, origin, callId });
+    if (p) return ring(`phone:${p.phone.number}`, { caller, origin, callId, secure });
     // No assigned character to carry a phone: nothing rings.
     return ui.notifications.warn(t("Warn.NoCharacter", { name: user.name }));
   } else {
@@ -47,6 +51,11 @@ export async function ring(target, { caller = MASKED, origin = null, callId = fo
     if (!phones.length) {
       if (origin) return finishOrigin(origin, "unassigned");
       return ui.notifications.warn(t("Warn.NoDevice", { value }));
+    }
+    if (!origin) {
+      if (secure === undefined) secure = phones.some((p) => secureWith(p.phone, keyFor(p.phone, call.from)));
+      else for (const p of phones) await setSecureWith(p.item, keyFor(p.phone, call.from), secure);
+      call.secure = !!secure;
     }
     for (const p of phones) {
       const mode = modeOf(p.phone);
@@ -93,7 +102,7 @@ export async function ring(target, { caller = MASKED, origin = null, callId = fo
   // GM: the call window while it rings. As an NPC: the NPC and the agent called (hang-up button).
   // Between agents: who calls whom ("network unavailable" button).
   const [userId, itemUuid] = call.open.entries().next().value;
-  const from = origin ? agentSide(fromUuidSync(origin.itemUuid), origin.userId) : npcSide(call.from, "", maskedLabel(caller));
+  const from = origin ? agentSide(fromUuidSync(origin.itemUuid), origin.userId) : npcSide(call.from, "", maskedLabel(caller), call.secure);
   openGmRing(callId, from, agentSide(fromUuidSync(itemUuid), userId));
   rerenderAll();
   return callId;
@@ -181,7 +190,7 @@ function liveSides(call, item, userId) {
     b.seen = call.origin.name;
     return [a, b];
   }
-  return [npcSide(call.from, displayName(phone, keyFor(phone, call.from)), maskedLabel(call.caller)), b];
+  return [npcSide(call.from, displayName(phone, keyFor(phone, call.from)), maskedLabel(call.caller), call.secure), b];
 }
 
 /**

@@ -31,6 +31,29 @@ export function msgOn(phone) {
   return !!(model.mail || model.sms);
 }
 
+/** Secure (encrypted) device: its calls and messages are encrypted when the other end is secure too. */
+export function isSecure(phone) {
+  return !!phone?.secure;
+}
+
+/**
+ * NPCs this secure device talks to on a secure line (normalized keys), set by the GM
+ * ("Secure line" box when calling, texting or answering as the NPC).
+ */
+export function secureWith(phone, key) {
+  return isSecure(phone) && (phone.secureWith ?? []).includes(norm(key));
+}
+
+/** GM: remembers whether this NPC talks to the device on a secure line. */
+export async function setSecureWith(item, key, on) {
+  const phone = getPhoneData(item);
+  const k = norm(key);
+  if (!phone || !isSecure(phone) || !k || secureWith(phone, key) === !!on) return;
+  const list = (phone.secureWith ?? []).filter((x) => x !== k);
+  if (on) list.push(k);
+  await item.update({ [`flags.${MODULE_ID}.phone.secureWith`]: list });
+}
+
 /** Pager: receives one short line of text, nothing else. */
 export function isPager(phone) {
   return !!modelOf(phone).pager;
@@ -491,12 +514,13 @@ export async function createPhone(actor, { label, number, model = "smartphone", 
   return item;
 }
 
-export async function markPhone(item, { label, number, model, sceneId, theme, inbox }) {
+export async function markPhone(item, { label, number, model, sceneId, theme, inbox, secure }) {
   const prev = getPhoneData(item) ?? { mode: "on", contacts: [], log: [] };
   const next = { ...prev, label, number };
   if (model) next.model = model;
   if (sceneId !== undefined) next.sceneId = sceneId;
   if (inbox !== undefined) next.inbox = inbox;
+  if (secure !== undefined) next.secure = !!secure;
   if (theme !== undefined || !next.theme) next.theme = cleanTheme(theme ?? next.theme, next.model ?? "smartphone");
   const patch = deviceItemPatch(item, next);
   // Device and item share one name.

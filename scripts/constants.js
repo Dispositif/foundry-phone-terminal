@@ -8,6 +8,8 @@ export const SMS_SRC = `modules/${MODULE_ID}/sounds/sms.ogg`;
 export const PICKUP_SRC = `modules/${MODULE_ID}/sounds/pickup.ogg`;
 export const HANGUP_SRC = `modules/${MODULE_ID}/sounds/hangup.ogg`;
 export const RINGBACK_SRC = `modules/${MODULE_ID}/sounds/ringback.ogg`;
+// Long tone when a secure line is set up (temporary sound: the Cyberpunk ring).
+export const SECURE_SRC = `modules/${MODULE_ID}/sounds/ring-cyber.ogg`;
 export const VIBRATE_SRC = `modules/${MODULE_ID}/sounds/vibrate.ogg`;
 /** Stored value for a hidden number (internal data, shown translated). */
 export const MASKED = "Numéro masqué"; // kept in French: stored in existing data

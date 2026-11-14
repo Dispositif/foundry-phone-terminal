@@ -226,7 +226,9 @@
       "Inbox_locked": "Locked",
       "Inbox_none": "None (files only)",
       "NoPlace": "No location (network access)",
-      "NoPlaceHint": "Without a location, the device is reached over the network only: give players access to it from the Items sidebar (Observer). Handy for a shared case-file database."
+      "NoPlaceHint": "Without a location, the device is reached over the network only: give players access to it from the Items sidebar (Observer). Handy for a shared case-file database.",
+      "Secure": "Secure (encrypted)",
+      "SecureHint": "Calls and messages are encrypted when the other end is secure too."
     },
     "Ok": "OK",
     "NewDevice": "New device",
@@ -598,6 +600,15 @@
       "MailFrom": "from {name}",
       "MailTo": "to {name}",
       "FollowsMailbox": "Email attachment: follows the mailbox ({state})"
+    },
+    "Secure": {
+      "Line": "Secure line",
+      "LineHint": "Encrypted call: both devices are secure.",
+      "Message": "Encrypted message",
+      "Device": "Secure device (encrypted)",
+      "BoxHint": "The NPC talks on a secure line. Encrypted only if the agent's device is secure. Remembered for this NPC.",
+      "On": "Secure line with this NPC (click to turn off)",
+      "Off": "Line in clear with this NPC (click to make it secure)"
     }
   }
 }

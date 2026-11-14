@@ -1,4 +1,4 @@
-import { ApplicationV2, HANGUP_SRC, MODULE_ID, SOCKET } from "./constants.js";
+import { ApplicationV2, HANGUP_SRC, MODULE_ID, SECURE_SRC, SOCKET } from "./constants.js";
 import { getPhoneData, isFixed, patchLog } from "./devices.js";
 import { esc, isActiveGM, isMasked, playLocal, rerenderAll } from "./util.js";
 import { t } from "./i18n.js";
@@ -25,12 +25,20 @@ export function agentSide(item, userId) {
   const actor = item?.parent instanceof Actor ? item.parent : user?.character ?? null;
   const place = isFixed(phone) ? game.scenes.get(phone.sceneId)?.name : null;
   const name = actor?.name ?? user?.name ?? "?";
-  return { pc: true, compromised: !!phone?.compromised, name, img: actor?.img ?? null, sub: [phone?.label, place].filter(Boolean).join(", "), seen: name, number: String(phone?.number ?? ""), userIds: userId ? [userId] : [], itemUuid: item?.uuid ?? null };
+  return { pc: true, compromised: !!phone?.compromised, secure: !!phone?.secure, name, img: actor?.img ?? null, sub: [phone?.label, place].filter(Boolean).join(", "), seen: name, number: String(phone?.number ?? ""), userIds: userId ? [userId] : [], itemUuid: item?.uuid ?? null };
 }
 
-/** GM: the NPC end. seen = name on the agent's device, gm = name for the GM (NPC directory). */
-export function npcSide(number, seen, gm = seen) {
-  return { pc: false, number: String(number ?? ""), seen, gm, userIds: [], itemUuid: null };
+/**
+ * GM: the NPC end. seen = name on the agent's device, gm = name for the GM (NPC directory).
+ * secure = the GM speaks for the NPC on a secure line.
+ */
+export function npcSide(number, seen, gm = seen, secure = false) {
+  return { pc: false, number: String(number ?? ""), seen, gm, secure: !!secure, userIds: [], itemUuid: null };
+}
+
+/** A secure line: both ends are secure (encrypted) devices, or a secure NPC. */
+export function secureLine(a, b) {
+  return !!(a?.secure && b?.secure);
 }
 
 /** Server clock: the same on every client, so the timers agree (and survive a reload). */
@@ -38,9 +46,9 @@ const now = () => game.time?.serverTime ?? Date.now();
 
 /** GM: the call was answered. Opens the window for everyone. */
 export function startLive(callId, a, b) {
-  const data = { callId, a, b, since: now() };
+  const data = { callId, a, b, since: now(), secure: secureLine(a, b) };
   game.socket.emit(SOCKET, { type: "liveStart", ...data });
-  openLive(data);
+  openLive(data, { answered: true });
   saveLive();
 }
 
@@ -51,7 +59,7 @@ export function startLive(callId, a, b) {
 function saveLive() {
   if (!isActiveGM()) return;
   const keep = {};
-  for (const d of liveCalls.values()) if (!d.ended && !d.dialing) keep[d.callId] = { callId: d.callId, a: d.a, b: d.b, since: d.since };
+  for (const d of liveCalls.values()) if (!d.ended && !d.dialing) keep[d.callId] = { callId: d.callId, a: d.a, b: d.b, since: d.since, secure: !!d.secure };
   game.settings.set(MODULE_ID, "liveCalls", keep);
 }
 
@@ -71,10 +79,12 @@ export function lineBusy({ ringing = false } = {}) {
   return [...liveCalls.values()].some((d) => !d.ended && (ringing || !d.dialing));
 }
 
-export function openLive(data) {
+/** answered: the call was just picked up (not a reload), so a secure line beeps for the two ends. */
+export function openLive(data, { answered = false } = {}) {
   data = { ...data, since: data.since ?? now() };
   delete data.type;
   liveCalls.set(data.callId, data);
+  if (answered && data.secure && (game.user.isGM || mySide(data))) playLocal(SECURE_SRC);
   startTicker();
   // A spectator's window opened while it was ringing: now on the line.
   const dialWindow = windows.get(data.callId);
@@ -153,7 +163,7 @@ const UNKNOWN = { pc: false, seen: "", number: "", userIds: [] };
 
 /** GM: the call window while it rings (calling as an NPC: hang-up button; between agents: "network unavailable"). */
 export function openGmRing(callId, a, b) {
-  liveCalls.set(callId, { callId, a, b, dialing: true, ringing: true });
+  liveCalls.set(callId, { callId, a, b, dialing: true, ringing: true, secure: secureLine(a, b) });
   openWindow(callId);
 }
 
@@ -227,11 +237,13 @@ export function timerHtml(data) {
 
 /** Status line: on the line (green, running timer), or ended / cut off (stopped timer). */
 export function statusHtml(data) {
-  if (data.dialing) return `<span class="spt-live-state dialing"><i class="fas fa-circle"></i> ${t(data.ringing ? "Call.Ringing" : "Call.Calling")}</span>`;
+  // Secure line: shown to the two ends and the GM (the rest of the table cannot tell).
+  const secure = data.secure && (game.user.isGM || mySide(data)) ? ` <span class="spt-live-secure" title="${t("Secure.LineHint")}"><i class="fas fa-shield-halved"></i> ${t("Secure.Line")}</span>` : "";
+  if (data.dialing) return `<span class="spt-live-state dialing"><i class="fas fa-circle"></i> ${t(data.ringing ? "Call.Ringing" : "Call.Calling")}</span>${secure}`;
   // A cut line looks like a plain hang-up to the players: only the GM knows.
   const cut = data.ended?.reason === "cut" && game.user.isGM;
   const label = !data.ended ? t("Live.OnLine") : cut ? t("Live.Cut") : t("Live.Ended");
-  return `<span class="spt-live-state ${data.ended ? `ended ${cut ? "cut" : ""}` : ""}"><i class="fas fa-circle"></i> ${label}</span> ${timerHtml(data)}`;
+  return `<span class="spt-live-state ${data.ended ? `ended ${cut ? "cut" : ""}` : ""}"><i class="fas fa-circle"></i> ${label}</span> ${timerHtml(data)}${secure}`;
 }
 
 /**

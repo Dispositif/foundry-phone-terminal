@@ -1,5 +1,5 @@
 import { MODULE_ID, RING_SRC, SMS_SRC } from "./constants.js";
-import { addLog, displayName, getPhoneData, holderName, holders, isLandline, keyFor, modelOf, phonesByNumber, gmName, isUnknownNumber } from "./devices.js";
+import { addLog, isSecure, secureWith, setSecureWith, displayName, getPhoneData, holderName, holders, isLandline, keyFor, modelOf, phonesByNumber, gmName, isUnknownNumber } from "./devices.js";
 import { deliverToPhone } from "./messages.js";
 import { RingDialog } from "./player-calls.js";
 import { finishOrigin, hangUp, networkBusy, pendingCalls, ring } from "./ring.js";
@@ -41,12 +41,14 @@ export async function onPlayerSms({ fromItemUuid, to, text, att = null, fwd = fa
   warnCompromised(fromPhone, ...targets.map((p) => p.phone));
 
   if (targets.length) {
-    // Between PCs: delivered directly (nothing in the chat).
-    await addLog(from, { kind: "sms", dir: "out", with: key, text, pj: true, ...extra });
-    for (const p of targets) await deliverToPhone(p, fromPhone.number, text, att, { fwd });
+    // Between PCs: delivered directly (nothing in the chat). Encrypted when both devices are secure.
+    const secure = isSecure(fromPhone) && targets.every((p) => isSecure(p.phone));
+    await addLog(from, { kind: "sms", dir: "out", with: key, text, pj: true, ...extra, ...(secure ? { secure: true } : {}) });
+    for (const p of targets) await deliverToPhone(p, fromPhone.number, text, att, { fwd, secure });
   } else {
-    // To an NPC: lands with the GM.
-    await addLog(from, { kind: "sms", dir: "out", with: key, text, seen: false, ...extra });
+    // To an NPC: lands with the GM. Encrypted if the GM set a secure line with this NPC.
+    const secure = secureWith(fromPhone, key);
+    await addLog(from, { kind: "sms", dir: "out", with: key, text, seen: false, ...extra, ...(secure ? { secure: true } : {}) });
     const toName = displayName(fromPhone, key);
     ui.notifications.info(`📱 ${t("Gm.WritesTo", { who, name: toName })}`);
     playLocal(SMS_SRC);
@@ -91,6 +93,9 @@ export async function onPlayerCall({ fromItemUuid, to, callId, userId }) {
   const call = { done: false, sound: null, dialog: null, origin };
   gmIncoming.set(callId, call);
   rerenderAll(); // GM floating button turns orange
+  // Secure device: the GM picks whether the NPC answers on a secure line (remembered for this NPC).
+  const canSecure = isSecure(fromPhone);
+  let secure = secureWith(fromPhone, key);
   const finish = (result) => {
     if (call.done) return;
     call.done = true;
@@ -99,15 +104,27 @@ export async function onPlayerCall({ fromItemUuid, to, callId, userId }) {
     rerenderAll();
     if (call.dialog?.rendered) call.dialog.close();
     if (result !== "cancelled") finishOrigin(origin, result);
-    if (result === "answer") startLive(callId, agentSide(from, userId), npcSide(key, origin.name, gmName(fromPhone, key)));
+    if (result === "answer") {
+      if (canSecure) setSecureWith(from, key, secure);
+      startLive(callId, agentSide(from, userId), npcSide(key, origin.name, gmName(fromPhone, key), secure));
+    }
     else addLog(from, { kind: "call", call: callId, dir: "out", with: key, result: "cancelled" });
   };
   const dialog = new RingDialog({
     window: { title: emptyRooms ? t("Gm.EmptyLandlineCall") : t("Gm.AgentCalling"), icon: emptyRooms ? "fas fa-phone" : "fas fa-mobile-screen" },
     classes: ["spt-phone-ring-dialog"],
     position: { width: 520 },
-    content: `<div class="spt-phone-ring"><i class="fas fa-phone-volume"></i><p class="spt-caller">${esc(gmName(fromPhone, key))}${isUnknownNumber(fromPhone, key) ? ` <small>(${t("Directory.Unknown")})</small>` : ""}</p>${place ? `<p><strong>${esc(place)}</strong><br><em>${t("Gm.NobodyThere")}</em></p>` : ""}<p>${t("Gm.CalledBy", { who: `<strong>${esc(who)}</strong>` })}</p>${fromPhone.compromised ? `<p class="spt-compromised"><i class="fas fa-triangle-exclamation"></i> ${t("Gm.CompromisedDevice", { label: esc(fromPhone.label) })}</p>` : ""}</div>`,
-    buttons: Object.entries(NPC_OUTCOMES).map(([action, o]) => ({ action, label: o.label, icon: o.icon, default: action === "answer", callback: () => action })),
+    content: `<div class="spt-phone-ring"><i class="fas fa-phone-volume"></i><p class="spt-caller">${esc(gmName(fromPhone, key))}${isUnknownNumber(fromPhone, key) ? ` <small>(${t("Directory.Unknown")})</small>` : ""}</p>${place ? `<p><strong>${esc(place)}</strong><br><em>${t("Gm.NobodyThere")}</em></p>` : ""}<p>${t("Gm.CalledBy", { who: `<strong>${esc(who)}</strong>` })}</p>${fromPhone.compromised ? `<p class="spt-compromised"><i class="fas fa-triangle-exclamation"></i> ${t("Gm.CompromisedDevice", { label: esc(fromPhone.label) })}</p>` : ""}${canSecure ? secureBox(secure) : ""}</div>`,
+    buttons: Object.entries(NPC_OUTCOMES).map(([action, o]) => ({
+      action,
+      label: o.label,
+      icon: o.icon,
+      default: action === "answer",
+      callback: (event, button) => {
+        if (canSecure) secure = !!button.form?.elements.secure?.checked;
+        return action;
+      }
+    })),
     submit: (result) => {
       call.dialog = null;
       finish(result);
@@ -119,6 +136,11 @@ export async function onPlayerCall({ fromItemUuid, to, callId, userId }) {
   dialog.render({ force: true });
   call.sound = await playLocal(RING_SRC, { loop: true });
   if (call.done) call.sound?.stop();
+}
+
+/** GM: "Secure line" box, for a secure device (the NPC talks on a secure line). */
+export function secureBox(checked) {
+  return `<label class="spt-secure-box" title="${t("Secure.BoxHint")}"><input type="checkbox" name="secure" ${checked ? "checked" : ""}> <i class="fas fa-shield-halved"></i> ${t("Secure.Line")}</label>`;
 }
 
 export function onPlayerHangup({ callId }) {
