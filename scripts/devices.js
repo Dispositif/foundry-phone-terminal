@@ -495,7 +495,7 @@ export function pickItemType() {
   return types.find((t) => /equip|gear|item|stuff|objet|possession|inventory/i.test(t)) ?? types[0];
 }
 
-export async function createPhone(actor, { label, number, model = "smartphone", sceneId = null, theme = null }) {
+export async function createPhone(actor, { label, number, model = "smartphone", sceneId = null, theme = null, secure = false }) {
   const options = actor ? { parent: actor, spt: true } : { spt: true };
   const item = await Item.create(
     {
@@ -504,7 +504,7 @@ export async function createPhone(actor, { label, number, model = "smartphone", 
       img: modelImg(model),
       flags: {
         core: { sheetClass: SHEET_ID },
-        [MODULE_ID]: { phone: { label, number, model, sceneId, theme: cleanTheme(theme ?? newTheme(model), model), mode: "on", contacts: [], log: [] } }
+        [MODULE_ID]: { phone: { label, number, model, sceneId, theme: cleanTheme(theme ?? newTheme(model), model), mode: "on", contacts: [], log: [], ...(secure ? { secure: true } : {}) } }
       }
     },
     options

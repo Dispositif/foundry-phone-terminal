@@ -43,7 +43,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
         <div class="form-group"><label>${t("Form.Number")}</label><input type="text" name="number" value="${esc(number)}"><p class="hint">${t("Form.NumberHint")}</p></div>
         <div class="form-group spt-if-themes"><label>${t("Form.Theme")}</label><select name="theme">${themeOpts}</select></div>
         <div class="form-group spt-if-computer"><label>${t("Form.Inbox")}</label><select name="inbox">${["on", "locked", "none"].map((k) => `<option value="${k}" ${k === inbox ? "selected" : ""}>${t(`Form.Inbox_${k}`)}</option>`).join("")}</select></div>
-        <div class="form-group"><label><i class="fas fa-shield-halved"></i> ${t("Form.Secure")}</label><div class="form-fields"><input type="checkbox" name="secure" ${secure ? "checked" : ""}></div><p class="hint">${t("Form.SecureHint")}</p></div>
+        ${secureRow(secure)}
       </div>`,
     render: (event, x) => {
       // v13+: (event, dialog); an HTML element is accepted too.
@@ -110,6 +110,11 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
     ],
     rejectClose: false
   });
+}
+
+/** "Secure (encrypted)" option, in New device and Edit device. */
+function secureRow(checked) {
+  return `<div class="spt-secure-row"><label class="spt-secure-check"><input type="checkbox" name="secure" ${checked ? "checked" : ""}> <i class="fas fa-shield-halved"></i> ${t("Form.Secure")}</label><p class="hint">${t("Form.SecureHint")}</p></div>`;
 }
 
 export function playerActors() {
@@ -230,6 +235,7 @@ function kindForm(kind) {
       model: kind.model,
       theme: kind.theme ?? f.theme?.value ?? DEFAULT_THEME,
       sceneId: fixed ? f.scene?.value || null : undefined,
+      secure: !!f.secure?.checked,
       open
     };
   };
@@ -246,6 +252,7 @@ function kindForm(kind) {
           <input type="text" name="number" value="${esc(randomAddress(kind.model))}">
           <button type="button" class="spt-dice" title="${t("NewDev.OtherNumber")}"><i class="fas fa-dice"></i></button></div><p class="hint">${t("Form.NumberHint")}</p></div>
         ${lookRow}
+        ${secureRow(false)}
       </div>`,
     render: (event, x) => {
       const root = x?.element ?? x;

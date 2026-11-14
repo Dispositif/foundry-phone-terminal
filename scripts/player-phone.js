@@ -500,13 +500,14 @@ export class PlayerPhone extends ApplicationV2 {
   }
 
   /** Incoming call on a smartphone or mobile: shown on its own screen, even when locked. */
-  _renderIncoming(p, mine, { caller, known, silent, img }) {
+  _renderIncoming(p, mine, { caller, known, silent, img, secure }) {
     return `${this._renderHeader(p, mine)}
       <div class="spt-lockscreen spt-incoming">
         <div class="spt-phone-ring ${silent ? "silent" : ""}">
           ${img ? `<div class="spt-live-face spt-ring-face" style="background-image:url('${esc(img)}')"></div>` : `<i class="fas fa-phone-volume"></i>`}
           <p class="spt-caller">${caller ? esc(caller) : t("Call.Ringing")}</p>
           ${known ? `<p>${t("Call.IsCalling")}</p>` : ""}
+          ${secure ? `<p class="spt-ring-secure"><i class="fas fa-shield-halved"></i> ${t("Secure.Line")}</p>` : ""}
         </div>
         <div class="spt-incoming-keys">
           <button type="button" class="spt-decline" data-action="decline" title="${t("Call.Decline")}"><i class="fas fa-phone-slash"></i></button>
@@ -690,7 +691,7 @@ export class PlayerPhone extends ApplicationV2 {
       : incoming
       ? `<div class="spt-dial-strip spt-lcd-ringing">
           <input type="text" value="${esc(incoming.caller ?? "")}" placeholder="${t("Call.Ringing")}" readonly tabindex="-1">
-          <i class="fas fa-phone-volume"></i>
+          ${incoming.secure ? `<i class="fas fa-shield-halved" title="${t("Secure.Line")}"></i>` : ""}<i class="fas fa-phone-volume"></i>
         </div>`
       : `<div class="spt-dial-strip">
           <input type="text" name="to" list="spt-yellow" value="${esc(this._state.to)}" placeholder="${t("Number")}" autocomplete="off">
@@ -807,7 +808,8 @@ export class PlayerPhone extends ApplicationV2 {
     const el = this.element;
     // Banners: GM preparation, secure device.
     const content = el.querySelector(".window-content");
-    const banner = { military: "Theme.Classified", federal: "Theme.GovSystem" }[skin];
+    // Military look: a banner on computers only (phones show none).
+    const banner = { military: cur && isComputer(cur.phone) ? "Theme.Restricted" : null, federal: "Theme.GovSystem" }[skin];
     if (content && banner) content.insertAdjacentHTML("afterbegin", `<div class="spt-banner">${t(banner)}</div>`);
     if (content && this.gm && cur) content.insertAdjacentHTML("beforeend", `<div class="spt-gm-ribbon"><i class="fas fa-pen"></i> ${t("Theme.GmView")}</div>`);
     if (!this.gm && cur && isLandline(cur.phone)) {

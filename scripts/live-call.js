@@ -266,7 +266,7 @@ export function endLive(callId, reason = "hangup") {
     const dur = Math.round((now() - data.since) / 1000);
     for (const side of [data.a, data.b]) {
       const item = side?.itemUuid ? fromUuidSync(side.itemUuid) : null;
-      if (item) patchLog(item, (e) => e.call === callId && e.result === "answer", { dur });
+      if (item) patchLog(item, (e) => e.call === callId && e.result === "answer", { dur, ...(data.secure ? { secure: true } : {}) });
     }
   }
   saveLive();

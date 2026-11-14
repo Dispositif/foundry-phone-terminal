@@ -443,8 +443,8 @@
       "neon": "Néon",
       "glitch": "Glitch (parasité)",
       "console": "Console texte",
-      "military": "Sécurisé (militaire)",
-      "Classified": "Confidentiel défense",
+      "military": "Militaire",
+      "Restricted": "Usage restreint",
       "GmView": "Vue MJ · préparation",
       "modern": "Moderne, à touches (1980-2020)",
       "federal": "Fédéral (FBI)",
@@ -606,9 +606,11 @@
       "LineHint": "Appel chiffré : les deux appareils sont sécurisés.",
       "Message": "Message chiffré",
       "Device": "Appareil sécurisé (chiffré)",
-      "BoxHint": "Le PNJ parle sur une ligne sécurisée. Chiffré seulement si l'appareil de l'agent est sécurisé. Retenu pour ce PNJ.",
+      "BoxHint": "Le PNJ parle sur une ligne sécurisée. Retenu pour ce PNJ sur cet appareil.",
       "On": "Ligne sécurisée avec ce PNJ (cliquer pour la couper)",
-      "Off": "Ligne en clair avec ce PNJ (cliquer pour la sécuriser)"
+      "Off": "Ligne en clair avec ce PNJ (cliquer pour la sécuriser)",
+      "Send": "Envoi sécurisé",
+      "Ring": "Appel sécurisé"
     }
   }
 }
