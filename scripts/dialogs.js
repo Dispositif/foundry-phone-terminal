@@ -1,7 +1,7 @@
 import { DialogV2, MODULE_ID } from "./constants.js";
 import { DEFAULT_THEME, MODELS, directoryText, createPhone, newTheme, getPhoneData, markPhone, randomAddress, shownTheme, themeChoices } from "./devices.js";
 import { modelAllowed } from "./universes.js";
-import { esc, isMailAddress, norm } from "./util.js";
+import { esc, isMailAddress, norm, shieldIcon } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
 /*  Dialogs (GM, and contacts for the player)    */
@@ -114,7 +114,7 @@ export async function phoneFormDialog({ title, selectHtml = "", label = null, nu
 
 /** "Secure (encrypted)" option, in New device and Edit device. */
 function secureRow(checked) {
-  return `<div class="spt-secure-row"><label class="spt-secure-check"><input type="checkbox" name="secure" ${checked ? "checked" : ""}> <i class="fas fa-shield-halved"></i> ${t("Form.Secure")}</label><p class="hint">${t("Form.SecureHint")}</p></div>`;
+  return `<div class="spt-secure-row"><label class="spt-secure-check"><input type="checkbox" name="secure" ${checked ? "checked" : ""}> ${shieldIcon()} ${t("Form.Secure")}</label><p class="hint">${t("Form.SecureHint")}</p></div>`;
 }
 
 export function playerActors() {

@@ -1,4 +1,4 @@
-import { MODULE_ID, RING_SRC, SMS_SRC } from "./constants.js";
+import { MODULE_ID, RING_SRC, SECURE_ICON, SMS_SRC } from "./constants.js";
 import { addLog, isSecure, secureWith, setSecureWith, displayName, getPhoneData, holderName, holders, isLandline, keyFor, modelOf, phonesByNumber, gmName, isUnknownNumber } from "./devices.js";
 import { deliverToPhone } from "./messages.js";
 import { RingDialog } from "./player-calls.js";
@@ -130,7 +130,7 @@ export async function onPlayerCall({ fromItemUuid, to, callId, userId }) {
     buttons: Object.entries(NPC_OUTCOMES).flatMap(([action, o]) => {
       const button = { action, label: o.label, icon: o.icon, default: action === "answer" && !(canSecure && remembered), callback: () => action };
       if (action !== "answer" || !canSecure) return [button];
-      return [button, { action: "answerSecure", label: t("Secure.Answer"), icon: "fas fa-shield-halved", default: remembered, callback: () => "answerSecure" }];
+      return [button, { action: "answerSecure", label: t("Secure.Answer"), icon: `fas ${SECURE_ICON}`, default: remembered, callback: () => "answerSecure" }];
     }),
     submit: (result) => {
       call.dialog = null;

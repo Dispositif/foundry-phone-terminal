@@ -538,6 +538,16 @@ export async function unmarkPhone(item) {
 }
 
 
+/** The phone the player's character carries (smartphone first, then mobile), or null. */
+export function carriedPhone(user) {
+  const actor = user?.character ?? null;
+  if (!actor) return null;
+  const order = ["smartphone", "mobile"];
+  return allPhones()
+    .filter((p) => p.actor === actor && order.includes(p.phone.model))
+    .sort((a, b) => order.indexOf(a.phone.model) - order.indexOf(b.phone.model))[0] ?? null;
+}
+
 /**
  * GM: the device a message or call "to a player" lands on. The player's character carried phone
  * (smartphone first, then mobile); if it has none, one of the universe's default model is created.
@@ -546,11 +556,8 @@ export async function unmarkPhone(item) {
 export async function defaultDeviceFor(user) {
   const actor = user?.character ?? null;
   if (!actor) return null;
-  const order = ["smartphone", "mobile"];
-  const carried = allPhones()
-    .filter((p) => p.actor === actor && order.includes(p.phone.model))
-    .sort((a, b) => order.indexOf(a.phone.model) - order.indexOf(b.phone.model));
-  if (carried.length) return carried[0];
+  const carried = carriedPhone(user);
+  if (carried) return carried;
   const model = universe().defaultModel;
   const label = MODELS[model]?.label ?? MODELS.smartphone.label;
   const item = await createPhone(actor, { label, number: randomAddress(model), model, theme: DEFAULT_THEME });

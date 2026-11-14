@@ -1,4 +1,4 @@
-import { AudioHelper, MASKED, MODULE_ID } from "./constants.js";
+import { AudioHelper, MASKED, MODULE_ID, SECURE_ICON } from "./constants.js";
 import { updateFab } from "./fab.js";
 import { t } from "./i18n.js";
 import { PhonePanel } from "./gm-panel.js";
@@ -13,6 +13,11 @@ export function esc(str) {
   const div = document.createElement("div");
   div.textContent = String(str ?? "");
   return div.innerHTML;
+}
+
+/** Shield icon of secure devices, lines and messages (title: tooltip, cls: extra classes). */
+export function shieldIcon({ title = "", cls = "" } = {}) {
+  return `<i class="fas ${SECURE_ICON}${cls ? ` ${cls}` : ""}"${title ? ` title="${esc(title)}"` : ""}></i>`;
 }
 
 export function nl2br(str) {

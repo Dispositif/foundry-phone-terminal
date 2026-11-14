@@ -1,7 +1,7 @@
 import { attChipHtml, attFromDrop, pickImage } from "./attachments.js";
 import { ApplicationV2, DialogV2, HandlebarsApplicationMixin, MASKED, MODES, MODULE_ID } from "./constants.js";
 import { filesOverview, previewEntry, previewFile, setFileStates } from "./files.js";
-import { allPhones, phonesByNumber, holders, sharedUsers, displayName, getLog, getPhoneData, hasSignal, holderName, inDeadZone, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc, isComputer, isSecure, secureWith, setSecureWith } from "./devices.js";
+import { allPhones, phonesByNumber, holders, sharedUsers, displayName, getLog, getPhoneData, hasSignal, holderName, inDeadZone, isFixed, keyFor, modelOf, msgOn, patchLog, phoneLabel, sameConv, unmarkPhone, unreadCount, modeOf, gmName, isUnknownNumber, npcDirectory, findNpc, isComputer, isSecure, secureWith, setSecureWith, carriedPhone } from "./devices.js";
 import { contactsDialog, directoryDialog, editPhoneDialog, giveDialog, newPhoneDialog } from "./dialogs.js";
 import { copyJournalLink } from "./journal-links.js";
 import { openPhone } from "./main.js";
@@ -509,8 +509,8 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!canCall && canMessage) this._state.mode = "message";
     const messaging = canMessage && canCall;
     // "Secure line" box: only for a secure recipient (a player: their character's carried phone).
-    const tpUser = kind === "user" ? phones.filter((p) => p.actor && p.actor === game.users.get(id)?.character && ["smartphone", "mobile"].includes(p.phone.model)) : [];
-    const canSecure = [...tp, ...tpUser].some((p) => isSecure(p.phone));
+    const tpUser = kind === "user" ? carriedPhone(game.users.get(id)) : null;
+    const canSecure = [...tp, ...(tpUser ? [tpUser] : [])].some((p) => isSecure(p.phone));
     return {
       tab: this._state.tab,
       mode: this._state.mode,
@@ -591,7 +591,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     this._readForm();
     if (!this._state.target) return ui.notifications.warn(t("Warn.NoRecipient"));
     this._rememberSender();
-    ring(this._state.target, { caller: this._normSender(), secure: this._secureChoice(secure) });
+    ring(this._state.target, { caller: this._normSender(), secure });
   }
 
   /** Files tab: every computer file, by device or by source journal. */
@@ -638,11 +638,6 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     return [...opts.values()];
   }
 
-  /** Send tab, secure recipient: which button was used. Otherwise the device's memory for that NPC decides. */
-  _secureChoice(secure) {
-    return this.element?.querySelector(".spt-gm-send .spt-secure-btn") ? secure : undefined;
-  }
-
   /** Remembers the last senders used (this session only). */
   _rememberSender() {
     const s = this._state.sender.trim();
@@ -663,7 +658,7 @@ export class PhonePanel extends HandlebarsApplicationMixin(ApplicationV2) {
     this._readForm();
     if (!this._state.target) return ui.notifications.warn(t("Warn.NoRecipient"));
     this._rememberSender();
-    await sendSms(this._state.target, this._state.text, { sender: this._normSender(), att: this._state.att, secure: this._secureChoice(secure) });
+    await sendSms(this._state.target, this._state.text, { sender: this._normSender(), att: this._state.att, secure });
     this._state.text = "";
     this._state.att = null;
     this._skipRead = true;

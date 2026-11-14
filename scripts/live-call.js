@@ -1,6 +1,6 @@
 import { ApplicationV2, HANGUP_SRC, MODULE_ID, SECURE_SRC, SOCKET } from "./constants.js";
 import { getPhoneData, isFixed, patchLog } from "./devices.js";
-import { esc, isActiveGM, isMasked, playLocal, rerenderAll } from "./util.js";
+import { esc, isActiveGM, isMasked, playLocal, rerenderAll, shieldIcon } from "./util.js";
 import { t } from "./i18n.js";
 import { PlayerPhone } from "./player-phone.js";
 import { failCall, hangUp } from "./ring.js";
@@ -238,7 +238,7 @@ export function timerHtml(data) {
 /** Status line: on the line (green, running timer), or ended / cut off (stopped timer). */
 export function statusHtml(data) {
   // Secure line: shown to the two ends and the GM (the rest of the table cannot tell).
-  const secure = data.secure && (game.user.isGM || mySide(data)) ? ` <span class="spt-live-secure" title="${t("Secure.LineHint")}"><i class="fas fa-shield-halved"></i> ${t("Secure.Line")}</span>` : "";
+  const secure = data.secure && (game.user.isGM || mySide(data)) ? ` <span class="spt-live-secure" title="${t("Secure.LineHint")}">${shieldIcon()} ${t("Secure.Line")}</span>` : "";
   if (data.dialing) return `<span class="spt-live-state dialing"><i class="fas fa-circle"></i> ${t(data.ringing ? "Call.Ringing" : "Call.Calling")}</span>${secure}`;
   // A cut line looks like a plain hang-up to the players: only the GM knows.
   const cut = data.ended?.reason === "cut" && game.user.isGM;

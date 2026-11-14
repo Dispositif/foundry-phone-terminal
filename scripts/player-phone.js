@@ -9,7 +9,7 @@ import { bindDrop, bindIconSelects, deviceSelect } from "./gm-panel.js";
 import { activeCall, endCall, outgoing, playerCall, playerSendSms } from "./player-calls.js";
 import { dismissEnded, hangUpLive, liveOn, otherEnd, phoneClosed, statusHtml } from "./live-call.js";
 import { attShowHtml, findEntry, forwardEntry, openReader, showScreen } from "./share.js";
-import { deviceNotice, esc, isMasked, nl2br } from "./util.js";
+import { deviceNotice, esc, isMasked, nl2br, shieldIcon } from "./util.js";
 import { openPager } from "./pager.js";
 import { t, tn } from "./i18n.js";
 /* -------------------------------------------- */
@@ -507,7 +507,7 @@ export class PlayerPhone extends ApplicationV2 {
           ${img ? `<div class="spt-live-face spt-ring-face" style="background-image:url('${esc(img)}')"></div>` : `<i class="fas fa-phone-volume"></i>`}
           <p class="spt-caller">${caller ? esc(caller) : t("Call.Ringing")}</p>
           ${known ? `<p>${t("Call.IsCalling")}</p>` : ""}
-          ${secure ? `<p class="spt-ring-secure"><i class="fas fa-shield-halved"></i> ${t("Secure.Line")}</p>` : ""}
+          ${secure ? `<p class="spt-ring-secure">${shieldIcon()} ${t("Secure.Line")}</p>` : ""}
         </div>
         <div class="spt-incoming-keys">
           <button type="button" class="spt-decline" data-action="decline" title="${t("Call.Decline")}"><i class="fas fa-phone-slash"></i></button>
@@ -608,7 +608,7 @@ export class PlayerPhone extends ApplicationV2 {
       ? `${contactsBtn}<a data-action="gmItemSheet" title="${t("Sheet.ItemSheet")}" aria-label="${t("Sheet.ItemSheet")}"><i class="fas fa-file-lines"></i></a>`
       : contactsBtn;
     // Secure device: a shield next to the signal.
-    const secure = isSecure(p.phone) ? `<i class="fas fa-shield-halved spt-secure-badge" title="${t("Secure.Device")}"></i>` : "";
+    const secure = isSecure(p.phone) ? shieldIcon({ title: t("Secure.Device"), cls: "spt-secure-badge" }) : "";
     return `<header class="spt-phone-top">${phoneSel}${secure}${signal}${gmTools}<div class="spt-modes">${modeBtns}</div></header>`;
   }
 
@@ -648,7 +648,7 @@ export class PlayerPhone extends ApplicationV2 {
     };
     // Encrypted message (secure line): a small shield.
     // An <i>, not a <span>: bubble spans are full-width blocks that would cover the share icons.
-    const secureTag = (e) => (e.secure ? `<i class="fas fa-shield-halved spt-secure-tag" title="${t("Secure.Message")}"></i>` : "");
+    const secureTag = (e) => (e.secure ? shieldIcon({ title: t("Secure.Message"), cls: "spt-secure-tag" }) : "");
     const fwdTag = (e) => (e.fwd ? `<span class="spt-fwd"><i class="fas fa-share"></i> ${t("Fwd.Forwarded")}</span>` : "");
     // Federal look: each email becomes a case file, with a stable reference and a stamp on received ones.
     const federal = skinOf(p.phone) === "federal";
@@ -694,7 +694,7 @@ export class PlayerPhone extends ApplicationV2 {
       : incoming
       ? `<div class="spt-dial-strip spt-lcd-ringing">
           <input type="text" value="${esc(incoming.caller ?? "")}" placeholder="${t("Call.Ringing")}" readonly tabindex="-1">
-          ${incoming.secure ? `<i class="fas fa-shield-halved" title="${t("Secure.Line")}"></i>` : ""}<i class="fas fa-phone-volume"></i>
+          ${incoming.secure ? shieldIcon({ title: t("Secure.Line") }) : ""}<i class="fas fa-phone-volume"></i>
         </div>`
       : `<div class="spt-dial-strip">
           <input type="text" name="to" list="spt-yellow" value="${esc(this._state.to)}" placeholder="${t("Number")}" autocomplete="off">

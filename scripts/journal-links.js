@@ -2,7 +2,7 @@ import { MASKED } from "./constants.js";
 import { allPhones, isComputer, phonesByNumber } from "./devices.js";
 import { sendSms } from "./messages.js";
 import { ring } from "./ring.js";
-import { esc, isMasked, maskedLabel, norm } from "./util.js";
+import { esc, isMasked, maskedLabel, norm, shieldIcon } from "./util.js";
 import { t } from "./i18n.js";
 /* -------------------------------------------- */
 /*  @SMS / @Mail / @Call links in journals      */
@@ -92,7 +92,7 @@ export function registerEnrichers() {
       Object.assign(a.dataset, { kind, to, from, text, att: attStr, secure: secure ? "1" : "" });
       a.title = t("Link.ClickToSend");
       const who = esc(maskedLabel(from || MASKED));
-      const shield = secure ? `<i class="fas fa-shield-halved" title="${t("Secure.Line")}"></i> ` : "";
+      const shield = secure ? `${shieldIcon({ title: t("Secure.Line") })} ` : "";
       a.innerHTML = shield +
         (kind === "SMS"
           ? `<i class="fas ${msgIcon}"></i> ${who} → ${esc(to)}${attStr ? ' <i class="fas fa-paperclip"></i>' : ""} : « ${esc(text)} »`

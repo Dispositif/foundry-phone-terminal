@@ -1,7 +1,7 @@
 import { DialogV2, HANGUP_SRC, MODULE_ID, PICKUP_SRC, RINGBACK_SRC, RING_SRC, SOCKET, VIBRATE_SRC } from "./constants.js";
 import { displayName, findContact, getPhoneData, hasSignal, keyFor, modelOf, msgOn, phonesByNumber, skinOf, modeOf } from "./devices.js";
 import { updateFab } from "./fab.js";
-import { deviceNotice, esc, isMasked, maskedLabel, playLocal, rerenderAll } from "./util.js";
+import { deviceNotice, esc, isMasked, maskedLabel, playLocal, rerenderAll, shieldIcon } from "./util.js";
 import { PlayerPhone } from "./player-phone.js";
 import { t } from "./i18n.js";
 import { calledOn, lineBusy } from "./live-call.js";
@@ -37,7 +37,7 @@ export async function receiveRing({ callId, caller, callerNumber, callerImg, tim
     app._skipRead = true;
     app.render({ force: true }).then(() => app.bringToFront?.());
   } else {
-    const sec = secure ? `<p class="spt-ring-secure"><i class="fas fa-shield-halved"></i> ${t("Secure.Line")}</p>` : "";
+    const sec = secure ? `<p class="spt-ring-secure">${shieldIcon()} ${t("Secure.Line")}</p>` : "";
     const which = label ? `<p class="spt-which"><i class="fas ${icon}"></i> ${esc(label)}${silent ? ` (${t("Mode.silent").toLowerCase()})` : ""}</p>` : "";
     const dialog = new RingDialog({
       window: { title: t("Call.Incoming"), icon: `fas ${icon}` },
