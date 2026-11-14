@@ -13,8 +13,7 @@ export function smsHtml(sender, text, phoneName, att = null, mail = false, icon 
   return `<div class="spt-sms ${mail ? "spt-mail" : ""}"><div class="spt-sms-header"><i class="fas ${mail ? "fa-envelope" : "fa-comment-sms"}"></i> ${esc(maskedLabel(sender))} ${to}</div><div class="spt-sms-body">${body}</div></div>`;
 }
 
-/** Delivers a message to a PC's device: history, whispered chat, beep. */
-/** secure: sent on a secure line (only kept if this device is secure too). */
+/** Delivers a message to a PC's device: history, beep. secure = sent on a secure line (kept only if this device is secure too). */
 export async function deliverToPhone(p, senderKeyOrName, text, att = null, { fwd = false, secure = false } = {}) {
   const model = modelOf(p.phone);
   if (!msgOn(p.phone)) {
@@ -83,8 +82,8 @@ export async function flushAll() {
   for (const p of allPhones()) await flushPending(p.item);
 }
 
-/** Message sent by the GM. target = "phone:<number>" or "user:<id>" */
 /**
+ * Message sent by the GM. target = "phone:<number>" or "user:<id>".
  * secure: the GM writes as an NPC on a secure line ("Secure line" box), remembered on the device for that NPC.
  * Left undefined (journal links), the device's memory for that NPC decides.
  */
